@@ -1,8 +1,16 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@*
+   File: Views/Home/Index.cshtml
+   Noi dung: Trang chu
+   Sinh vien thuc hien: SV1 - Module 1
+*@
+@{
+    ViewData["Title"] = "Trang chu";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mt-5">
+    <h1 class="display-4">He thong quan ly cho thue xe</h1>
+    <p class="lead">De tai 20 - Nhom UNETI02 - Lop TI17A2HN</p>
+    <hr class="my-4" />
+    <p>Vui long dang nhap de su dung he thong.</p>
+    <a asp-controller="TaiKhoan" asp-action="DangNhap" class="btn btn-primary btn-lg">Dang nhap</a>
 </div>

@@ -1,47 +1,141 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@*
+   File: Views/Shared/_Layout.cshtml
+   Noi dung: Layout chinh, hien thi menu theo vai tro
+   Sinh vien thuc hien: Pham Gia Minh Hoang - 23103100087 - SV1
+   Module: Module 1 - Tai khoan, Dang nhap, Phan quyen, Loai xe, Hang xe
+*@
+@using Microsoft.AspNetCore.Http
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Helpers
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var session = HttpContextAccessor.HttpContext?.Session;
+    var daDangNhap = session?.DaDangNhap() ?? false;
+    var hoTen = session?.GetString(SessionKeys.HoTen) ?? "";
+    var vaiTro = session?.GetVaiTro() ?? "";
+    var laQuanTri = session?.LaQuanTri() ?? false;
+    var laKhachHang = session?.LaKhachHang() ?? false;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - QuanLyChoThueXe_UNETI02_TI17A2HN</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Quan Ly Cho Thue Xe</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/QuanLyChoThueXe_UNETI02_TI17A2HN.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">QuanLyChoThueXe_UNETI02_TI17A2HN</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    Quan Ly Cho Thue Xe
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav me-auto">
+                        @if (laQuanTri)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Quan ly danh muc</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="LoaiXe" asp-action="Index">Loai xe</a></li>
+                                    <li><a class="dropdown-item" asp-controller="HangXe" asp-action="Index">Hang xe</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Xe" asp-action="Index">Xe</a></li>
+                                    <li><a class="dropdown-item" asp-controller="BangGiaThue" asp-action="Index">Bang gia thue</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Nghiep vu</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="KhachHang" asp-action="Index">Khach hang</a></li>
+                                    <li><a class="dropdown-item" asp-controller="DatXe" asp-action="Index">Don dat xe</a></li>
+                                    <li><a class="dropdown-item" asp-controller="BanGiaoXe" asp-action="Index">Ban giao xe</a></li>
+                                    <li><a class="dropdown-item" asp-controller="TraXe" asp-action="Index">Tra xe</a></li>
+                                    <li><a class="dropdown-item" asp-controller="ThanhToan" asp-action="Index">Thanh toan</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="ThongKe" asp-action="Index">Thong ke</a>
+                            </li>
+                        }
+                        @if (laKhachHang)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">Trang chu</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Xe" asp-action="DanhSach">Xem xe</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="DatXe" asp-action="TimXeTrong">Tim xe trong</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="DatXe" asp-action="DonCuaToi">Don cua toi</a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (daDangNhap)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">
+                                    @hoTen (@vaiTro)
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="DoiMatKhau">Doi mat khau</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-controller="TaiKhoan" asp-action="DangXuat" method="post" class="px-2">
+                                            <button type="submit" class="btn btn-link dropdown-item p-0">Dang xuat</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="TaiKhoan" asp-action="DangNhap">Dang nhap</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container mt-4">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - QuanLyChoThueXe_UNETI02_TI17A2HN - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container py-3">
+            &copy; 2026 - Quan Ly Cho Thue Xe - UNETI02 - TI17A2HN
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
