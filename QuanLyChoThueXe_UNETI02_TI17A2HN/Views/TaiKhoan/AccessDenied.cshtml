@@ -1,0 +1,16 @@
+﻿@*
+   File: Views/TaiKhoan/AccessDenied.cshtml
+   Noi dung: Trang bao khong co quyen truy cap
+   Sinh vien thuc hien: Pham Gia Minh Hoang - 23103100087 - SV1
+   Module: Module 1 - Tai khoan, Dang nhap, Phan quyen, Loai xe, Hang xe
+*@
+@{
+    ViewData["Title"] = "Khong co quyen truy cap";
+}
+
+<div class="text-center mt-5">
+    <h1 class="display-1 text-danger">403</h1>
+    <h3 class="mb-3">Ban khong co quyen truy cap trang nay</h3>
+    <p class="text-muted">Vui long lien he quan tri vien neu ban cho rang day la loi.</p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Ve trang chu</a>
+</div>
