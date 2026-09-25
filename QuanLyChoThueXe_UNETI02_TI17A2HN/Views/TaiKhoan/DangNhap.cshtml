@@ -1,0 +1,67 @@
+﻿@*
+   File: Views/TaiKhoan/DangNhap.cshtml
+   Noi dung: Man hinh dang nhap
+   Sinh vien thuc hien: Pham Gia Minh Hoang - 23103100087 - SV1
+   Module: Module 1 - Tai khoan, Dang nhap, Phan quyen, Loai xe, Hang xe
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.TaiKhoan.DangNhapVM
+
+@{
+    ViewData["Title"] = "Dang nhap";
+    Layout = "_Layout";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">DANG NHAP HE THONG</h4>
+                <small>Quan ly cho thue xe - UNETI02</small>
+            </div>
+            <div class="card-body">
+                <form asp-action="DangNhap" method="post">
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="TenDangNhap" class="form-label"></label>
+                        <input asp-for="TenDangNhap" class="form-control" autofocus />
+                        <span asp-validation-for="TenDangNhap" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="MatKhau" class="form-label"></label>
+                        <input asp-for="MatKhau" class="form-control" />
+                        <span asp-validation-for="MatKhau" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input asp-for="GhiNho" class="form-check-input" />
+                        <label asp-for="GhiNho" class="form-check-label"></label>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Dang nhap</button>
+                    </div>
+                </form>
+
+                <hr class="my-4" />
+
+                <div class="alert alert-info mb-0">
+                    <strong>Tai khoan kiem thu:</strong>
+                    <ul class="mb-0 mt-2 small">
+                        <li>Admin: <code>admin</code> / <code>admin123</code></li>
+                        <li>Nhan vien: <code>nhanvien01</code> / <code>nv123456</code></li>
+                        <li>Khach hang: <code>kh01</code> / <code>kh123456</code></li>
+                        <li>Tai khoan bi khoa: <code>kh30</code> / <code>kh123456</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

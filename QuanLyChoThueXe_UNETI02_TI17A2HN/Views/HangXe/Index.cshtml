@@ -1,0 +1,132 @@
+﻿@*
+   File: Views/HangXe/Index.cshtml
+   Noi dung: Danh sach hang xe co tim kiem, loc, sap xep, phan trang
+   Sinh vien thuc hien: Pham Gia Minh Hoang - 23103100087 - SV1
+   Module: Module 1 - Tai khoan, Dang nhap, Phan quyen, Loai xe, Hang xe
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.HangXe.HangXeListVM
+
+@{
+    ViewData["Title"] = "Danh sach hang xe";
+    var quocGiaList = ViewBag.QuocGiaList as List<string> ?? new List<string>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Danh sach hang xe</h2>
+    <a asp-action="Create" class="btn btn-success">Them hang xe moi</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-2">
+            <div class="col-md-3">
+                <label class="form-label">Tu khoa</label>
+                <input type="text" name="tuKhoa" value="@Model.TuKhoa" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Quoc gia</label>
+                <select name="quocGia" class="form-select">
+                    <option value="">-- Tat ca --</option>
+                    @foreach (var qg in quocGiaList)
+                    {
+                        <option value="@qg" selected="@(Model.QuocGia == qg)">@qg</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Trang thai</label>
+                <select name="trangThai" class="form-select">
+                    <option value="">-- Tat ca --</option>
+                    <option value="true" selected="@(Model.TrangThai == true)">Hoat dong</option>
+                    <option value="false" selected="@(Model.TrangThai == false)">Ngung</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Sap xep</label>
+                <select name="sapXepTheo" class="form-select">
+                    <option value="">Mac dinh</option>
+                    <option value="tenhangxe" selected="@(Model.SapXepTheo == "tenhangxe")">Ten hang</option>
+                    <option value="quocgia" selected="@(Model.SapXepTheo == "quocgia")">Quoc gia</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Loc</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Ma</th>
+                <th>Ten hang xe</th>
+                <th>Quoc gia</th>
+                <th>Mo ta</th>
+                <th>Trang thai</th>
+                <th>Thao tac</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.DanhSach.Any())
+            {
+                foreach (var item in Model.DanhSach)
+                {
+                    <tr>
+                        <td>@item.MaHangXe</td>
+                        <td>@item.TenHangXe</td>
+                        <td>@(item.QuocGia ?? "-")</td>
+                        <td>@(item.MoTa ?? "-")</td>
+                        <td>
+                            @if (item.TrangThai)
+                            {
+                                <span class="badge bg-success">Hoat dong</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Ngung</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.MaHangXe" class="btn btn-sm btn-info">Chi tiet</a>
+                            <a asp-action="Edit" asp-route-id="@item.MaHangXe" class="btn btn-sm btn-warning">Sua</a>
+                            <form asp-action="DoiTrangThai" asp-route-id="@item.MaHangXe" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-secondary"
+                                        onclick="return confirm('Ban co chac muon doi trang thai?')">
+                                    @(item.TrangThai ? "Ngung" : "Kich hoat")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Khong co du lieu</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@{
+    var pagination = new QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.Shared.PaginationVM
+    {
+        Trang = Model.Trang,
+        TongSoTrang = Model.TongSoTrang,
+        Action = "Index",
+        Controller = "HangXe",
+        QueryParams = new Dictionary<string, string?>
+        {
+            ["tuKhoa"] = Model.TuKhoa,
+            ["quocGia"] = Model.QuocGia,
+            ["trangThai"] = Model.TrangThai?.ToString(),
+            ["sapXepTheo"] = Model.SapXepTheo
+        }
+    };
+}
+
+<partial name="_Pagination" model="pagination" />

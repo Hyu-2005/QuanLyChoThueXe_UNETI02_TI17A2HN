@@ -1,0 +1,47 @@
+﻿@* ============================================================
+   File: Views/Shared/_Pagination.cshtml
+   Noi dung: Partial view phan trang dung chung
+   Sinh vien thuc hien: [Ho ten SV1] - [MSSV SV1]
+   Module: Module 1
+   ============================================================ *@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.Shared.PaginationVM
+
+@if (Model.TongSoTrang > 1)
+{
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.CoTrangTruoc ? "" : "disabled")">
+                <a class="page-link"
+                       asp-action="@Model.Action"
+                       asp-controller="@Model.Controller"
+                       asp-all-route-data="Model.QueryParams"
+                       asp-route-trang="@(Model.Trang - 1)">
+                    Truoc
+                </a>
+            </li>
+
+            @for (int i = 1; i <= Model.TongSoTrang; i++)
+            {
+                <li class="page-item @(i == Model.Trang ? "active" : "")">
+                    <a class="page-link"
+                           asp-action="@Model.Action"
+                           asp-controller="@Model.Controller"
+                           asp-all-route-data="Model.QueryParams"
+                           asp-route-trang="@i">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(Model.CoTrangSau ? "" : "disabled")">
+                <a class="page-link"
+                       asp-action="@Model.Action"
+                       asp-controller="@Model.Controller"
+                       asp-all-route-data="Model.QueryParams"
+                       asp-route-trang="@(Model.Trang + 1)">
+                    Sau
+                </a>
+            </li>
+        </ul>
+    </nav>
+}
