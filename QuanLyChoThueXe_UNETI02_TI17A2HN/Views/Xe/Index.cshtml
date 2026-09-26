@@ -27,14 +27,14 @@
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-            <strong>✓ Thành công:</strong> @TempData["Success"]
+            <strong>Thành công:</strong> @TempData["Success"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-            <strong>✗ Lỗi:</strong> @TempData["Error"]
+            <strong>Lỗi:</strong> @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
@@ -42,7 +42,7 @@
     <!-- SEARCH & FILTER -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-white border-bottom py-3">
-            <h6 class="mb-0 fw-semibold text-secondary">TÌM KIẾM & LỌC</h6>
+            <h6 class="mb-0 fw-semibold text-secondary">TÌM KIẾM &amp; LỌC</h6>
         </div>
         <div class="card-body">
             <form method="get" asp-action="Index" id="filterForm">
@@ -137,12 +137,8 @@
                     </div>
 
                     <div class="col-12 d-flex gap-2 justify-content-end pt-3 border-top">
-                        <a asp-action="Index" class="btn btn-outline-secondary px-3">
-                            Xóa lọc
-                        </a>
-                        <button type="submit" class="btn btn-primary px-4">
-                            Áp dụng
-                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-3">Xóa lọc</a>
+                        <button type="submit" class="btn btn-primary px-4">Áp dụng</button>
                     </div>
                 </div>
             </form>
@@ -162,6 +158,7 @@
                         <th>Hãng xe</th>
                         <th>Năm SX</th>
                         <th>Số chỗ</th>
+                        <th>Km</th>
                         <th>Tình trạng</th>
                         <th class="text-end pe-4" style="width:180px">Thao tác</th>
                     </tr>
@@ -169,7 +166,7 @@
                 <tbody>
                     @if (Model.DanhSach.Any())
                     {
-                        @foreach (var xe in Model.DanhSach)
+                        foreach (var xe in Model.DanhSach)
                         {
                             <tr>
                                 <td class="ps-4">
@@ -183,10 +180,11 @@
                                     </span>
                                 </td>
                                 <td class="fw-semibold">@xe.TenXe</td>
-                                <td>@xe.LoaiXe?.TenLoaiXe</td>
-                                <td>@xe.HangXe?.TenHangXe</td>
+                                <td>@(xe.LoaiXe?.TenLoaiXe ?? "-")</td>
+                                <td>@(xe.HangXe?.TenHangXe ?? "-")</td>
                                 <td>@xe.NamSanXuat</td>
                                 <td>@xe.SoCho chỗ</td>
+                                <td>@xe.SoKmHienTai.ToString("N0")</td>
                                 <td>
                                     @{
                                         var badge = xe.TinhTrang switch
@@ -213,7 +211,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="9" class="text-center py-5 text-muted">
+                            <td colspan="10" class="text-center py-5 text-muted">
                                 <div class="display-6 text-secondary mb-2">—</div>
                                 Không có xe nào phù hợp
                             </td>
@@ -268,7 +266,7 @@
                                    asp-route-donGiaDen="@Model.DonGiaDen" asp-route-sapXepTheo="@Model.SapXepTheo"
                                    asp-route-thuTuSapXep="@Model.ThuTuSapXep" asp-route-kichThuocTrang="@Model.KichThuocTrang">1</a>
                             </li>
-                            @if (batDau > 2)
+                            if (batDau > 2)
                             {
                                 <li class="page-item disabled"><span class="page-link">...</span></li>
                             }
@@ -297,7 +295,7 @@
 
                         @if (ketThuc < Model.TongSoTrang)
                         {
-                            @if (ketThuc < Model.TongSoTrang - 1)
+                            if (ketThuc < Model.TongSoTrang - 1)
                             {
                                 <li class="page-item disabled"><span class="page-link">...</span></li>
                             }

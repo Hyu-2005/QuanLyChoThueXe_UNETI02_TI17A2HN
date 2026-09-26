@@ -8,8 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Data;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Helpers;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants;
-using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities;
-using QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.Xe;
 
 namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 {
@@ -55,13 +53,18 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                     (x.LoaiXe != null && x.LoaiXe.TenLoaiXe.Contains(kw)));
             }
 
-            if (maLoaiXe.HasValue) query = query.Where(x => x.MaLoaiXe == maLoaiXe.Value);
-            if (maHangXe.HasValue) query = query.Where(x => x.MaHangXe == maHangXe.Value);
-            if (soCho.HasValue) query = query.Where(x => x.SoCho == soCho.Value);
+            if (maLoaiXe.HasValue)
+                query = query.Where(x => x.MaLoaiXe == maLoaiXe.Value);
+            if (maHangXe.HasValue)
+                query = query.Where(x => x.MaHangXe == maHangXe.Value);
+            if (soCho.HasValue)
+                query = query.Where(x => x.SoCho == soCho.Value);
             if (!string.IsNullOrWhiteSpace(tinhTrang))
                 query = query.Where(x => x.TinhTrang == tinhTrang);
-            if (namSanXuatTu.HasValue) query = query.Where(x => x.NamSanXuat >= namSanXuatTu.Value);
-            if (namSanXuatDen.HasValue) query = query.Where(x => x.NamSanXuat <= namSanXuatDen.Value);
+            if (namSanXuatTu.HasValue)
+                query = query.Where(x => x.NamSanXuat >= namSanXuatTu.Value);
+            if (namSanXuatDen.HasValue)
+                query = query.Where(x => x.NamSanXuat <= namSanXuatDen.Value);
 
             if (donGiaTu.HasValue || donGiaDen.HasValue)
             {
@@ -117,7 +120,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 .Take(kichThuocTrang)
                 .ToListAsync();
 
-            var vm = new XeListVM
+            var vm = new ViewModels.Xe.XeListVM
             {
                 DanhSach = danhSach,
                 TuKhoa = tuKhoa,
@@ -149,6 +152,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 .Include(x => x.LoaiXe)
                 .Include(x => x.HangXe)
                 .Include(x => x.BangGiaThues)
+                    .ThenInclude(b => b.LoaiXe)      // de hien thi ten loai trong bang gia
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.MaXe == id);
 
@@ -164,7 +168,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var vm = new XeFormVM
+            var vm = new ViewModels.Xe.XeFormVM
             {
                 DanhSachLoaiXe = await LayDanhSachLoaiXe(),
                 DanhSachHangXe = await LayDanhSachHangXe(),
@@ -175,7 +179,8 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(XeFormVM vm)
+        [RequestSizeLimit(5 * 1024 * 1024)]     
+        public async Task<IActionResult> Create(ViewModels.Xe.XeFormVM vm)
         {
             if (!ModelState.IsValid)
             {
@@ -185,6 +190,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
             var trungBienSo = await _context.Xes
                 .AnyAsync(x => x.BienSo == vm.BienSo.Trim());
+
             if (trungBienSo)
             {
                 ModelState.AddModelError(nameof(vm.BienSo), "Bien so da ton tai");
@@ -211,18 +217,21 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             }
 
             string? duongDanAnh = null;
-            try
+            if (vm.FileAnh != null && vm.FileAnh.Length > 0)
             {
-                duongDanAnh = await LuuAnhAsync(vm.FileAnh);
-            }
-            catch (InvalidOperationException ex)
-            {
-                ModelState.AddModelError(nameof(vm.FileAnh), ex.Message);
-                await LoadDropdownsAsync(vm);
-                return View(vm);
+                try
+                {
+                    duongDanAnh = await LuuAnhAsync(vm.FileAnh);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError(nameof(vm.FileAnh), ex.Message);
+                    await LoadDropdownsAsync(vm);
+                    return View(vm);
+                }
             }
 
-            var xe = new Xe
+            var xe = new Models.Entities.Xe
             {
                 BienSo = vm.BienSo.Trim(),
                 TenXe = vm.TenXe.Trim(),
@@ -254,7 +263,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var vm = new XeFormVM
+            var vm = new ViewModels.Xe.XeFormVM
             {
                 MaXe = xe.MaXe,
                 BienSo = xe.BienSo,
@@ -278,9 +287,11 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, XeFormVM vm)
+        [RequestSizeLimit(5 * 1024 * 1024)]
+        public async Task<IActionResult> Edit(int id, ViewModels.Xe.XeFormVM vm)
         {
-            if (id != vm.MaXe) return BadRequest();
+            if (id != vm.MaXe)
+                return BadRequest();
 
             if (!ModelState.IsValid)
             {
@@ -297,6 +308,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
             var trungBienSo = await _context.Xes
                 .AnyAsync(x => x.BienSo == vm.BienSo.Trim() && x.MaXe != id);
+
             if (trungBienSo)
             {
                 ModelState.AddModelError(nameof(vm.BienSo), "Bien so da ton tai");
@@ -317,8 +329,8 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 try
                 {
                     var anhMoi = await LuuAnhAsync(vm.FileAnh);
-                    XoaAnhCu(xe.AnhXe);
-                    xe.AnhXe = anhMoi;
+                    XoaAnhCu(xe.AnhXe);       // xoa anh cu tren dia
+                    xe.AnhXe = anhMoi;         // gan anh moi
                 }
                 catch (InvalidOperationException ex)
                 {
@@ -494,7 +506,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
         }
 
-        private async Task LoadDropdownsAsync(XeFormVM vm)
+        private async Task LoadDropdownsAsync(ViewModels.Xe.XeFormVM vm)
         {
             vm.DanhSachLoaiXe = await LayDanhSachLoaiXe();
             vm.DanhSachHangXe = await LayDanhSachHangXe();
