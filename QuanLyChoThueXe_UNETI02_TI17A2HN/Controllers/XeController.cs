@@ -1,8 +1,6 @@
-﻿// ============================================================
-// XeController.cs - Quan ly xe (CRUD + tim kiem + loc + sap xep + phan trang)
-// SV: Dao Gia Hung - 23103100065
-// Module 2: Quan ly xe, bang gia thue
-// ============================================================
+﻿// XeController.cs - quan ly xe (CRUD + tim kiem + loc + sap xep + phan trang)
+// sinh vien thuc hien: Dao Gia Hung - 23103100065
+// module 2 - quan ly xe, bang gia thue
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -25,10 +23,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             _context = context;
         }
 
-        // ============================================================
-        // GET: /Xe
-        // Danh sach + Tim kiem + Loc + Sap xep + Phan trang
-        // ============================================================
         [HttpGet]
         public async Task<IActionResult> Index(
             string? tuKhoa,
@@ -45,14 +39,12 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             int trang = 1,
             int kichThuocTrang = 10)
         {
-            // ---------- 1. TRUY VAN ----------
             var query = _context.Xes
                 .Include(x => x.LoaiXe)
                 .Include(x => x.HangXe)
                 .AsNoTracking()
                 .AsQueryable();
 
-            // ---------- 2. TIM KIEM ----------
             if (!string.IsNullOrWhiteSpace(tuKhoa))
             {
                 var kw = tuKhoa.Trim();
@@ -63,7 +55,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                     (x.LoaiXe != null && x.LoaiXe.TenLoaiXe.Contains(kw)));
             }
 
-            // ---------- 3. LOC ----------
             if (maLoaiXe.HasValue) query = query.Where(x => x.MaLoaiXe == maLoaiXe.Value);
             if (maHangXe.HasValue) query = query.Where(x => x.MaHangXe == maHangXe.Value);
             if (soCho.HasValue) query = query.Where(x => x.SoCho == soCho.Value);
@@ -72,7 +63,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             if (namSanXuatTu.HasValue) query = query.Where(x => x.NamSanXuat >= namSanXuatTu.Value);
             if (namSanXuatDen.HasValue) query = query.Where(x => x.NamSanXuat <= namSanXuatDen.Value);
 
-            // Loc theo don gia (lay tu BangGiaThue dang hieu luc)
             if (donGiaTu.HasValue || donGiaDen.HasValue)
             {
                 var now = DateTime.Now;
@@ -84,7 +74,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                     (!donGiaDen.HasValue || b.DonGiaNgay <= donGiaDen.Value)));
             }
 
-            // ---------- 4. SAP XEP ----------
             var nowSort = DateTime.Now;
             query = (sapXepTheo?.ToLower(), thuTuSapXep?.ToLower()) switch
             {
@@ -117,7 +106,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 _ => query.OrderBy(x => x.MaXe)
             };
 
-            // ---------- 5. PHAN TRANG ----------
             var tongSo = await query.CountAsync();
 
             if (trang < 1) trang = 1;
@@ -129,7 +117,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 .Take(kichThuocTrang)
                 .ToListAsync();
 
-            // ---------- 6. TAO VIEWMODEL ----------
             var vm = new XeListVM
             {
                 DanhSach = danhSach,
@@ -155,9 +142,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return View(vm);
         }
 
-        // ============================================================
-        // GET: /Xe/Details/5
-        // ============================================================
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -177,9 +161,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return View(xe);
         }
 
-        // ============================================================
-        // GET: /Xe/Create
-        // ============================================================
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -192,9 +173,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return View(vm);
         }
 
-        // ============================================================
-        // POST: /Xe/Create
-        // ============================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(XeFormVM vm)
@@ -205,7 +183,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return View(vm);
             }
 
-            // 1. Bien so khong trung
             var trungBienSo = await _context.Xes
                 .AnyAsync(x => x.BienSo == vm.BienSo.Trim());
             if (trungBienSo)
@@ -215,7 +192,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return View(vm);
             }
 
-            // 2. Loai xe hop le
             var loaiXe = await _context.LoaiXes.FindAsync(vm.MaLoaiXe);
             if (loaiXe == null || !loaiXe.TrangThai)
             {
@@ -225,7 +201,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return View(vm);
             }
 
-            // 3. Hang xe hop le
             var hangXe = await _context.HangXes.FindAsync(vm.MaHangXe);
             if (hangXe == null || !hangXe.TrangThai)
             {
@@ -235,7 +210,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return View(vm);
             }
 
-            // 4. Upload anh
             string? duongDanAnh = null;
             try
             {
@@ -270,9 +244,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ============================================================
-        // GET: /Xe/Edit/5
-        // ============================================================
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -305,9 +276,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return View(vm);
         }
 
-        // ============================================================
-        // POST: /Xe/Edit/5
-        // ============================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, XeFormVM vm)
@@ -344,7 +312,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return View(vm);
             }
 
-            // Xu ly anh: co anh moi -> upload & xoa anh cu
             if (vm.FileAnh != null && vm.FileAnh.Length > 0)
             {
                 try
@@ -378,9 +345,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ============================================================
-        // POST: /Xe/DoiTinhTrang
-        // ============================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DoiTinhTrang(int id, string tinhTrangMoi)
@@ -398,14 +362,12 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Xe dang cho thue -> khong cho doi
             if (xe.TinhTrang == TinhTrangXe.DangChoThue)
             {
                 TempData["Error"] = "Xe dang cho thue, khong the doi tinh trang";
                 return RedirectToAction(nameof(Index));
             }
 
-            // 👇 Ngung hoat dong -> check con lich dat chua hoan thanh
             if (tinhTrangMoi == TinhTrangXe.NgungHoatDong)
             {
                 var conLichDat = await _context.DatXes.AnyAsync(d =>
@@ -421,7 +383,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 }
             }
 
-            // 👇 Bao duong -> check co lich dat sap toi
             if (tinhTrangMoi == TinhTrangXe.BaoDuong)
             {
                 var now = DateTime.Now;
@@ -446,9 +407,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ============================================================
-        // GET: /Xe/KiemTraCoTheChoThue/5
-        // ============================================================
         [HttpGet]
         public async Task<IActionResult> KiemTraCoTheChoThue(int id)
         {
@@ -468,9 +426,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return Ok(new { CoThe = true, LyDo = "" });
         }
 
-        // ============================================================
-        // GET: /Xe/KiemTraTrongKhoang/5?tuNgay=&denNgay=
-        // ============================================================
         [HttpGet]
         public async Task<IActionResult> KiemTraTrongKhoang(int id, DateTime tuNgay, DateTime denNgay)
         {
@@ -481,7 +436,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             if (xe == null)
                 return NotFound(new { ThongBao = "Khong tim thay xe" });
 
-            // Xe bao duong / ngung hoat dong -> luon khong trong
             if (xe.TinhTrang == TinhTrangXe.BaoDuong ||
                 xe.TinhTrang == TinhTrangXe.NgungHoatDong)
             {
@@ -492,7 +446,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 });
             }
 
-            // Check lich dat trung khoang (dung dung ten field thoi gian)
             var biTrung = await _context.DatXes.AnyAsync(d =>
                 d.MaXe == id &&
                 d.TrangThai != TrangThaiDatXe.DaHuy &&
@@ -507,9 +460,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             });
         }
 
-        // ============================================================
-        // HELPER: Upload anh
-        // ============================================================
         private async Task<string?> LuuAnhAsync(IFormFile? fileAnh)
         {
             if (fileAnh == null || fileAnh.Length == 0) return null;
@@ -534,9 +484,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return "/images/xe/" + tenFile;
         }
 
-        // ============================================================
-        // HELPER: Xoa anh cu
-        // ============================================================
         private void XoaAnhCu(string? duongDanAnh)
         {
             if (string.IsNullOrEmpty(duongDanAnh)) return;
@@ -547,9 +494,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
         }
 
-        // ============================================================
-        // HELPER: Load dropdown
-        // ============================================================
         private async Task LoadDropdownsAsync(XeFormVM vm)
         {
             vm.DanhSachLoaiXe = await LayDanhSachLoaiXe();
