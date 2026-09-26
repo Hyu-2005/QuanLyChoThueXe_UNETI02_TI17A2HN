@@ -1,8 +1,11 @@
-﻿// XeFormVM.cs - ViewModel cho form Them/Sua Xe
+﻿// ============================================================
+// XeFormVM.cs - ViewModel cho form Them/Sua Xe
 // SV: Dao Gia Hung - 23103100065
 // Module 2: Quan ly xe, bang gia thue
+// ============================================================
 
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.Xe
@@ -58,10 +61,14 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.Xe
         [Display(Name = "Mo ta")]
         public string? MoTa { get; set; }
 
-        [StringLength(255)]
-        [Display(Name = "Anh xe (URL)")]
-        public string? AnhXe { get; set; }
+        // 👇 ẢNH XE
+        [Display(Name = "Anh hien tai")]
+        public string? AnhXe { get; set; }        // đường dẫn ảnh cũ
 
+        [Display(Name = "Chon anh moi")]
+        public IFormFile? FileAnh { get; set; }   // file upload
+
+        // ===== Dropdown =====
         public List<SelectListItem> DanhSachLoaiXe { get; set; } = new();
         public List<SelectListItem> DanhSachHangXe { get; set; } = new();
         public List<SelectListItem> DanhSachTinhTrang { get; set; } = new();

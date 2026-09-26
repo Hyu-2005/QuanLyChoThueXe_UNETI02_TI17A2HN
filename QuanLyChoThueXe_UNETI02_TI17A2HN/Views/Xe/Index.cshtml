@@ -1,0 +1,340 @@
+﻿@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.Xe.XeListVM
+@{
+    ViewData["Title"] = "Danh sách xe";
+}
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Quản lý xe</h3>
+            <p class="text-muted mb-0 small">
+                Tổng cộng <strong>@Model.TongSoBanGhi</strong> xe trong hệ thống
+            </p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary shadow-sm px-3">
+            + Thêm xe mới
+        </a>
+    </div>
+
+    <!-- THÔNG BÁO -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <strong>✓ Thành công:</strong> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <strong>✗ Lỗi:</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- SEARCH & FILTER -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-bottom py-3">
+            <h6 class="mb-0 fw-semibold text-secondary">TÌM KIẾM & LỌC</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Index" id="filterForm">
+                <input type="hidden" name="trang" value="1" />
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold text-muted">Từ khóa</label>
+                        <input type="text" name="tuKhoa" value="@Model.TuKhoa"
+                               class="form-control"
+                               placeholder="Biển số, tên xe, hãng, loại..." />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Loại xe</label>
+                        <select name="maLoaiXe" class="form-select" asp-items="Model.DanhSachLoaiXe">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Hãng xe</label>
+                        <select name="maHangXe" class="form-select" asp-items="Model.DanhSachHangXe">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Số chỗ</label>
+                        <input type="number" name="soCho" value="@Model.SoCho"
+                               class="form-control" min="1" placeholder="VD: 4" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Tình trạng</label>
+                        <select name="tinhTrang" class="form-select" asp-items="Model.DanhSachTinhTrang">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Năm SX từ</label>
+                        <input type="number" name="namSanXuatTu" value="@Model.NamSanXuatTu"
+                               class="form-control" placeholder="1990" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Đến</label>
+                        <input type="number" name="namSanXuatDen" value="@Model.NamSanXuatDen"
+                               class="form-control" placeholder="2100" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Giá từ (đ)</label>
+                        <input type="number" name="donGiaTu" value="@Model.DonGiaTu"
+                               class="form-control" step="1000" placeholder="0" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Đến (đ)</label>
+                        <input type="number" name="donGiaDen" value="@Model.DonGiaDen"
+                               class="form-control" step="1000" placeholder="10000000" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Sắp xếp theo</label>
+                        <select name="sapXepTheo" class="form-select">
+                            <option value="">Mặc định</option>
+                            <option value="tenxe" selected="@(Model.SapXepTheo == "tenxe")">Tên xe</option>
+                            <option value="namsanxuat" selected="@(Model.SapXepTheo == "namsanxuat")">Năm SX</option>
+                            <option value="socho" selected="@(Model.SapXepTheo == "socho")">Số chỗ</option>
+                            <option value="dongia" selected="@(Model.SapXepTheo == "dongia")">Đơn giá</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Thứ tự</label>
+                        <select name="thuTuSapXep" class="form-select">
+                            <option value="asc" selected="@(Model.ThuTuSapXep == "asc")">Tăng dần</option>
+                            <option value="desc" selected="@(Model.ThuTuSapXep == "desc")">Giảm dần</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Hiển thị</label>
+                        <select name="kichThuocTrang" class="form-select">
+                            <option value="10" selected="@(Model.KichThuocTrang == 10)">10 / trang</option>
+                            <option value="20" selected="@(Model.KichThuocTrang == 20)">20 / trang</option>
+                            <option value="50" selected="@(Model.KichThuocTrang == 50)">50 / trang</option>
+                            <option value="100" selected="@(Model.KichThuocTrang == 100)">100 / trang</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 d-flex gap-2 justify-content-end pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-3">
+                            Xóa lọc
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            Áp dụng
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4" style="width:110px">Ảnh</th>
+                        <th>Biển số</th>
+                        <th>Tên xe</th>
+                        <th>Loại xe</th>
+                        <th>Hãng xe</th>
+                        <th>Năm SX</th>
+                        <th>Số chỗ</th>
+                        <th>Tình trạng</th>
+                        <th class="text-end pe-4" style="width:180px">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.DanhSach.Any())
+                    {
+                        @foreach (var xe in Model.DanhSach)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <img src="@(string.IsNullOrEmpty(xe.AnhXe) ? "/images/xe/default.jpg" : xe.AnhXe)"
+                                         class="rounded shadow-sm border"
+                                         style="width:72px;height:54px;object-fit:cover" />
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border px-3 py-2 fw-semibold">
+                                        @xe.BienSo
+                                    </span>
+                                </td>
+                                <td class="fw-semibold">@xe.TenXe</td>
+                                <td>@xe.LoaiXe?.TenLoaiXe</td>
+                                <td>@xe.HangXe?.TenHangXe</td>
+                                <td>@xe.NamSanXuat</td>
+                                <td>@xe.SoCho chỗ</td>
+                                <td>
+                                    @{
+                                        var badge = xe.TinhTrang switch
+                                        {
+                                            "Sẵn sàng" => "bg-success text-white",
+                                            "Đang được giữ chỗ" => "bg-info text-dark",
+                                            "Đang cho thuê" => "bg-warning text-dark",
+                                            "Bảo dưỡng" => "bg-danger text-white",
+                                            "Ngừng hoạt động" => "bg-secondary text-white",
+                                            _ => "bg-secondary text-white"
+                                        };
+                                    }
+                                    <span class="badge @badge px-3 py-2">@xe.TinhTrang</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a asp-action="Details" asp-route-id="@xe.MaXe"
+                                       class="btn btn-sm btn-outline-info px-3">Xem</a>
+                                    <a asp-action="Edit" asp-route-id="@xe.MaXe"
+                                       class="btn btn-sm btn-outline-warning px-3">Sửa</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center py-5 text-muted">
+                                <div class="display-6 text-secondary mb-2">—</div>
+                                Không có xe nào phù hợp
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        @if (Model.TongSoTrang > 1)
+        {
+            <div class="card-footer bg-white border-top d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
+                <small class="text-muted">
+                    Trang <strong>@Model.Trang</strong> / <strong>@Model.TongSoTrang</strong>
+                    — Hiển thị @Model.DanhSach.Count / @Model.TongSoBanGhi bản ghi
+                </small>
+
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.CoTrangTruoc ? "" : "disabled")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-trang="@(Model.Trang - 1)"
+                               asp-route-tuKhoa="@Model.TuKhoa"
+                               asp-route-maLoaiXe="@Model.MaLoaiXe"
+                               asp-route-maHangXe="@Model.MaHangXe"
+                               asp-route-soCho="@Model.SoCho"
+                               asp-route-tinhTrang="@Model.TinhTrang"
+                               asp-route-namSanXuatTu="@Model.NamSanXuatTu"
+                               asp-route-namSanXuatDen="@Model.NamSanXuatDen"
+                               asp-route-donGiaTu="@Model.DonGiaTu"
+                               asp-route-donGiaDen="@Model.DonGiaDen"
+                               asp-route-sapXepTheo="@Model.SapXepTheo"
+                               asp-route-thuTuSapXep="@Model.ThuTuSapXep"
+                               asp-route-kichThuocTrang="@Model.KichThuocTrang">‹ Trước</a>
+                        </li>
+
+                        @{
+                            var batDau = Math.Max(1, Model.Trang - 2);
+                            var ketThuc = Math.Min(Model.TongSoTrang, Model.Trang + 2);
+                        }
+
+                        @if (batDau > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="Index" asp-route-trang="1"
+                                   asp-route-tuKhoa="@Model.TuKhoa" asp-route-maLoaiXe="@Model.MaLoaiXe"
+                                   asp-route-maHangXe="@Model.MaHangXe" asp-route-soCho="@Model.SoCho"
+                                   asp-route-tinhTrang="@Model.TinhTrang" asp-route-namSanXuatTu="@Model.NamSanXuatTu"
+                                   asp-route-namSanXuatDen="@Model.NamSanXuatDen" asp-route-donGiaTu="@Model.DonGiaTu"
+                                   asp-route-donGiaDen="@Model.DonGiaDen" asp-route-sapXepTheo="@Model.SapXepTheo"
+                                   asp-route-thuTuSapXep="@Model.ThuTuSapXep" asp-route-kichThuocTrang="@Model.KichThuocTrang">1</a>
+                            </li>
+                            @if (batDau > 2)
+                            {
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            }
+                        }
+
+                        @for (int i = batDau; i <= ketThuc; i++)
+                        {
+                            <li class="page-item @(i == Model.Trang ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-trang="@i"
+                                   asp-route-tuKhoa="@Model.TuKhoa"
+                                   asp-route-maLoaiXe="@Model.MaLoaiXe"
+                                   asp-route-maHangXe="@Model.MaHangXe"
+                                   asp-route-soCho="@Model.SoCho"
+                                   asp-route-tinhTrang="@Model.TinhTrang"
+                                   asp-route-namSanXuatTu="@Model.NamSanXuatTu"
+                                   asp-route-namSanXuatDen="@Model.NamSanXuatDen"
+                                   asp-route-donGiaTu="@Model.DonGiaTu"
+                                   asp-route-donGiaDen="@Model.DonGiaDen"
+                                   asp-route-sapXepTheo="@Model.SapXepTheo"
+                                   asp-route-thuTuSapXep="@Model.ThuTuSapXep"
+                                   asp-route-kichThuocTrang="@Model.KichThuocTrang">@i</a>
+                            </li>
+                        }
+
+                        @if (ketThuc < Model.TongSoTrang)
+                        {
+                            @if (ketThuc < Model.TongSoTrang - 1)
+                            {
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            }
+                            <li class="page-item">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-trang="@Model.TongSoTrang"
+                                   asp-route-tuKhoa="@Model.TuKhoa"
+                                   asp-route-maLoaiXe="@Model.MaLoaiXe"
+                                   asp-route-maHangXe="@Model.MaHangXe"
+                                   asp-route-soCho="@Model.SoCho"
+                                   asp-route-tinhTrang="@Model.TinhTrang"
+                                   asp-route-namSanXuatTu="@Model.NamSanXuatTu"
+                                   asp-route-namSanXuatDen="@Model.NamSanXuatDen"
+                                   asp-route-donGiaTu="@Model.DonGiaTu"
+                                   asp-route-donGiaDen="@Model.DonGiaDen"
+                                   asp-route-sapXepTheo="@Model.SapXepTheo"
+                                   asp-route-thuTuSapXep="@Model.ThuTuSapXep"
+                                   asp-route-kichThuocTrang="@Model.KichThuocTrang">@Model.TongSoTrang</a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.CoTrangSau ? "" : "disabled")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-trang="@(Model.Trang + 1)"
+                               asp-route-tuKhoa="@Model.TuKhoa"
+                               asp-route-maLoaiXe="@Model.MaLoaiXe"
+                               asp-route-maHangXe="@Model.MaHangXe"
+                               asp-route-soCho="@Model.SoCho"
+                               asp-route-tinhTrang="@Model.TinhTrang"
+                               asp-route-namSanXuatTu="@Model.NamSanXuatTu"
+                               asp-route-namSanXuatDen="@Model.NamSanXuatDen"
+                               asp-route-donGiaTu="@Model.DonGiaTu"
+                               asp-route-donGiaDen="@Model.DonGiaDen"
+                               asp-route-sapXepTheo="@Model.SapXepTheo"
+                               asp-route-thuTuSapXep="@Model.ThuTuSapXep"
+                               asp-route-kichThuocTrang="@Model.KichThuocTrang">Sau ›</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>

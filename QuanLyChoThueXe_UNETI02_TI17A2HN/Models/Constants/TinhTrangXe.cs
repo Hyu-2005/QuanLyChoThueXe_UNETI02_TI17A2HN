@@ -13,9 +13,6 @@
             SanSang, DangGiuCho, DangChoThue, BaoDuong, NgungHoatDong
         };
 
-        /// <summary>
-        /// Các trạng thái xe CÓ THỂ nhận đơn mới (dùng trong tìm xe trống)
-        /// </summary>
         public static readonly string[] CoTheChoThue =
         {
             SanSang, DangGiuCho
