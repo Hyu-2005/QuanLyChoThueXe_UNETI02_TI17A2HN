@@ -9,144 +9,324 @@
 
     var badge = Model.TinhTrang switch
     {
-        "Sẵn sàng" => "bg-success text-white",
-        "Đang được giữ chỗ" => "bg-info text-dark",
-        "Đang cho thuê" => "bg-warning text-dark",
-        "Bảo dưỡng" => "bg-danger text-white",
-        "Ngừng hoạt động" => "bg-secondary text-white",
-        _ => "bg-secondary text-white"
+        "Sẵn sàng" => "ready",
+        "Đang được giữ chỗ" => "hold",
+        "Đang cho thuê" => "renting",
+        "Bảo dưỡng" => "maint",
+        "Ngừng hoạt động" => "off",
+        _ => "off"
     };
 
     var anh = string.IsNullOrEmpty(Model.AnhXe) ? "/images/xe/default.jpg" : Model.AnhXe;
+    var today = DateTime.Today;
+
+    var giaHienHanh = Model.BangGiaThues?
+        .Where(b => b.TrangThai && b.TuNgay <= today && b.DenNgay >= today)
+        .OrderByDescending(b => b.MaXe.HasValue)
+        .FirstOrDefault();
 }
 
-<div class="container py-4" style="max-width:1100px">
+<style>
+    .detail-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .detail-wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
 
-    <div class="d-flex align-items-center mb-4">
-        <a asp-action="Index" class="btn btn-sm btn-outline-secondary me-3">← Quay lại</a>
-        <div>
-            <h3 class="fw-bold mb-1">@Model.TenXe</h3>
-            <p class="text-muted mb-0 small">
-                Biển số:
-                <span class="badge bg-light text-dark border">@Model.BienSo</span>
-            </p>
-        </div>
-        <div class="ms-auto d-flex gap-2">
-            <a asp-action="Edit" asp-route-id="@Model.MaXe" class="btn btn-warning">Sửa</a>
-        </div>
-    </div>
+    .detail-head {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        margin-bottom: 28px; padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .detail-head .back {
+        font-size: 13px; color: #64748b; text-decoration: none;
+        display: inline-block; margin-bottom: 8px;
+    }
+    .detail-head .back:hover { color: #1d4ed8; }
+    .detail-head h1 {
+        font-size: 26px; font-weight: 800; color: #0f172a;
+        letter-spacing: -0.4px; margin: 0 0 8px 0;
+    }
+    .plate-chip {
+        display: inline-block;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 14px;
+        margin-right: 8px;
+        font-variant-numeric: tabular-nums;
+    }
 
-    <div class="row g-4">
-        <!-- ẢNH -->
-        <div class="col-md-5">
-            <div class="card border-0 shadow-sm">
-                <img src="@anh"
-                     class="card-img-top"
-                     style="height:340px;object-fit:cover"
-                     alt="@Model.TenXe" />
+    .status-pill {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+    }
+    .status-pill.ready   { background: #dcfce7; color: #166534; }
+    .status-pill.hold    { background: #cffafe; color: #155e75; }
+    .status-pill.renting { background: #fef3c7; color: #92400e; }
+    .status-pill.maint   { background: #fee2e2; color: #991b1b; }
+    .status-pill.off     { background: #f1f5f9; color: #64748b; }
 
-                <div class="card-body text-center">
-                    <span class="badge @badge px-4 py-2 fs-6">@Model.TinhTrang</span>
+    .hero-img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(15,23,42,.04);
+    }
+
+    .info-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 26px 30px;
+        height: 100%;
+    }
+    .info-card .title {
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        color: #64748b; margin: 0 0 20px 0;
+    }
+    .info-row {
+        display: flex; justify-content: space-between;
+        padding: 13px 0; border-bottom: 1px solid #f1f5f9;
+        font-size: 14px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .lbl { color: #64748b; }
+    .info-row .val {
+        font-weight: 600; color: #0f172a; text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .desc-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 18px 20px;
+        font-size: 14px;
+        color: #334155;
+        line-height: 1.7;
+    }
+
+    /* PRICE HIGHLIGHT */
+    .price-highlight {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        border-radius: 14px;
+        padding: 24px 28px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .price-highlight .lbl {
+        font-size: 12px; text-transform: uppercase;
+        letter-spacing: .8px; opacity: .8; margin-bottom: 6px;
+    }
+    .price-highlight .val {
+        font-size: 32px; font-weight: 800;
+        letter-spacing: -0.8px; line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+    .price-highlight .val small {
+        font-size: 14px; font-weight: 500; opacity: .8;
+    }
+    .price-highlight .extra {
+        text-align: right; font-size: 13px; opacity: .9;
+        line-height: 1.8;
+    }
+    .price-highlight .empty-price {
+        font-size: 15px;
+        opacity: .9;
+    }
+
+    .data-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    .data-card .card-head {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .data-card .card-head .title {
+        font-size: 14px; font-weight: 700;
+        color: #0f172a; margin: 0;
+        text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .data-card .card-head .count {
+        font-size: 12px; color: #64748b;
+        background: #f1f5f9;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .data-card table { margin: 0; font-size: 14px; }
+    .data-card thead th {
+        background: #f9fafb;
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        color: #475569; padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .data-card tbody td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .data-card tbody tr:last-child td { border-bottom: none; }
+
+    .money {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600; color: #0f172a;
+    }
+    .money.primary {
+        color: #1d4ed8;
+        font-size: 15px;
+        font-weight: 700;
+    }
+    .money .unit {
+        font-size: 11px; font-weight: 500;
+        color: #94a3b8; margin-left: 2px;
+    }
+
+    .badge-soft {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px; font-weight: 700;
+        letter-spacing: .3px; text-transform: uppercase;
+    }
+</style>
+
+<div class="detail-shell">
+    <div class="detail-wrap">
+
+        <div class="detail-head">
+            <div>
+                <a asp-action="Index" class="back">← Quay lại danh sách</a>
+                <h1>@Model.TenXe</h1>
+                <div>
+                    <span class="plate-chip">@Model.BienSo</span>
+                    <span class="status-pill @badge">@Model.TinhTrang</span>
                 </div>
             </div>
+            <a asp-action="Edit" asp-route-id="@Model.MaXe"
+               class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">
+                Sửa xe
+            </a>
         </div>
 
-        <!-- THÔNG TIN -->
-        <div class="col-md-7">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-
-                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Thông tin chi tiết</h6>
-
-                    <div class="row g-3">
-                        <div class="col-sm-6">
-                            <div class="p-3 bg-light rounded">
-                                <small class="text-muted d-block">Biển số</small>
-                                <strong>@Model.BienSo</strong>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="p-3 bg-light rounded">
-                                <small class="text-muted d-block">Tên xe</small>
-                                <strong>@Model.TenXe</strong>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="p-3 bg-light rounded">
-                                <small class="text-muted d-block">Loại xe</small>
-                                <strong>@(Model.LoaiXe?.TenLoaiXe ?? "-")</strong>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="p-3 bg-light rounded">
-                                <small class="text-muted d-block">Hãng xe</small>
-                                <strong>@(Model.HangXe?.TenHangXe ?? "-")</strong>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="p-3 bg-light rounded">
-                                <small class="text-muted d-block">Năm sản xuất</small>
-                                <strong>@Model.NamSanXuat</strong>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="p-3 bg-light rounded">
-                                <small class="text-muted d-block">Màu sắc</small>
-                                <strong>@(string.IsNullOrEmpty(Model.MauSac) ? "-" : Model.MauSac)</strong>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="p-3 bg-light rounded">
-                                <small class="text-muted d-block">Số chỗ</small>
-                                <strong>@Model.SoCho chỗ</strong>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="p-3 bg-light rounded">
-                                <small class="text-muted d-block">Số km hiện tại</small>
-                                <strong>@Model.SoKmHienTai.ToString("N0") km</strong>
-                            </div>
-                        </div>
-
-                        @if (!string.IsNullOrEmpty(Model.MoTa))
-                        {
-                            <div class="col-12">
-                                <div class="p-3 bg-light rounded">
-                                    <small class="text-muted d-block">Mô tả</small>
-                                    <span>@Model.MoTa</span>
-                                </div>
-                            </div>
-                        }
+        <div class="price-highlight">
+            @if (giaHienHanh != null)
+            {
+                <div>
+                    <div class="lbl">Đơn giá thuê hiện hành</div>
+                    <div class="val">
+                        @giaHienHanh.DonGiaNgay.ToString("N0") <small>đ / ngày</small>
                     </div>
+                </div>
+                <div class="extra">
+                    <div>Giá giờ: <strong>@giaHienHanh.DonGiaGio.ToString("N0") đ</strong></div>
+                    <div>Tiền cọc: <strong>@giaHienHanh.TienCocMacDinh.ToString("N0") đ</strong></div>
+                    <div>Hiệu lực: @giaHienHanh.TuNgay.ToString("dd/MM/yyyy") – @giaHienHanh.DenNgay.ToString("dd/MM/yyyy")</div>
+                </div>
+            }
+            else
+            {
+                <div class="empty-price">
+                    Chưa có bảng giá hiện hành cho xe này.
+                    <a asp-controller="BangGiaThue" asp-action="Create" class="text-white fw-bold">
+                        Thêm bảng giá →
+                    </a>
+                </div>
+            }
+        </div>
 
+        <div class="row g-4 mb-4">
+            <div class="col-md-5">
+                <img src="@anh" class="hero-img" alt="@Model.TenXe" />
+            </div>
+
+            <div class="col-md-7">
+                <div class="info-card">
+                    <h6 class="title">Thông tin chi tiết</h6>
+
+                    <div class="info-row">
+                        <span class="lbl">Biển số</span>
+                        <span class="val">@Model.BienSo</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Loại xe</span>
+                        <span class="val">@(Model.LoaiXe?.TenLoaiXe ?? "-")</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Hãng xe</span>
+                        <span class="val">@(Model.HangXe?.TenHangXe ?? "-")</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Năm sản xuất</span>
+                        <span class="val">@Model.NamSanXuat</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Màu sắc</span>
+                        <span class="val">@(string.IsNullOrEmpty(Model.MauSac) ? "-" : Model.MauSac)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Số chỗ</span>
+                        <span class="val">@Model.SoCho chỗ</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Số km hiện tại</span>
+                        <span class="val">@Model.SoKmHienTai.ToString("N0") km</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Tình trạng</span>
+                        <span class="val">@Model.TinhTrang</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- BẢNG GIÁ -->
-    <div class="card border-0 shadow-sm mt-4">
-        <div class="card-body p-4">
-            <h6 class="text-uppercase text-muted small fw-bold mb-3">
-                Bảng giá hiện có (@(Model.BangGiaThues?.Count ?? 0))
-            </h6>
+        @if (!string.IsNullOrEmpty(Model.MoTa))
+        {
+            <div class="mb-4">
+                <div class="info-card">
+                    <h6 class="title">Mô tả</h6>
+                    <div class="desc-box">@Model.MoTa</div>
+                </div>
+            </div>
+        }
+
+        <div class="data-card">
+            <div class="card-head">
+                <h6 class="title">Bảng giá áp dụng cho xe này</h6>
+                <span class="count">@(Model.BangGiaThues?.Count ?? 0) bảng giá</span>
+            </div>
 
             @if (Model.BangGiaThues != null && Model.BangGiaThues.Any())
             {
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover align-middle mb-0">
-                        <thead class="table-light">
+                    <table class="table align-middle">
+                        <thead>
                             <tr>
                                 <th>Áp dụng cho</th>
-                                <th>Từ ngày</th>
-                                <th>Đến ngày</th>
+                                <th>Hiệu lực</th>
                                 <th class="text-end">Đơn giá ngày</th>
                                 <th class="text-end">Đơn giá giờ</th>
                                 <th class="text-end">Tiền cọc</th>
@@ -162,28 +342,38 @@
                                     <td>
                                         @if (bg.MaXe.HasValue)
                                         {
-                                            <span class="badge bg-primary">Riêng xe này</span>
+                                            <span class="badge-soft" style="background:#d1fae5;color:#065f46">Xe này</span>
                                         }
                                         else if (bg.MaLoaiXe.HasValue)
                                         {
-                                            <span class="badge bg-info text-dark">
-                                                Loại: @(bg.LoaiXe?.TenLoaiXe ?? "-")
+                                            <span class="badge-soft" style="background:#dbeafe;color:#1e40af">
+                                                Loại · @(bg.LoaiXe?.TenLoaiXe ?? "-")
                                             </span>
                                         }
                                     </td>
-                                    <td>@bg.TuNgay.ToString("dd/MM/yyyy")</td>
-                                    <td>@bg.DenNgay.ToString("dd/MM/yyyy")</td>
-                                    <td class="text-end">@bg.DonGiaNgay.ToString("N0") đ</td>
-                                    <td class="text-end">@bg.DonGiaGio.ToString("N0") đ</td>
-                                    <td class="text-end">@bg.TienCocMacDinh.ToString("N0") đ</td>
+                                    <td>
+                                        <div class="fw-semibold">@bg.TuNgay.ToString("dd/MM/yyyy")</div>
+                                        <div class="small text-muted">đến @bg.DenNgay.ToString("dd/MM/yyyy")</div>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="money primary">
+                                            @bg.DonGiaNgay.ToString("N0")<span class="unit">đ</span>
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="money">@bg.DonGiaGio.ToString("N0")<span class="unit">đ</span></span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="money">@bg.TienCocMacDinh.ToString("N0")<span class="unit">đ</span></span>
+                                    </td>
                                     <td class="text-center">
                                         @if (bg.TrangThai)
                                         {
-                                            <span class="badge bg-success">Đang áp dụng</span>
+                                            <span class="badge-soft" style="background:#dcfce7;color:#166534">Đang áp dụng</span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary">Ngừng</span>
+                                            <span class="badge-soft" style="background:#f1f5f9;color:#64748b">Ngừng</span>
                                         }
                                     </td>
                                 </tr>
@@ -194,9 +384,11 @@
             }
             else
             {
-                <p class="text-muted mb-0">Chưa có bảng giá nào cho xe này.</p>
+                <div class="text-center py-5 text-muted">
+                    <div style="font-size:40px;color:#cbd5e1;letter-spacing:6px">— — —</div>
+                    <div class="mt-2">Chưa có bảng giá nào cho xe này</div>
+                </div>
             }
         </div>
     </div>
-
 </div>
