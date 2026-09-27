@@ -1,0 +1,310 @@
+﻿@*
+    Details.cshtml - xem chi tiet bang gia thue
+    sinh vien thuc hien: Dao Gia Hung - 23103100065
+    module 2 - quan ly xe, bang gia thue
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.BangGiaThue
+@{
+    ViewData["Title"] = "Chi tiết bảng giá";
+
+    var today = DateTime.Today;
+    var dangApDung = Model.TrangThai && Model.TuNgay <= today && Model.DenNgay >= today;
+    var chuaHieuLuc = Model.TrangThai && Model.TuNgay > today;
+    var hetHieuLuc = Model.TrangThai && Model.DenNgay < today;
+}
+
+<style>
+    .detail-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .detail-wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+    .detail-head {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        margin-bottom: 28px; padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .detail-head .back {
+        font-size: 13px; color: #64748b; text-decoration: none;
+        display: inline-block; margin-bottom: 8px;
+    }
+    .detail-head .back:hover { color: #1d4ed8; }
+    .detail-head h1 {
+        font-size: 26px; font-weight: 700; color: #0f172a;
+        letter-spacing: -0.4px; margin: 0 0 4px 0;
+    }
+    .detail-head .id-chip {
+        display: inline-block;
+        background: #e0e7ff;
+        color: #3730a3;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 4px 12px;
+        border-radius: 8px;
+        margin-left: 8px;
+        vertical-align: middle;
+    }
+    .detail-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+
+    .status-banner {
+        border-radius: 12px;
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid;
+    }
+    .status-banner.active   { background: #f0fdf4; border-color: #bbf7d0; }
+    .status-banner.off      { background: #f8fafc; border-color: #e2e8f0; }
+    .status-banner.pending  { background: #fffbeb; border-color: #fde68a; }
+    .status-banner.expired  { background: #fef2f2; border-color: #fecaca; }
+
+    .status-banner .lbl {
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1px;
+        margin-bottom: 6px; opacity: .75;
+    }
+    .status-banner .val { font-size: 22px; font-weight: 700; margin: 0; }
+    .status-banner .note { font-size: 13px; opacity: .8; }
+    .status-banner.active   .lbl, .status-banner.active   .val { color: #166534; }
+    .status-banner.off      .lbl, .status-banner.off      .val { color: #334155; }
+    .status-banner.pending  .lbl, .status-banner.pending  .val { color: #92400e; }
+    .status-banner.expired  .lbl, .status-banner.expired  .val { color: #991b1b; }
+
+    .info-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px 28px;
+        height: 100%;
+    }
+    .info-card .title {
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1px;
+        color: #64748b; margin: 0 0 18px 0;
+    }
+    .info-row {
+        display: flex; justify-content: space-between;
+        padding: 12px 0; border-bottom: 1px solid #f1f5f9;
+        font-size: 14px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .lbl { color: #64748b; }
+    .info-row .val {
+        font-weight: 600; color: #0f172a;
+        text-align: right; font-variant-numeric: tabular-nums;
+    }
+
+    .price-tile {
+        border-radius: 12px;
+        padding: 26px 22px;
+        text-align: center;
+        border: 1px solid;
+        height: 100%;
+    }
+    .price-tile.blue  { background: #eff6ff; border-color: #bfdbfe; }
+    .price-tile.cyan  { background: #ecfeff; border-color: #a5f3fc; }
+    .price-tile.amber { background: #fffbeb; border-color: #fde68a; }
+
+    .price-tile .lbl {
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1px;
+        margin-bottom: 12px; opacity: .75;
+    }
+    .price-tile.blue  .lbl { color: #1e40af; }
+    .price-tile.cyan  .lbl { color: #155e75; }
+    .price-tile.amber .lbl { color: #92400e; }
+
+    .price-tile .val {
+        font-size: 30px; font-weight: 700;
+        letter-spacing: -0.6px; line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+    .price-tile.blue  .val { color: #1d4ed8; }
+    .price-tile.cyan  .val { color: #0e7490; }
+    .price-tile.amber .val { color: #b45309; }
+
+    .price-tile .unit {
+        font-size: 12px; font-weight: 600;
+        margin-top: 8px; opacity: .75;
+    }
+    .price-tile.blue  .unit { color: #1e40af; }
+    .price-tile.cyan  .unit { color: #155e75; }
+    .price-tile.amber .unit { color: #92400e; }
+
+    .scope-block {
+        display: flex; align-items: center; gap: 12px;
+        padding: 16px 20px;
+        background: #f8fafc;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+    .scope-block .ic {
+        font-size: 12px; font-weight: 700;
+        padding: 6px 12px; border-radius: 8px;
+        text-transform: uppercase; letter-spacing: .5px;
+    }
+    .scope-block.loai .ic { background: #dbeafe; color: #1e40af; }
+    .scope-block.xe   .ic { background: #d1fae5; color: #065f46; }
+</style>
+
+<div class="detail-shell">
+    <div class="detail-wrap">
+
+        <div class="detail-head">
+            <div>
+                <a asp-action="Index" class="back">← Quay lại danh sách</a>
+                <h1>
+                    Bảng giá
+                    <span class="id-chip">#@Model.MaBangGia</span>
+                </h1>
+                <p class="sub">Thông tin chi tiết về đơn giá, hiệu lực và trạng thái áp dụng</p>
+            </div>
+            <a asp-action="Edit" asp-route-id="@Model.MaBangGia"
+               class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">
+                Sửa bảng giá
+            </a>
+        </div>
+
+        @if (!Model.TrangThai)
+        {
+            <div class="status-banner off">
+                <div>
+                    <div class="lbl">Trạng thái</div>
+                    <p class="val">Đã ngừng áp dụng</p>
+                </div>
+                <div class="note text-end">Bảng giá này không được dùng để tính tiền thuê</div>
+            </div>
+        }
+        else if (dangApDung)
+        {
+            <div class="status-banner active">
+                <div>
+                    <div class="lbl">Trạng thái</div>
+                    <p class="val">Đang áp dụng</p>
+                </div>
+                <div class="note text-end">Có hiệu lực trong khoảng thời gian hiện tại</div>
+            </div>
+        }
+        else if (chuaHieuLuc)
+        {
+            <div class="status-banner pending">
+                <div>
+                    <div class="lbl">Trạng thái</div>
+                    <p class="val">Chưa đến ngày hiệu lực</p>
+                </div>
+                <div class="note text-end">Sẽ bắt đầu từ @Model.TuNgay.ToString("dd/MM/yyyy")</div>
+            </div>
+        }
+        else if (hetHieuLuc)
+        {
+            <div class="status-banner expired">
+                <div>
+                    <div class="lbl">Trạng thái</div>
+                    <p class="val">Đã hết hiệu lực</p>
+                </div>
+                <div class="note text-end">Đã kết thúc vào @Model.DenNgay.ToString("dd/MM/yyyy")</div>
+            </div>
+        }
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h6 class="title">Phạm vi áp dụng</h6>
+
+                    @if (Model.MaXe.HasValue && Model.Xe != null)
+                    {
+                        <div class="scope-block xe mb-3">
+                            <span class="ic">Xe cụ thể</span>
+                            <div>
+                                <strong>@Model.Xe.BienSo</strong>
+                                <div class="small text-muted">@Model.Xe.TenXe</div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <span class="lbl">Loại xe</span>
+                            <span class="val">@(Model.Xe.LoaiXe?.TenLoaiXe ?? "-")</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="lbl">Hãng xe</span>
+                            <span class="val">@(Model.Xe.HangXe?.TenHangXe ?? "-")</span>
+                        </div>
+                    }
+                    else if (Model.MaLoaiXe.HasValue && Model.LoaiXe != null)
+                    {
+                        <div class="scope-block loai mb-3">
+                            <span class="ic">Loại xe</span>
+                            <div>
+                                <strong>@Model.LoaiXe.TenLoaiXe</strong>
+                                <div class="small text-muted">@Model.LoaiXe.SoCho chỗ</div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <span class="lbl">Số chỗ</span>
+                            <span class="val">@Model.LoaiXe.SoCho</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="lbl">Mô tả</span>
+                            <span class="val">@(string.IsNullOrEmpty(Model.LoaiXe.MoTa) ? "-" : Model.LoaiXe.MoTa)</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h6 class="title">Khoảng hiệu lực</h6>
+
+                    <div class="info-row">
+                        <span class="lbl">Từ ngày</span>
+                        <span class="val">@Model.TuNgay.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Đến ngày</span>
+                        <span class="val">@Model.DenNgay.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Tổng số ngày</span>
+                        <span class="val">@((Model.DenNgay - Model.TuNgay).Days) ngày</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Trạng thái</span>
+                        <span class="val">
+                            @if (Model.TrangThai)
+                            {
+                                <span class="badge bg-success">Đang bật</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Đang tắt</span>
+                            }
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="price-tile blue">
+                    <div class="lbl">Đơn giá ngày</div>
+                    <div class="val">@Model.DonGiaNgay.ToString("N0")</div>
+                    <div class="unit">VNĐ / ngày</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="price-tile cyan">
+                    <div class="lbl">Đơn giá giờ</div>
+                    <div class="val">@Model.DonGiaGio.ToString("N0")</div>
+                    <div class="unit">VNĐ / giờ</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="price-tile amber">
+                    <div class="lbl">Tiền cọc mặc định</div>
+                    <div class="val">@Model.TienCocMacDinh.ToString("N0")</div>
+                    <div class="unit">VNĐ</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

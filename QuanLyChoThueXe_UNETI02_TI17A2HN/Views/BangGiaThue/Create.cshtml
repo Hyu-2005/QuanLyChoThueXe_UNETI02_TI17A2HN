@@ -1,0 +1,245 @@
+﻿@*
+    Create.cshtml - form them bang gia thue moi
+    sinh vien thuc hien: Dao Gia Hung - 23103100065
+    module 2 - quan ly xe, bang gia thue
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.BangGiaThue.BangGiaThueFormVM
+@{
+    ViewData["Title"] = "Thêm bảng giá thuê";
+}
+
+<style>
+    .form-shell {
+        background: #f5f7fa;
+        min-height: 100vh;
+        padding: 32px 0;
+    }
+    .form-wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+    .form-head { margin-bottom: 28px; }
+    .form-head .back {
+        font-size: 13px;
+        color: #64748b;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+    .form-head .back:hover { color: #1d4ed8; }
+    .form-head h1 {
+        font-size: 26px;
+        font-weight: 700;
+        color: #0f172a;
+        letter-spacing: -0.4px;
+        margin: 0 0 4px 0;
+    }
+    .form-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+
+    .form-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(15,23,42,.04);
+    }
+    .form-card .sect {
+        padding: 28px 32px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .form-card .sect:last-of-type { border-bottom: none; }
+    .form-card .sect-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #64748b;
+        margin: 0 0 20px 0;
+    }
+    .form-card .sect-title .num {
+        width: 22px; height: 22px;
+        border-radius: 50%;
+        background: #1d4ed8;
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .scope-hint {
+        background: #fef9c3;
+        border-left: 4px solid #eab308;
+        padding: 14px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #713f12;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 6px;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border-color: #d1d5db;
+        font-size: 14px;
+        padding: 9px 12px;
+        height: 42px;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+    .input-group-text {
+        background: #f8fafc;
+        border-color: #d1d5db;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .form-actions {
+        padding: 20px 32px;
+        background: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    .form-actions .btn { padding: 10px 24px; font-weight: 600; border-radius: 8px; }
+</style>
+
+<div class="form-shell">
+    <div class="form-wrap">
+
+        <div class="form-head">
+            <a asp-action="Index" class="back">← Quay lại danh sách</a>
+            <h1>Thêm bảng giá mới</h1>
+            <p class="sub">Cấu hình đơn giá và tiền cọc cho loại xe hoặc xe cụ thể</p>
+        </div>
+
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="form-card">
+
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">1</span> Phạm vi áp dụng
+                    </h6>
+
+                    <div class="scope-hint">
+                        <strong>Lưu ý quan trọng:</strong> Chọn <strong>1 trong 2</strong> hình thức —
+                        áp dụng theo <strong>Loại xe</strong> (dùng chung nhiều xe cùng loại)
+                        hoặc theo <strong>Xe cụ thể</strong> (riêng cho một xe).
+                        Không được chọn cả hai.
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="MaLoaiXe" class="form-label"></label>
+                            <select asp-for="MaLoaiXe" asp-items="Model.DanhSachLoaiXe"
+                                    class="form-select" id="MaLoaiXe">
+                                <option value="">— Không chọn loại —</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="MaXe" class="form-label"></label>
+                            <select asp-for="MaXe" asp-items="Model.DanhSachXe"
+                                    class="form-select" id="MaXe">
+                                <option value="">— Không chọn xe —</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">2</span> Đơn giá &amp; tiền cọc
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="DonGiaNgay" class="form-label"></label>
+                            <div class="input-group">
+                                <input asp-for="DonGiaNgay" type="number" step="1000"
+                                       class="form-control" placeholder="700000" />
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                            <span asp-validation-for="DonGiaNgay" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="DonGiaGio" class="form-label"></label>
+                            <div class="input-group">
+                                <input asp-for="DonGiaGio" type="number" step="1000"
+                                       class="form-control" placeholder="120000" />
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                            <span asp-validation-for="DonGiaGio" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="TienCocMacDinh" class="form-label"></label>
+                            <div class="input-group">
+                                <input asp-for="TienCocMacDinh" type="number" step="1000"
+                                       class="form-control" placeholder="3000000" />
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                            <span asp-validation-for="TienCocMacDinh" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">3</span> Khoảng hiệu lực
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="TuNgay" class="form-label"></label>
+                            <input asp-for="TuNgay" type="date" class="form-control" />
+                            <span asp-validation-for="TuNgay" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="DenNgay" class="form-label"></label>
+                            <input asp-for="DenNgay" type="date" class="form-control" />
+                            <span asp-validation-for="DenNgay" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <div class="form-check">
+                                <input asp-for="TrangThai" class="form-check-input" />
+                                <label asp-for="TrangThai" class="form-check-label fw-semibold"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-primary">Lưu bảng giá</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const loai = document.getElementById('MaLoaiXe');
+        const xe = document.getElementById('MaXe');
+        loai.addEventListener('change', () => { if (loai.value) xe.value = ''; });
+        xe.addEventListener('change', () => { if (xe.value) loai.value = ''; });
+    </script>
+}
