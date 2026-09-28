@@ -36,7 +36,10 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             int kichThuocTrang = 10)
         {
             // 1. Truy van goc
-            var query = _context.LoaiXes.AsNoTracking().AsQueryable();
+            var query = _context.LoaiXes
+    .Include(l => l.Xes)              // <-- THEM DONG NAY
+    .AsNoTracking()
+    .AsQueryable();
 
             // 2. Tim kiem theo ten
             if (!string.IsNullOrWhiteSpace(tuKhoa))

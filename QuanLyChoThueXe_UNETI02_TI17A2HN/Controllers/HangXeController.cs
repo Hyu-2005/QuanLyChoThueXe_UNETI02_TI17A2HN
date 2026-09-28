@@ -34,7 +34,10 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             int trang = 1,
             int kichThuocTrang = 10)
         {
-            var query = _context.HangXes.AsNoTracking().AsQueryable();
+            var query = _context.HangXes
+    .Include(h => h.Xes)              // <-- THEM DONG NAY
+    .AsNoTracking()
+    .AsQueryable();
 
             // Tim kiem
             if (!string.IsNullOrWhiteSpace(tuKhoa))

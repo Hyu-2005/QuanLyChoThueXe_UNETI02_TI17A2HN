@@ -4,8 +4,18 @@
     module 2 - quan ly xe, bang gia thue
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.Xe
+
+@using Microsoft.AspNetCore.Http
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Helpers
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
+@inject IHttpContextAccessor HttpContextAccessor
+
 @{
     ViewData["Title"] = "Chi tiết xe";
+
+    var session = HttpContextAccessor.HttpContext?.Session;
+    var vaiTro = session?.GetVaiTro() ?? "";
+    var laQuanTri = vaiTro == VaiTro.Admin || vaiTro == VaiTro.NhanVien;
 
     var badge = Model.TinhTrang switch
     {
@@ -116,7 +126,6 @@
         line-height: 1.7;
     }
 
-    /* PRICE HIGHLIGHT */
     .price-highlight {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         color: #fff;
@@ -217,6 +226,7 @@
 <div class="detail-shell">
     <div class="detail-wrap">
 
+        <!-- HEADER -->
         <div class="detail-head">
             <div>
                 <a asp-action="Index" class="back">← Quay lại danh sách</a>
@@ -226,12 +236,17 @@
                     <span class="status-pill @badge">@Model.TinhTrang</span>
                 </div>
             </div>
-            <a asp-action="Edit" asp-route-id="@Model.MaXe"
-               class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">
-                Sửa xe
-            </a>
+
+            @if (laQuanTri)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.MaXe"
+                   class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">
+                    Sửa xe
+                </a>
+            }
         </div>
 
+        <!-- PRICE HIGHLIGHT -->
         <div class="price-highlight">
             @if (giaHienHanh != null)
             {
@@ -251,13 +266,17 @@
             {
                 <div class="empty-price">
                     Chưa có bảng giá hiện hành cho xe này.
-                    <a asp-controller="BangGiaThue" asp-action="Create" class="text-white fw-bold">
-                        Thêm bảng giá →
-                    </a>
+                    @if (laQuanTri)
+                    {
+                        <a asp-controller="BangGiaThue" asp-action="Create" class="text-white fw-bold">
+                            Thêm bảng giá →
+                        </a>
+                    }
                 </div>
             }
         </div>
 
+        <!-- HERO IMG + INFO -->
         <div class="row g-4 mb-4">
             <div class="col-md-5">
                 <img src="@anh" class="hero-img" alt="@Model.TenXe" />
@@ -303,6 +322,7 @@
             </div>
         </div>
 
+        <!-- MÔ TẢ -->
         @if (!string.IsNullOrEmpty(Model.MoTa))
         {
             <div class="mb-4">
@@ -313,6 +333,7 @@
             </div>
         }
 
+        <!-- BẢNG GIÁ -->
         <div class="data-card">
             <div class="card-head">
                 <h6 class="title">Bảng giá áp dụng cho xe này</h6>
