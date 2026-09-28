@@ -204,8 +204,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             var xe = await _context.Xes
                 .Include(x => x.LoaiXe)
                 .Include(x => x.HangXe)
-                .Include(x => x.BangGiaThues)
-                    .ThenInclude(b => b.LoaiXe)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.MaXe == id);
 
@@ -214,6 +212,19 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 TempData["Error"] = "Khong tim thay xe";
                 return RedirectToAction(nameof(Index));
             }
+
+            // Lay bang gia ap dung: rieng xe (MaXe) HOAC theo loai (MaLoaiXe)
+            var bangGiaApDung = await _context.BangGiaThues
+                .Include(b => b.LoaiXe)
+                .Where(b => b.MaXe == id || b.MaLoaiXe == xe.MaLoaiXe)
+                .OrderByDescending(b => b.TrangThai)
+                .ThenByDescending(b => b.MaXe.HasValue)
+                .ThenByDescending(b => b.TuNgay)
+                .AsNoTracking()
+                .ToListAsync();
+
+            // Truyen qua ViewBag (khong dung xe.BangGiaThues vi relationship chi chua bang gia rieng xe)
+            ViewBag.BangGiaApDung = bangGiaApDung;
 
             return View(xe);
         }
