@@ -5,127 +5,526 @@
    Module: Module 1 - Tai khoan, Dang nhap, Phan quyen, Loai xe, Hang xe
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.LoaiXe.LoaiXeListVM
-
 @{
-    ViewData["Title"] = "Danh sach loai xe";
+    ViewData["Title"] = "Loại xe";
+    int stt = (Model.Trang - 1) * Model.KichThuocTrang;
+
+    var tongLoai = Model.TongSoBanGhi;
+    var dangHoatDong = Model.DanhSach.Count(x => x.TrangThai);
+    var dangNgung = Model.DanhSach.Count(x => !x.TrangThai);
+    var coFilter = !string.IsNullOrEmpty(Model.TuKhoa)
+                || Model.SoChoTu.HasValue
+                || Model.SoChoDen.HasValue
+                || Model.TrangThai.HasValue;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Danh sach loai xe</h2>
-    <a asp-action="Create" class="btn btn-success">Them loai xe moi</a>
-</div>
+<style>
+    .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .page-wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
 
-<div class="card mb-3">
-    <div class="card-body">
-        <form method="get" asp-action="Index" class="row g-2">
-            <div class="col-md-3">
-                <label class="form-label">Tu khoa</label>
-                <input type="text" name="tuKhoa" value="@Model.TuKhoa" class="form-control"
-                       placeholder="Nhap ten loai xe..." />
+    .loai-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        border-radius: 14px;
+        padding: 32px 30px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .loai-hero::before {
+        content: "";
+        position: absolute;
+        top: -60px; right: -60px;
+        width: 220px; height: 220px;
+        background: rgba(255,255,255,.06);
+        border-radius: 50%;
+    }
+    .loai-hero h1 {
+        font-size: 28px; font-weight: 800;
+        letter-spacing: -0.6px; margin: 0 0 6px 0;
+    }
+    .loai-hero .sub {
+        font-size: 14px; opacity: .85;
+        margin: 0 0 20px 0; max-width: 520px;
+    }
+    .stat-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+    .stat-row .stat {
+        background: rgba(255,255,255,.12);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 10px;
+        padding: 14px 16px;
+    }
+    .stat-row .stat .lbl {
+        font-size: 11px; text-transform: uppercase;
+        letter-spacing: .8px; opacity: .8; margin-bottom: 6px;
+    }
+    .stat-row .stat .num {
+        font-size: 22px; font-weight: 800; line-height: 1;
+    }
+    .hero-actions { position: absolute; top: 32px; right: 30px; }
+
+    .filter-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    .filter-card .head {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 16px 22px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .filter-card .head h6 {
+        font-size: 12px; font-weight: 700;
+        letter-spacing: 1px; text-transform: uppercase;
+        color: #475569; margin: 0;
+    }
+    .filter-toggle {
+        background: transparent; border: none;
+        font-size: 13px; font-weight: 600;
+        color: #1d4ed8; cursor: pointer;
+        padding: 4px 8px; border-radius: 6px;
+    }
+    .filter-toggle:hover { background: #eff6ff; }
+    .filter-card .body { padding: 18px 22px; }
+    .filter-card .form-label {
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .5px;
+        color: #64748b; margin-bottom: 6px;
+    }
+    .filter-card .form-control,
+    .filter-card .form-select {
+        border-radius: 8px; border-color: #d1d5db;
+        font-size: 14px; height: 40px;
+    }
+    .filter-card .form-control:focus,
+    .filter-card .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+    .filter-badge {
+        display: inline-block;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 11px; font-weight: 700;
+        padding: 3px 8px; border-radius: 6px;
+        margin-left: 6px;
+    }
+
+    .data-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    .data-card .card-head {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 18px 22px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .data-card .card-head .title {
+        font-size: 14px; font-weight: 700;
+        color: #0f172a; margin: 0;
+    }
+    .data-card .card-head .count {
+        font-size: 12px; color: #64748b;
+        background: #f1f5f9;
+        padding: 4px 12px; border-radius: 999px;
+        font-weight: 600;
+    }
+    .data-card table { margin: 0; font-size: 14px; }
+    .data-card thead th {
+        background: #f9fafb;
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .5px;
+        color: #475569; padding: 14px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+    .data-card tbody td {
+        padding: 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .data-card tbody tr:last-child td { border-bottom: none; }
+    .data-card tbody tr:hover { background: #fafbfc; }
+
+    .loai-name {
+        font-weight: 700; color: #0f172a;
+        font-size: 15px; margin-bottom: 4px;
+    }
+    .loai-meta { font-size: 12px; color: #64748b; }
+
+    .seat-badge {
+        display: inline-block;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .status-pill {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .2px;
+        white-space: nowrap;
+    }
+    .status-pill.on  { background: #dcfce7; color: #166534; }
+    .status-pill.off { background: #f1f5f9; color: #64748b; }
+
+    .count-xe {
+        font-weight: 700;
+        color: #0f172a;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .action-cell {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+    .btn-clean {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #374151;
+        text-decoration: none;
+        transition: all .15s;
+        line-height: 1;
+        white-space: nowrap;
+        min-height: 34px;
+    }
+    .btn-clean:hover { border-color: #9ca3af; background: #f9fafb; color: #111827; }
+    .btn-clean.warn { color: #b45309; border-color: #fcd34d; }
+    .btn-clean.warn:hover { background: #fffbeb; }
+    .btn-clean.danger { color: #b91c1c; border-color: #fca5a5; }
+    .btn-clean.danger:hover { background: #fef2f2; }
+
+    .empty-state {
+        padding: 80px 24px;
+        text-align: center;
+        color: #94a3b8;
+    }
+    .empty-state .big {
+        font-size: 42px; font-weight: 700;
+        color: #e5e7eb; letter-spacing: 4px;
+    }
+    .empty-state .msg { font-size: 15px; margin-top: 8px; }
+
+    .pager {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 16px 22px;
+        background: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+        font-size: 13px; color: #64748b;
+    }
+    .pager .pagination { margin: 0; }
+    .pager .page-link {
+        border-radius: 8px; margin: 0 2px;
+        border-color: #e5e7eb; color: #334155;
+        font-size: 13px; font-weight: 600;
+        padding: 6px 12px;
+    }
+    .pager .page-item.active .page-link {
+        background: #1d4ed8; border-color: #1d4ed8;
+    }
+</style>
+
+<div class="page-shell">
+    <div class="page-wrap">
+
+        <div class="loai-hero">
+            <div class="hero-actions">
+                <a asp-action="Create" class="btn btn-light fw-semibold px-4 py-2"
+                       style="border-radius:8px">
+                    + Thêm loại xe mới
+                </a>
             </div>
-            <div class="col-md-2">
-                <label class="form-label">So cho tu</label>
-                <input type="number" name="soChoTu" value="@Model.SoChoTu" class="form-control" min="1" />
+            <h1>Loại xe</h1>
+            <p class="sub">
+                Danh mục loại xe dùng để phân loại xe trong hệ thống cho thuê.
+                Mỗi loại xe có số chỗ và mô tả riêng.
+            </p>
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="lbl">Tổng số loại</div>
+                    <div class="num">@tongLoai</div>
+                </div>
+                <div class="stat">
+                    <div class="lbl">Đang hoạt động</div>
+                    <div class="num">@dangHoatDong</div>
+                </div>
+                <div class="stat">
+                    <div class="lbl">Ngừng hoạt động</div>
+                    <div class="num">@dangNgung</div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <label class="form-label">So cho den</label>
-                <input type="number" name="soChoDen" value="@Model.SoChoDen" class="form-control" min="1" />
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>Thành công.</strong> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-            <div class="col-md-2">
-                <label class="form-label">Trang thai</label>
-                <select name="trangThai" class="form-select">
-                    <option value="">-- Tat ca --</option>
-                    <option value="true" selected="@(Model.TrangThai == true)">Hoat dong</option>
-                    <option value="false" selected="@(Model.TrangThai == false)">Ngung</option>
-                </select>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Lỗi.</strong> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-            <div class="col-md-2">
-                <label class="form-label">Sap xep theo</label>
-                <select name="sapXepTheo" class="form-select">
-                    <option value="">Mac dinh</option>
-                    <option value="tenloaixe" selected="@(Model.SapXepTheo == "tenloaixe")">Ten loai xe</option>
-                    <option value="socho" selected="@(Model.SapXepTheo == "socho")">So cho</option>
-                </select>
+        }
+
+        <div class="filter-card">
+            <div class="head">
+                <h6>
+                    Tìm kiếm &amp; lọc
+                    @if (coFilter)
+                    {
+                        <span class="filter-badge">Đang lọc</span>
+                    }
+                </h6>
+                <button type="button" class="filter-toggle" data-bs-toggle="collapse"
+                        data-bs-target="#filterBody" aria-expanded="true">
+                    Ẩn / hiện bộ lọc
+                </button>
             </div>
-            <div class="col-md-1 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Loc</button>
+
+            <div class="collapse show" id="filterBody">
+                <div class="body">
+                    <form method="get" asp-action="Index">
+                        <input type="hidden" name="trang" value="1" />
+
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label">Từ khóa</label>
+                                <input type="text" name="tuKhoa" value="@Model.TuKhoa"
+                                       class="form-control"
+                                       placeholder="Nhập tên loại xe..." />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Số chỗ từ</label>
+                                <input type="number" name="soChoTu" value="@Model.SoChoTu"
+                                       class="form-control" min="1" placeholder="1" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Số chỗ đến</label>
+                                <input type="number" name="soChoDen" value="@Model.SoChoDen"
+                                       class="form-control" min="1" placeholder="50" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Trạng thái</label>
+                                <select name="trangThai" class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="true" selected="@(Model.TrangThai == true)">Hoạt động</option>
+                                    <option value="false" selected="@(Model.TrangThai == false)">Ngừng</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Sắp xếp theo</label>
+                                <select name="sapXepTheo" class="form-select">
+                                    <option value="">Mặc định</option>
+                                    <option value="tenloaixe" selected="@(Model.SapXepTheo == "tenloaixe")">Tên loại xe</option>
+                                    <option value="socho" selected="@(Model.SapXepTheo == "socho")">Số chỗ</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-1">
+                                <label class="form-label">Hiển thị</label>
+                                <select name="kichThuocTrang" class="form-select">
+                                    <option value="10" selected="@(Model.KichThuocTrang == 10)">10</option>
+                                    <option value="20" selected="@(Model.KichThuocTrang == 20)">20</option>
+                                    <option value="50" selected="@(Model.KichThuocTrang == 50)">50</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12 d-flex justify-content-end gap-2 pt-2">
+                                <a asp-action="Index" class="btn btn-outline-secondary px-3">Xóa lọc</a>
+                                <button type="submit" class="btn btn-primary px-4">Áp dụng</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
+        </div>
+
+        <div class="data-card">
+            <div class="card-head">
+                <h6 class="title">Danh sách loại xe</h6>
+                <span class="count">
+                    @Model.DanhSach.Count / @Model.TongSoBanGhi loại xe
+                </span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width:56px">STT</th>
+                            <th>Loại xe</th>
+                            <th>Số chỗ</th>
+                            <th>Mô tả</th>
+                            <th class="text-center">Số xe</th>
+                            <th>Trạng thái</th>
+                            <th class="text-end" style="width:240px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.DanhSach.Any())
+                        {
+                            foreach (var item in Model.DanhSach)
+                            {
+                                stt++;
+                                <tr>
+                                    <td class="text-muted">@stt</td>
+                                    <td>
+                                        <div class="loai-name">@item.TenLoaiXe</div>
+                                        <div class="loai-meta">Mã loại: #@item.MaLoaiXe</div>
+                                    </td>
+                                    <td>
+                                        <span class="seat-badge">@item.SoCho chỗ</span>
+                                    </td>
+                                    <td class="text-muted" style="max-width:280px">
+                                        @(string.IsNullOrEmpty(item.MoTa) ? "—" : item.MoTa)
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="count-xe">@(item.Xes?.Count ?? 0)</span>
+                                    </td>
+                                    <td>
+                                        @if (item.TrangThai)
+                                        {
+                                            <span class="status-pill on">Hoạt động</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-pill off">Ngừng</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="action-cell">
+                                            <a asp-action="Details" asp-route-id="@item.MaLoaiXe"
+                                               class="btn-clean">Xem</a>
+                                            <a asp-action="Edit" asp-route-id="@item.MaLoaiXe"
+                                               class="btn-clean warn">Sửa</a>
+                                            <form asp-action="DoiTrangThai" asp-route-id="@item.MaLoaiXe"
+                                                  method="post" class="m-0">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit"
+                                                        class="btn-clean danger"
+                                                        onclick="return confirm('Đổi trạng thái loại xe này?')">
+                                                    @(item.TrangThai ? "Ngừng" : "Bật")
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <div class="big">— — —</div>
+                                        <div class="msg">Không có loại xe nào phù hợp</div>
+                                        @if (coFilter)
+                                        {
+                                            <a asp-action="Index" class="btn btn-outline-primary mt-3">
+                                                Xóa bộ lọc
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TongSoTrang > 1)
+            {
+                <div class="pager">
+                    <div>
+                        Trang <strong>@Model.Trang</strong> / @Model.TongSoTrang —
+                        hiển thị <strong>@Model.DanhSach.Count</strong> trong
+                        <strong>@Model.TongSoBanGhi</strong> loại xe
+                    </div>
+
+                    <nav>
+                        <ul class="pagination pagination-sm">
+                            <li class="page-item @(Model.CoTrangTruoc ? "" : "disabled")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-trang="@(Model.Trang - 1)"
+                                   asp-route-tuKhoa="@Model.TuKhoa"
+                                   asp-route-soChoTu="@Model.SoChoTu"
+                                   asp-route-soChoDen="@Model.SoChoDen"
+                                   asp-route-trangThai="@Model.TrangThai"
+                                   asp-route-sapXepTheo="@Model.SapXepTheo"
+                                   asp-route-kichThuocTrang="@Model.KichThuocTrang">Trước</a>
+                            </li>
+
+                            @{
+                                var batDau = Math.Max(1, Model.Trang - 2);
+                                var ketThuc = Math.Min(Model.TongSoTrang, Model.Trang + 2);
+                            }
+
+                            @for (int i = batDau; i <= ketThuc; i++)
+                            {
+                                <li class="page-item @(i == Model.Trang ? "active" : "")">
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-trang="@i"
+                                       asp-route-tuKhoa="@Model.TuKhoa"
+                                       asp-route-soChoTu="@Model.SoChoTu"
+                                       asp-route-soChoDen="@Model.SoChoDen"
+                                       asp-route-trangThai="@Model.TrangThai"
+                                       asp-route-sapXepTheo="@Model.SapXepTheo"
+                                       asp-route-kichThuocTrang="@Model.KichThuocTrang">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.CoTrangSau ? "" : "disabled")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-trang="@(Model.Trang + 1)"
+                                   asp-route-tuKhoa="@Model.TuKhoa"
+                                   asp-route-soChoTu="@Model.SoChoTu"
+                                   asp-route-soChoDen="@Model.SoChoDen"
+                                   asp-route-trangThai="@Model.TrangThai"
+                                   asp-route-sapXepTheo="@Model.SapXepTheo"
+                                   asp-route-kichThuocTrang="@Model.KichThuocTrang">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
     </div>
 </div>
-
-<div class="table-responsive">
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Ma</th>
-                <th>Ten loai xe</th>
-                <th>So cho</th>
-                <th>Mo ta</th>
-                <th>Trang thai</th>
-                <th>Thao tac</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.DanhSach.Any())
-            {
-                foreach (var item in Model.DanhSach)
-                {
-                    <tr>
-                        <td>@item.MaLoaiXe</td>
-                        <td>@item.TenLoaiXe</td>
-                        <td>@item.SoCho</td>
-                        <td>@(item.MoTa ?? "-")</td>
-                        <td>
-                            @if (item.TrangThai)
-                            {
-                                <span class="badge bg-success">Hoat dong</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Ngung</span>
-                            }
-                        </td>
-                        <td>
-                            <a asp-action="Details" asp-route-id="@item.MaLoaiXe" class="btn btn-sm btn-info">Chi tiet</a>
-                            <a asp-action="Edit" asp-route-id="@item.MaLoaiXe" class="btn btn-sm btn-warning">Sua</a>
-                            <form asp-action="DoiTrangThai" asp-route-id="@item.MaLoaiXe" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-secondary"
-                                        onclick="return confirm('Ban co chac muon doi trang thai?')">
-                                    @(item.TrangThai ? "Ngung" : "Kich hoat")
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="6" class="text-center text-muted">Khong co du lieu</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-@{
-    var pagination = new QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.Shared.PaginationVM
-    {
-        Trang = Model.Trang,
-        TongSoTrang = Model.TongSoTrang,
-        Action = "Index",
-        Controller = "LoaiXe",
-        QueryParams = new Dictionary<string, string?>
-        {
-            ["tuKhoa"] = Model.TuKhoa,
-            ["soChoTu"] = Model.SoChoTu?.ToString(),
-            ["soChoDen"] = Model.SoChoDen?.ToString(),
-            ["trangThai"] = Model.TrangThai?.ToString(),
-            ["sapXepTheo"] = Model.SapXepTheo
-        }
-    };
-}
-
-<partial name="_Pagination" model="pagination" />
