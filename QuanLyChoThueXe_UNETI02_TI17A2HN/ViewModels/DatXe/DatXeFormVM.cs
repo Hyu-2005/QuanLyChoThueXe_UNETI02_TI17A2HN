@@ -1,6 +1,6 @@
 ﻿// File: ViewModels/DatXe/DatXeFormVM.cs
 // Noi dung: ViewModel form dat xe (khach hang dat sau khi da tim xe trong)
-// Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lich
+// Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lichj
 
 using System.ComponentModel.DataAnnotations;
 

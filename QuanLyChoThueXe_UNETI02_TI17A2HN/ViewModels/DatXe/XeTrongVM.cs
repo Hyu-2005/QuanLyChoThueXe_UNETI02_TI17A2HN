@@ -1,6 +1,6 @@
 ﻿// File: ViewModels/DatXe/XeTrongVM.cs
 // Noi dung: ViewModel 1 xe trong ket qua tim xe trong, kem gia ap dung tai thoi diem tim
-// Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lich
+// Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lichj
 
 namespace QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.DatXe
 {

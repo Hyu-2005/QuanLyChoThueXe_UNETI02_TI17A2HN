@@ -1,6 +1,6 @@
 ﻿// File: ViewModels/DatXe/TimXeTrongVM.cs
 // Noi dung: ViewModel tim kiem xe trong theo khoang thoi gian (cho khach hang)
-// Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lich
+// Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lichj
 
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;

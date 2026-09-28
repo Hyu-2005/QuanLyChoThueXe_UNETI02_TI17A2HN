@@ -1,6 +1,6 @@
 ﻿// File: ViewModels/DatXe/DonCuaToiVM.cs
 // Noi dung: ViewModel danh sach don dat xe cua khach hang dang dang nhap
-// Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lich
+// Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lichj
 
 using DatXeEntity = QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.DatXe;
 
