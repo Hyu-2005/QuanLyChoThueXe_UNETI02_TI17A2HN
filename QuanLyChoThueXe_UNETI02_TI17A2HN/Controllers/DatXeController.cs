@@ -1,5 +1,5 @@
 ﻿// File: Controllers/DatXeController.cs
-// Noi dung: Khach hang tim xe trong, dat xe, kiem tra trung lich, xem/huy don cua toi
+// Noi dung: Khach hang tim xe trong, dat xe, kiem tra trung lich, xem/huy don cua to
 // Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lich
 
 using Microsoft.AspNetCore.Mvc;
