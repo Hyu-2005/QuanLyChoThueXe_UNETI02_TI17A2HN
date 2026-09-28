@@ -1,6 +1,8 @@
-﻿@*
-    TimXeTrong.cshtml - form tim xe trong theo khoang thoi gian (khach hang)
-    Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lichj
+﻿@* 
+   File: Views/DatXe/TimXeTrong.cshtml
+   Noi dung: Man hinh tim xe trong theo khoang thoi gian
+   Sinh vien thuc hien: Vu Tien Dat - 23103100119 - SV3
+   Module: Module 3 - Khach hang, Tim xe trong va Dat xe
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.DatXe.TimXeTrongVM
 @{
@@ -9,146 +11,321 @@
 
 <style>
     .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
-    .page-wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .page-wrap { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
 
-    .txt-hero {
+    .hero {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         color: #fff;
         border-radius: 14px;
         padding: 32px 30px;
         margin-bottom: 24px;
     }
-    .txt-hero h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.6px; margin: 0 0 6px 0; }
-    .txt-hero .sub { font-size: 14px; opacity: .85; margin: 0; max-width: 560px; }
+    .hero h1 { font-size: 28px; font-weight: 800; letter-spacing: -.6px; margin: 0 0 6px 0; }
+    .hero p { font-size: 14px; opacity: .85; margin: 0; }
 
     .filter-card {
         background: #fff;
         border: 1px solid #e5e7eb;
         border-radius: 14px;
-        padding: 22px;
+        padding: 24px;
         margin-bottom: 24px;
     }
     .filter-card .form-label {
-        font-size: 11px; font-weight: 700; text-transform: uppercase;
-        letter-spacing: .5px; color: #64748b; margin-bottom: 6px;
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .5px;
+        color: #64748b; margin-bottom: 6px;
     }
-    .filter-card .form-control, .filter-card .form-select {
-        border-radius: 8px; border-color: #d1d5db; font-size: 14px; height: 40px;
+    .filter-card .form-control,
+    .filter-card .form-select {
+        border-radius: 8px; border-color: #d1d5db;
+        font-size: 14px; height: 42px;
+    }
+    .filter-card .form-control:focus,
+    .filter-card .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
     }
 
     .result-head {
         display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 16px;
+    }
+    .result-head h4 {
+        font-size: 16px; font-weight: 700;
+        color: #0f172a; margin: 0;
+    }
+    .result-head .count {
+        font-size: 12px; color: #64748b;
+        background: #e0e7ff; color: #3730a3;
+        padding: 5px 14px; border-radius: 999px;
+        font-weight: 700;
+    }
+
+    .xe-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+    }
+    .xe-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        transition: all .2s;
+        display: flex;
+        flex-direction: column;
+    }
+    .xe-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px rgba(15,23,42,.08);
+        border-color: #cbd5e1;
+    }
+    .xe-card .img-wrap {
+        position: relative;
+        height: 200px;
+        background: #f1f5f9;
+        overflow: hidden;
+    }
+    .xe-card .img-wrap img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+    }
+    .xe-card .type-chip {
+        position: absolute;
+        top: 12px; left: 12px;
+        background: rgba(30,58,138,.9);
+        color: #fff;
+        font-size: 11px; font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 8px;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        backdrop-filter: blur(4px);
+    }
+    .xe-card .body { padding: 18px 20px; flex: 1; }
+    .xe-card .name {
+        font-size: 16px; font-weight: 700;
+        color: #0f172a; margin: 0 0 4px 0;
+    }
+    .xe-card .plate {
+        display: inline-block;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        font-size: 12px; font-weight: 700;
+        color: #0f172a;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-variant-numeric: tabular-nums;
+        margin-bottom: 12px;
+    }
+    .xe-card .specs {
+        display: flex; gap: 12px;
+        font-size: 12px; color: #64748b;
+        padding-bottom: 14px;
+        border-bottom: 1px dashed #e5e7eb;
         margin-bottom: 14px;
     }
-    .result-head h6 { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; }
-    .result-head .count {
-        font-size: 12px; color: #64748b; background: #f1f5f9;
-        padding: 4px 12px; border-radius: 999px; font-weight: 600;
+    .xe-card .specs span { display: inline-flex; align-items: center; gap: 4px; }
+    .xe-card .specs strong { color: #334155; }
+
+    .price-block {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 14px;
+    }
+    .price-block .row-line {
+        display: flex; justify-content: space-between;
+        font-size: 13px; padding: 4px 0;
+    }
+    .price-block .row-line .lbl { color: #64748b; }
+    .price-block .row-line .val { color: #334155; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .price-block .row-line.total {
+        border-top: 1px solid #e2e8f0;
+        margin-top: 6px;
+        padding-top: 8px;
+    }
+    .price-block .row-line.total .lbl {
+        color: #0f172a; font-weight: 700; font-size: 14px;
+    }
+    .price-block .row-line.total .val {
+        color: #1d4ed8; font-weight: 800; font-size: 16px;
     }
 
-    .xe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
-    .xe-card {
-        background: #fff; border: 1px solid #e5e7eb; border-radius: 14px;
-        overflow: hidden; transition: box-shadow .15s;
+    .xe-card .actions {
+        padding: 0 20px 20px;
+        display: flex; gap: 8px;
     }
-    .xe-card:hover { box-shadow: 0 6px 18px rgba(15,23,42,.08); }
-    .xe-card .thumb { width: 100%; height: 150px; object-fit: cover; background: #f8fafc; }
-    .xe-card .body { padding: 16px; }
-    .xe-card .name { font-weight: 700; color: #0f172a; font-size: 15px; margin-bottom: 2px; }
-    .xe-card .plate {
-        display: inline-block; padding: 3px 9px; border-radius: 6px;
-        background: #f1f5f9; border: 1px solid #e2e8f0; font-weight: 700;
-        font-size: 12px; color: #0f172a; margin-bottom: 8px;
+    .xe-card .actions .btn-detail {
+        flex: 1;
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        border: 1px solid #d1d5db;
+        color: #334155;
+        background: #fff;
+        transition: all .15s;
     }
-    .xe-card .meta { font-size: 12px; color: #64748b; margin-bottom: 12px; }
-    .xe-card .price { font-weight: 800; color: #1e40af; font-size: 18px; }
-    .xe-card .price small { font-weight: 500; color: #6b7280; font-size: 11px; }
-    .xe-card .deposit { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+    .xe-card .actions .btn-detail:hover { background: #f9fafb; border-color: #9ca3af; }
+    .xe-card .actions .btn-book {
+        flex: 2;
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        border: none;
+        transition: all .15s;
+        box-shadow: 0 4px 12px rgba(59,130,246,.25);
+    }
+    .xe-card .actions .btn-book:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(59,130,246,.35);
+        color: #fff;
+    }
 
-    .empty-state { padding: 70px 24px; text-align: center; color: #94a3b8; }
-    .empty-state .big { font-size: 40px; font-weight: 700; color: #e5e7eb; letter-spacing: 4px; }
-    .empty-state .msg { font-size: 15px; margin-top: 8px; }
+    .empty-result {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 72px 24px;
+        text-align: center;
+        color: #94a3b8;
+    }
+    .empty-result .big { font-size: 42px; color: #e5e7eb; letter-spacing: 4px; margin-bottom: 12px; }
+    .empty-result .msg { font-size: 15px; }
 </style>
 
 <div class="page-shell">
     <div class="page-wrap">
 
-        <div class="txt-hero">
+        <!-- HERO -->
+        <div class="hero">
             <h1>Tìm xe trống</h1>
-            <p class="sub">
-                Chọn thời gian nhận và trả xe dự kiến, hệ thống sẽ chỉ hiển thị những xe
-                chưa có lịch trùng trong khoảng thời gian bạn chọn.
-            </p>
+            <p>Nhập thời gian nhận và trả xe để tìm xe còn trống trong khoảng thời gian đó</p>
         </div>
 
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <div asp-validation-summary="ModelOnly"></div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
+        <!-- FILTER -->
         <div class="filter-card">
             <form method="post" asp-action="TimXeTrong">
-                <div class="row g-3">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="row g-3 align-items-end">
                     <div class="col-md-3">
-                        <label class="form-label">Thời gian nhận</label>
+                        <label asp-for="ThoiGianNhan" class="form-label"></label>
                         <input asp-for="ThoiGianNhan" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="ThoiGianNhan" class="text-danger small"></span>
                     </div>
+
                     <div class="col-md-3">
-                        <label class="form-label">Thời gian trả</label>
+                        <label asp-for="ThoiGianTra" class="form-label"></label>
                         <input asp-for="ThoiGianTra" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="ThoiGianTra" class="text-danger small"></span>
                     </div>
+
                     <div class="col-md-2">
-                        <label class="form-label">Loại xe</label>
-                        <select asp-for="MaLoaiXe" class="form-select" asp-items="Model.DanhSachLoaiXe">
+                        <label asp-for="MaLoaiXe" class="form-label"></label>
+                        <select asp-for="MaLoaiXe" asp-items="Model.DanhSachLoaiXe" class="form-select">
                             <option value="">Tất cả</option>
                         </select>
                     </div>
+
                     <div class="col-md-2">
-                        <label class="form-label">Số chỗ tối thiểu</label>
-                        <input asp-for="SoCho" type="number" min="1" class="form-control" placeholder="VD: 4" />
+                        <label asp-for="MaHangXe" class="form-label"></label>
+                        <select asp-for="MaHangXe" asp-items="Model.DanhSachHangXe" class="form-select">
+                            <option value="">Tất cả</option>
+                        </select>
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Tìm xe</button>
+
+                    <div class="col-md-2">
+                        <label asp-for="SoCho" class="form-label"></label>
+                        <input asp-for="SoCho" type="number" class="form-control" placeholder="VD: 4" min="1" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label asp-for="DonGiaTu" class="form-label"></label>
+                        <input asp-for="DonGiaTu" type="number" step="1000" class="form-control" placeholder="0" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label asp-for="DonGiaDen" class="form-label"></label>
+                        <input asp-for="DonGiaDen" type="number" step="1000" class="form-control" placeholder="10000000" />
+                    </div>
+
+                    <div class="col-md-8 d-flex justify-content-end gap-2">
+                        <a asp-action="TimXeTrong" class="btn btn-outline-secondary px-3">Xóa lọc</a>
+                        <button type="submit" class="btn btn-primary px-4">Tìm xe trống</button>
                     </div>
                 </div>
             </form>
         </div>
 
+        <!-- KẾT QUẢ -->
         @if (Model.DaTimKiem)
         {
             <div class="result-head">
-                <h6>Kết quả tìm kiếm</h6>
-                <span class="count">@Model.KetQua.Count xe trống</span>
+                <h4>Kết quả tìm kiếm</h4>
+                <span class="count">@Model.DanhSachXeTrong.Count xe trống</span>
             </div>
 
-            @if (Model.KetQua.Any())
+            @if (Model.DanhSachXeTrong.Any())
             {
                 <div class="xe-grid">
-                    @foreach (var xe in Model.KetQua)
+                    @foreach (var xe in Model.DanhSachXeTrong)
                     {
                         <div class="xe-card">
-                            <img src="@(string.IsNullOrEmpty(xe.AnhXe) ? "/images/xe/default.jpg" : xe.AnhXe)"
-                                 class="thumb" alt="@xe.TenXe" />
+                            <div class="img-wrap">
+                                <img src="@(string.IsNullOrEmpty(xe.AnhXe) ? "/images/xe/default.jpg" : xe.AnhXe)"
+                                     alt="@xe.TenXe" />
+                                <span class="type-chip">@xe.TenLoaiXe</span>
+                            </div>
+
                             <div class="body">
-                                <div class="name">@xe.TenXe</div>
+                                <h5 class="name">@xe.TenXe</h5>
                                 <span class="plate">@xe.BienSo</span>
-                                <div class="meta">@xe.TenHangXe · @xe.TenLoaiXe · @xe.SoCho chỗ</div>
-                                <div class="price">
-                                    @xe.TongTienDuKien.ToString("N0") <small>đ / chuyến dự kiến</small>
+
+                                <div class="specs">
+                                    <span><strong>@xe.SoCho</strong> chỗ</span>
+                                    <span>·</span>
+                                    <span><strong>@xe.TenHangXe</strong></span>
+                                    <span>·</span>
+                                    <span>@xe.NamSanXuat</span>
                                 </div>
-                                <div class="deposit">
-                                    Đơn giá ngày @xe.DonGiaNgay.ToString("N0") đ · Cọc @xe.TienCocMacDinh.ToString("N0") đ
+
+                                <div class="price-block">
+                                    <div class="row-line">
+                                        <span class="lbl">Đơn giá ngày</span>
+                                        <span class="val">@xe.DonGiaNgay.ToString("N0") đ</span>
+                                    </div>
+                                    <div class="row-line">
+                                        <span class="lbl">Số ngày thuê</span>
+                                        <span class="val">@xe.SoNgayThue ngày</span>
+                                    </div>
+                                    <div class="row-line">
+                                        <span class="lbl">Tiền cọc</span>
+                                        <span class="val">@xe.TienCocMacDinh.ToString("N0") đ</span>
+                                    </div>
+                                    <div class="row-line total">
+                                        <span class="lbl">Tiền thuê dự kiến</span>
+                                        <span class="val">@xe.TienThueDuKien.ToString("N0") đ</span>
+                                    </div>
                                 </div>
-                                <a class="btn btn-primary w-100"
-                                   asp-controller="DatXe" asp-action="DatXe"
-                                   asp-route-maXe="@xe.MaXe"
-                                   asp-route-tuNgay="@Model.ThoiGianNhan?.ToString("yyyy-MM-ddTHH:mm")"
-                                   asp-route-denNgay="@Model.ThoiGianTra?.ToString("yyyy-MM-ddTHH:mm")">
-                                    Đặt xe này
-                                </a>
+                            </div>
+
+                            <div class="actions">
+                                <a asp-action="Details" asp-route-id="@xe.MaXe"
+                                   asp-controller="Xe"
+                                   class="btn-detail">Chi tiết</a>
+                                <a asp-action="DatXe" asp-route-maXe="@xe.MaXe"
+                                   asp-route-thoiGianNhan="@Model.ThoiGianNhan.ToString("yyyy-MM-ddTHH:mm")"
+                                   asp-route-thoiGianTra="@Model.ThoiGianTra.ToString("yyyy-MM-ddTHH:mm")"
+                                   class="btn-book">Đặt xe này</a>
                             </div>
                         </div>
                     }
@@ -156,11 +333,16 @@
             }
             else
             {
-                <div class="empty-state">
+                <div class="empty-result">
                     <div class="big">— — —</div>
-                    <div class="msg">Không có xe nào trống trong khoảng thời gian đã chọn</div>
+                    <div class="msg">Không có xe nào trống trong khoảng thời gian này</div>
+                    <div class="mt-2 small">Thử đổi thời gian hoặc bỏ bớt bộ lọc</div>
                 </div>
             }
         }
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

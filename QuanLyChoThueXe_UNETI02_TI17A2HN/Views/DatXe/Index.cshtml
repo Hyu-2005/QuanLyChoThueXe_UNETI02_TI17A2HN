@@ -1,34 +1,64 @@
 ﻿@* 
-   File: Views/DatXe/DonCuaToi.cshtml
-   Noi dung: Danh sach don dat xe cua khach hang dang nhap
+   File: Views/DatXe/Index.cshtml
+   Noi dung: Danh sach tat ca don dat xe (admin/nhan vien)
    Sinh vien thuc hien: Vu Tien Dat - 23103100119 - SV3
    Module: Module 3 - Khach hang, Tim xe trong va Dat xe
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.DatXe.DatXeListVM
 @{
-    ViewData["Title"] = "Đơn của tôi";
+    ViewData["Title"] = "Quản lý đơn đặt xe";
     int stt = (Model.Trang - 1) * Model.KichThuocTrang;
 
     var tongDon = Model.TongSoBanGhi;
     var choDuyet = Model.DanhSach.Count(x => x.TrangThai == "Chờ duyệt");
     var daDuyet = Model.DanhSach.Count(x => x.TrangThai == "Đã duyệt");
-    var hoanThanh = Model.DanhSach.Count(x => x.TrangThai == "Hoàn thành");
+    var dangThue = Model.DanhSach.Count(x => x.TrangThai == "Đang thuê");
+    var coFilter = !string.IsNullOrEmpty(Model.TuKhoa)
+                || !string.IsNullOrEmpty(Model.TrangThai)
+                || Model.MaLoaiXe.HasValue
+                || Model.TuNgay.HasValue
+                || Model.DenNgay.HasValue;
 }
 
 <style>
     .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
     .page-wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
 
-    .hero {
+    /* HERO */
+    .dx-hero {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         color: #fff;
         border-radius: 14px;
         padding: 32px 30px;
         margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
     }
-    .hero h1 { font-size: 28px; font-weight: 800; letter-spacing: -.6px; margin: 0 0 6px 0; }
-    .hero p { font-size: 14px; opacity: .85; margin: 0 0 20px 0; }
-    .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .dx-hero::before {
+        content: "";
+        position: absolute;
+        top: -60px; right: -60px;
+        width: 220px; height: 220px;
+        background: rgba(255,255,255,.06);
+        border-radius: 50%;
+    }
+    .dx-hero h1 {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+        margin: 0 0 6px 0;
+    }
+    .dx-hero .sub {
+        font-size: 14px;
+        opacity: .85;
+        margin: 0 0 20px 0;
+        max-width: 560px;
+    }
+    .stat-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
     .stat-row .stat {
         background: rgba(255,255,255,.12);
         backdrop-filter: blur(8px);
@@ -37,11 +67,19 @@
         padding: 14px 16px;
     }
     .stat-row .stat .lbl {
-        font-size: 11px; text-transform: uppercase;
-        letter-spacing: .8px; opacity: .8; margin-bottom: 6px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        opacity: .8;
+        margin-bottom: 6px;
     }
-    .stat-row .stat .num { font-size: 22px; font-weight: 800; line-height: 1; }
+    .stat-row .stat .num {
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1;
+    }
 
+    /* FILTER */
     .filter-card {
         background: #fff;
         border: 1px solid #e5e7eb;
@@ -50,14 +88,19 @@
         margin-bottom: 20px;
     }
     .filter-card .form-label {
-        font-size: 11px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: .5px;
-        color: #64748b; margin-bottom: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: #64748b;
+        margin-bottom: 6px;
     }
     .filter-card .form-control,
     .filter-card .form-select {
-        border-radius: 8px; border-color: #d1d5db;
-        font-size: 14px; height: 40px;
+        border-radius: 8px;
+        border-color: #d1d5db;
+        font-size: 14px;
+        height: 40px;
     }
     .filter-card .form-control:focus,
     .filter-card .form-select:focus {
@@ -65,6 +108,7 @@
         box-shadow: 0 0 0 3px rgba(59,130,246,.12);
     }
 
+    /* DATA */
     .data-card {
         background: #fff;
         border: 1px solid #e5e7eb;
@@ -72,25 +116,38 @@
         overflow: hidden;
     }
     .data-card .card-head {
-        display: flex; justify-content: space-between; align-items: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         padding: 18px 22px;
         border-bottom: 1px solid #f1f5f9;
     }
     .data-card .card-head .title {
-        font-size: 14px; font-weight: 700; color: #0f172a; margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
     }
     .data-card .card-head .count {
-        font-size: 12px; color: #64748b;
+        font-size: 12px;
+        color: #64748b;
         background: #f1f5f9;
-        padding: 4px 12px; border-radius: 999px;
+        padding: 4px 12px;
+        border-radius: 999px;
         font-weight: 600;
     }
-    .data-card table { margin: 0; font-size: 14px; }
+    .data-card table {
+        margin: 0;
+        font-size: 14px;
+    }
     .data-card thead th {
         background: #f9fafb;
-        font-size: 11px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: .5px;
-        color: #475569; padding: 14px 16px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: #475569;
+        padding: 14px 16px;
         border-bottom: 1px solid #e5e7eb;
         white-space: nowrap;
     }
@@ -102,28 +159,83 @@
     .data-card tbody tr:last-child td { border-bottom: none; }
     .data-card tbody tr:hover { background: #fafbfc; }
 
-    .xe-cell { display: flex; align-items: center; gap: 12px; }
+    /* CELL */
+    .kh-cell .name {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+    .kh-cell .phone {
+        font-size: 12px;
+        color: #64748b;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .xe-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
     .xe-thumb {
-        width: 60px; height: 46px;
-        object-fit: cover; border-radius: 8px;
+        width: 56px;
+        height: 44px;
+        object-fit: cover;
+        border-radius: 8px;
         border: 1px solid #e5e7eb;
         flex-shrink: 0;
     }
-    .xe-name { font-weight: 700; color: #0f172a; font-size: 14px; }
+    .xe-name {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
     .xe-plate {
         display: inline-block;
         background: #f1f5f9;
         border: 1px solid #e2e8f0;
-        font-size: 11px; font-weight: 700;
+        font-size: 11px;
+        font-weight: 700;
         padding: 2px 8px;
         border-radius: 5px;
-        margin-top: 2px;
         font-variant-numeric: tabular-nums;
     }
 
-    .time-cell { font-size: 13px; }
-    .time-cell .lbl { color: #64748b; font-size: 11px; display: block; }
-    .time-cell .val { font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; }
+    .time-cell {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    .time-cell .lbl {
+        color: #94a3b8;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+    }
+    .time-cell .val {
+        font-weight: 600;
+        color: #0f172a;
+        font-variant-numeric: tabular-nums;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .money {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        color: #0f172a;
+    }
+    .money.primary {
+        color: #1d4ed8;
+        font-weight: 700;
+        font-size: 15px;
+    }
+    .money .unit {
+        font-size: 11px;
+        font-weight: 500;
+        color: #94a3b8;
+        margin-left: 2px;
+    }
 
     .status-pill {
         display: inline-block;
@@ -144,49 +256,75 @@
     .status-pill.tu-choi { background: #fee2e2; color: #991b1b; }
     .status-pill.da-huy { background: #f1f5f9; color: #64748b; }
 
-    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #0f172a; }
-    .money.primary { color: #1d4ed8; font-weight: 700; font-size: 15px; }
-    .money .unit { font-size: 11px; font-weight: 500; color: #94a3b8; margin-left: 2px; }
-
-    .action-cell { display: flex; justify-content: flex-end; gap: 6px; flex-wrap: nowrap; }
+    .action-cell {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
     .btn-clean {
-        display: inline-flex; align-items: center; justify-content: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         padding: 7px 14px;
-        font-size: 13px; font-weight: 600;
+        font-size: 13px;
+        font-weight: 600;
         border-radius: 8px;
         border: 1px solid #d1d5db;
-        background: #fff; color: #374151;
+        background: #fff;
+        color: #374151;
         text-decoration: none;
         transition: all .15s;
-        line-height: 1; white-space: nowrap;
+        line-height: 1;
+        white-space: nowrap;
         min-height: 34px;
     }
     .btn-clean:hover { border-color: #9ca3af; background: #f9fafb; color: #111827; }
-    .btn-clean.danger { color: #b91c1c; border-color: #fca5a5; }
-    .btn-clean.danger:hover { background: #fef2f2; }
+    .btn-clean.warn { color: #b45309; border-color: #fcd34d; }
+    .btn-clean.warn:hover { background: #fffbeb; }
 
     .empty-state {
-        padding: 72px 24px; text-align: center; color: #94a3b8;
+        padding: 80px 24px;
+        text-align: center;
+        color: #94a3b8;
     }
-    .empty-state .big { font-size: 42px; color: #e5e7eb; letter-spacing: 4px; }
+    .empty-state .big {
+        font-size: 42px;
+        font-weight: 700;
+        color: #e5e7eb;
+        letter-spacing: 4px;
+    }
     .empty-state .msg { font-size: 15px; margin-top: 8px; }
 
+    /* PAGER */
     .pager {
-        display: flex; justify-content: space-between; align-items: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         padding: 16px 22px;
         background: #f9fafb;
         border-top: 1px solid #e5e7eb;
-        font-size: 13px; color: #64748b;
+        font-size: 13px;
+        color: #64748b;
     }
     .pager .pagination { margin: 0; }
     .pager .page-link {
-        border-radius: 8px; margin: 0 2px;
-        border-color: #e5e7eb; color: #334155;
-        font-size: 13px; font-weight: 600;
+        border-radius: 8px;
+        margin: 0 2px;
+        border-color: #e5e7eb;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
         padding: 6px 12px;
     }
     .pager .page-item.active .page-link {
-        background: #1d4ed8; border-color: #1d4ed8;
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+
+    @@media (max-width: 768px) {
+        .stat-row { grid-template-columns: repeat(2, 1fr); }
     }
 </style>
 
@@ -194,12 +332,15 @@
     <div class="page-wrap">
 
         <!-- HERO -->
-        <div class="hero">
-            <h1>Đơn đặt xe của tôi</h1>
-            <p>Theo dõi trạng thái các đơn đặt xe bạn đã tạo</p>
+        <div class="dx-hero">
+            <h1>Quản lý đơn đặt xe</h1>
+            <p class="sub">
+                Theo dõi, lọc và xử lý toàn bộ đơn đặt xe trong hệ thống.
+                Duyệt đơn, bàn giao, trả xe và thanh toán ở các module tiếp theo.
+            </p>
             <div class="stat-row">
                 <div class="stat">
-                    <div class="lbl">Tổng đơn</div>
+                    <div class="lbl">Tổng số đơn</div>
                     <div class="num">@tongDon</div>
                 </div>
                 <div class="stat">
@@ -211,8 +352,8 @@
                     <div class="num">@daDuyet</div>
                 </div>
                 <div class="stat">
-                    <div class="lbl">Hoàn thành</div>
-                    <div class="num">@hoanThanh</div>
+                    <div class="lbl">Đang thuê</div>
+                    <div class="num">@dangThue</div>
                 </div>
             </div>
         </div>
@@ -235,14 +376,15 @@
 
         <!-- FILTER -->
         <div class="filter-card">
-            <form method="get" asp-action="DonCuaToi">
+            <form method="get" asp-action="Index">
                 <input type="hidden" name="trang" value="1" />
 
                 <div class="row g-3 align-items-end">
                     <div class="col-md-3">
                         <label class="form-label">Từ khóa</label>
                         <input type="text" name="tuKhoa" value="@Model.TuKhoa"
-                               class="form-control" placeholder="Biển số, tên xe..." />
+                               class="form-control"
+                               placeholder="Tên KH, SĐT, biển số, tên xe..." />
                     </div>
 
                     <div class="col-md-2">
@@ -261,13 +403,15 @@
 
                     <div class="col-md-2">
                         <label class="form-label">Từ ngày nhận</label>
-                        <input type="date" name="tuNgay" value="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+                        <input type="date" name="tuNgay"
+                               value="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
                                class="form-control" />
                     </div>
 
                     <div class="col-md-2">
                         <label class="form-label">Đến ngày</label>
-                        <input type="date" name="denNgay" value="@(Model.DenNgay?.ToString("yyyy-MM-dd"))"
+                        <input type="date" name="denNgay"
+                               value="@(Model.DenNgay?.ToString("yyyy-MM-dd"))"
                                class="form-control" />
                     </div>
 
@@ -281,7 +425,7 @@
                     </div>
 
                     <div class="col-md-11 d-flex justify-content-end gap-2">
-                        <a asp-action="DonCuaToi" class="btn btn-outline-secondary px-3">Xóa lọc</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-3">Xóa lọc</a>
                         <button type="submit" class="btn btn-primary px-4">Áp dụng</button>
                     </div>
                 </div>
@@ -291,8 +435,10 @@
         <!-- DATA -->
         <div class="data-card">
             <div class="card-head">
-                <h6 class="title">Danh sách đơn</h6>
-                <span class="count">@Model.DanhSach.Count / @Model.TongSoBanGhi đơn</span>
+                <h6 class="title">Danh sách đơn đặt xe</h6>
+                <span class="count">
+                    @Model.DanhSach.Count / @Model.TongSoBanGhi đơn
+                </span>
             </div>
 
             <div class="table-responsive">
@@ -300,12 +446,13 @@
                     <thead>
                         <tr>
                             <th style="width:56px">STT</th>
+                            <th>Khách hàng</th>
                             <th>Xe</th>
                             <th>Thời gian thuê</th>
                             <th class="text-end">Đơn giá / ngày</th>
                             <th class="text-end">Tiền cọc</th>
                             <th>Trạng thái</th>
-                            <th class="text-end" style="width:180px">Thao tác</th>
+                            <th class="text-end" style="width:170px">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -326,10 +473,17 @@
                                     "Đã hủy" => "da-huy",
                                     _ => "da-huy"
                                 };
-                                var coTheHuy = item.TrangThai == "Chờ duyệt" || item.TrangThai == "Đã duyệt";
 
                                 <tr>
                                     <td class="text-muted">@stt</td>
+
+                                    <td>
+                                        <div class="kh-cell">
+                                            <div class="name">@item.KhachHang?.HoTen</div>
+                                            <div class="phone">@item.KhachHang?.SoDienThoai</div>
+                                        </div>
+                                    </td>
+
                                     <td>
                                         <div class="xe-cell">
                                             <img src="@(string.IsNullOrEmpty(item.Xe?.AnhXe) ? "/images/xe/default.jpg" : item.Xe.AnhXe)"
@@ -340,41 +494,34 @@
                                             </div>
                                         </div>
                                     </td>
+
                                     <td class="time-cell">
                                         <span class="lbl">Nhận</span>
                                         <span class="val">@item.ThoiGianNhanDuKien.ToString("dd/MM/yyyy HH:mm")</span>
-                                        <span class="lbl mt-1">Trả</span>
+                                        <span class="lbl">Trả</span>
                                         <span class="val">@item.ThoiGianTraDuKien.ToString("dd/MM/yyyy HH:mm")</span>
                                     </td>
+
                                     <td class="text-end">
                                         <span class="money primary">
                                             @item.DonGiaApDung.ToString("N0")<span class="unit">đ</span>
                                         </span>
                                     </td>
+
                                     <td class="text-end">
                                         <span class="money">
                                             @item.TienCoc.ToString("N0")<span class="unit">đ</span>
                                         </span>
                                     </td>
+
                                     <td>
                                         <span class="status-pill @statusClass">@item.TrangThai</span>
                                     </td>
+
                                     <td>
                                         <div class="action-cell">
                                             <a asp-action="Details" asp-route-id="@item.MaDatXe"
                                                class="btn-clean">Xem</a>
-                                            @if (coTheHuy)
-                                            {
-                                                <form asp-action="Huy" asp-route-id="@item.MaDatXe"
-                                                      method="post" class="m-0">
-                                                    @Html.AntiForgeryToken()
-                                                    <button type="submit"
-                                                            class="btn-clean danger"
-                                                            onclick="return confirm('Bạn có chắc muốn hủy đơn này?')">
-                                                        Hủy
-                                                    </button>
-                                                </form>
-                                            }
                                         </div>
                                     </td>
                                 </tr>
@@ -383,13 +530,16 @@
                         else
                         {
                             <tr>
-                                <td colspan="7">
+                                <td colspan="8">
                                     <div class="empty-state">
                                         <div class="big">— — —</div>
-                                        <div class="msg">Bạn chưa có đơn đặt xe nào</div>
-                                        <a asp-action="TimXeTrong" class="btn btn-primary mt-3">
-                                            Tìm xe và đặt ngay
-                                        </a>
+                                        <div class="msg">Không có đơn đặt xe nào phù hợp</div>
+                                        @if (coFilter)
+                                        {
+                                            <a asp-action="Index" class="btn btn-outline-primary mt-3">
+                                                Xóa bộ lọc
+                                            </a>
+                                        }
                                     </div>
                                 </td>
                             </tr>
@@ -398,6 +548,7 @@
                 </table>
             </div>
 
+            <!-- PAGER -->
             @if (Model.TongSoTrang > 1)
             {
                 <div class="pager">
@@ -411,11 +562,15 @@
                         <ul class="pagination pagination-sm">
                             <li class="page-item @(Model.CoTrangTruoc ? "" : "disabled")">
                                 <a class="page-link"
-                                   asp-action="DonCuaToi"
+                                   asp-action="Index"
                                    asp-route-trang="@(Model.Trang - 1)"
                                    asp-route-tuKhoa="@Model.TuKhoa"
                                    asp-route-trangThai="@Model.TrangThai"
                                    asp-route-maLoaiXe="@Model.MaLoaiXe"
+                                   asp-route-tuNgay="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+                                   asp-route-denNgay="@(Model.DenNgay?.ToString("yyyy-MM-dd"))"
+                                   asp-route-sapXepTheo="@Model.SapXepTheo"
+                                   asp-route-thuTuSapXep="@Model.ThuTuSapXep"
                                    asp-route-kichThuocTrang="@Model.KichThuocTrang">Trước</a>
                             </li>
 
@@ -428,22 +583,30 @@
                             {
                                 <li class="page-item @(i == Model.Trang ? "active" : "")">
                                     <a class="page-link"
-                                       asp-action="DonCuaToi"
+                                       asp-action="Index"
                                        asp-route-trang="@i"
                                        asp-route-tuKhoa="@Model.TuKhoa"
                                        asp-route-trangThai="@Model.TrangThai"
                                        asp-route-maLoaiXe="@Model.MaLoaiXe"
+                                       asp-route-tuNgay="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+                                       asp-route-denNgay="@(Model.DenNgay?.ToString("yyyy-MM-dd"))"
+                                       asp-route-sapXepTheo="@Model.SapXepTheo"
+                                       asp-route-thuTuSapXep="@Model.ThuTuSapXep"
                                        asp-route-kichThuocTrang="@Model.KichThuocTrang">@i</a>
                                 </li>
                             }
 
                             <li class="page-item @(Model.CoTrangSau ? "" : "disabled")">
                                 <a class="page-link"
-                                   asp-action="DonCuaToi"
+                                   asp-action="Index"
                                    asp-route-trang="@(Model.Trang + 1)"
                                    asp-route-tuKhoa="@Model.TuKhoa"
                                    asp-route-trangThai="@Model.TrangThai"
                                    asp-route-maLoaiXe="@Model.MaLoaiXe"
+                                   asp-route-tuNgay="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+                                   asp-route-denNgay="@(Model.DenNgay?.ToString("yyyy-MM-dd"))"
+                                   asp-route-sapXepTheo="@Model.SapXepTheo"
+                                   asp-route-thuTuSapXep="@Model.ThuTuSapXep"
                                    asp-route-kichThuocTrang="@Model.KichThuocTrang">Sau</a>
                             </li>
                         </ul>
