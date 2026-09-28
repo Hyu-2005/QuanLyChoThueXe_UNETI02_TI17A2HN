@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Data;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData;
+using QuanLyChoThueXe_UNETI02_TI17A2HN.Services.Implementations;
+using QuanLyChoThueXe_UNETI02_TI17A2HN.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,9 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<ITrungLichService, TrungLichService>();
+builder.Services.AddScoped<IXeTrongService, XeTrongService>();
 
 var app = builder.Build();
 
