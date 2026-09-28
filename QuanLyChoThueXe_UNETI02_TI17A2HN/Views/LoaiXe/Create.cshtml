@@ -1,47 +1,158 @@
-﻿@*
+﻿@* 
    File: Views/LoaiXe/Create.cshtml
-   Noi dung: Them loai xe moi
+   Noi dung: Form them loai xe moi
    Sinh vien thuc hien: Pham Gia Minh Hoang - 23103100087 - SV1
    Module: Module 1 - Tai khoan, Dang nhap, Phan quyen, Loai xe, Hang xe
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.LoaiXe.LoaiXeFormVM
-
 @{
-    ViewData["Title"] = "Them loai xe";
+    ViewData["Title"] = "Thêm loại xe";
 }
 
-<h2>Them loai xe</h2>
+<style>
+    .form-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .form-wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
 
-<div class="row">
-    <div class="col-md-6">
+    .form-head {
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .form-head .back {
+        font-size: 13px; color: #64748b; text-decoration: none;
+        display: inline-block; margin-bottom: 8px;
+    }
+    .form-head .back:hover { color: #1d4ed8; }
+    .form-head h1 {
+        font-size: 26px; font-weight: 800; color: #0f172a;
+        letter-spacing: -0.4px; margin: 0 0 4px 0;
+    }
+    .form-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+
+    .form-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(15,23,42,.04);
+    }
+    .form-card .sect {
+        padding: 28px 32px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .form-card .sect:last-of-type { border-bottom: none; }
+    .form-card .sect-title {
+        display: flex; align-items: center; gap: 12px;
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        color: #64748b; margin: 0 0 22px 0;
+    }
+    .form-card .sect-title .num {
+        width: 26px; height: 26px; border-radius: 50%;
+        background: #1d4ed8; color: #fff;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .form-card .sect-title .hint {
+        margin-left: auto; font-size: 11px; font-weight: 500;
+        text-transform: none; letter-spacing: 0; color: #94a3b8;
+    }
+
+    .form-label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+    .form-label .req { color: #dc2626; margin-left: 2px; }
+    .form-control, .form-select {
+        border-radius: 8px; border-color: #d1d5db;
+        font-size: 14px; padding: 9px 12px; height: 42px;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+    .form-text { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+
+    .form-actions {
+        padding: 20px 32px;
+        background: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+        display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .form-actions .btn { padding: 10px 26px; font-weight: 600; border-radius: 8px; }
+</style>
+
+<div class="form-shell">
+    <div class="form-wrap">
+
+        <div class="form-head">
+            <a asp-action="Index" class="back">← Quay lại danh sách</a>
+            <h1>Thêm loại xe mới</h1>
+            <p class="sub">Khai báo loại xe dùng để phân loại xe trong hệ thống</p>
+        </div>
+
         <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-            <div class="mb-3">
-                <label asp-for="TenLoaiXe" class="form-label"></label>
-                <input asp-for="TenLoaiXe" class="form-control" />
-                <span asp-validation-for="TenLoaiXe" class="text-danger"></span>
+            <div class="form-card">
+
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">1</span> Thông tin loại xe
+                        <span class="hint">Tên và số chỗ ngồi</span>
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label asp-for="TenLoaiXe" class="form-label">
+                                Tên loại xe <span class="req">*</span>
+                            </label>
+                            <input asp-for="TenLoaiXe" class="form-control"
+                                   placeholder="VD: Sedan 4 chỗ, SUV 5 chỗ, MPV 7 chỗ..." />
+                            <span asp-validation-for="TenLoaiXe" class="text-danger small"></span>
+                            <div class="form-text">Tên loại xe phải là duy nhất trong hệ thống</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="SoCho" class="form-label">
+                                Số chỗ <span class="req">*</span>
+                            </label>
+                            <input asp-for="SoCho" type="number" class="form-control"
+                                   placeholder="VD: 4" />
+                            <span asp-validation-for="SoCho" class="text-danger small"></span>
+                            <div class="form-text">Từ 1 đến 50 chỗ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">2</span> Mô tả &amp; trạng thái
+                        <span class="hint">Mô tả chi tiết và trạng thái hoạt động</span>
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label asp-for="MoTa" class="form-label">Mô tả</label>
+                            <textarea asp-for="MoTa" rows="3" class="form-control"
+                                      placeholder="VD: Xe sedan 4 chỗ phù hợp đi gia đình nhỏ, tiết kiệm nhiên liệu..."></textarea>
+                            <span asp-validation-for="MoTa" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <div class="form-check">
+                                <input asp-for="TrangThai" class="form-check-input" />
+                                <label asp-for="TrangThai" class="form-check-label fw-semibold"></label>
+                                <div class="form-text">
+                                    Loại xe ngừng hoạt động sẽ không thể gán cho xe mới
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-primary">Lưu loại xe</button>
+                </div>
             </div>
-
-            <div class="mb-3">
-                <label asp-for="SoCho" class="form-label"></label>
-                <input asp-for="SoCho" class="form-control" type="number" />
-                <span asp-validation-for="SoCho" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="MoTa" class="form-label"></label>
-                <textarea asp-for="MoTa" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="MoTa" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3 form-check">
-                <input asp-for="TrangThai" class="form-check-input" />
-                <label asp-for="TrangThai" class="form-check-label"></label>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Luu</button>
-            <a asp-action="Index" class="btn btn-secondary">Huy</a>
         </form>
     </div>
 </div>

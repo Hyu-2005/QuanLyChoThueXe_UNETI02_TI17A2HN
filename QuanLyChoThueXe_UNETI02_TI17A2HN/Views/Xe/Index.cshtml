@@ -4,9 +4,19 @@
     module 2 - quan ly xe, bang gia thue
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.Xe.XeListVM
+
+@using Microsoft.AspNetCore.Http
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Helpers
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
+@inject IHttpContextAccessor HttpContextAccessor
+
 @{
     ViewData["Title"] = "Quản lý xe";
     int stt = (Model.Trang - 1) * Model.KichThuocTrang;
+
+    var session = HttpContextAccessor.HttpContext?.Session;
+    var vaiTro = session?.GetVaiTro() ?? "";
+    var laQuanTri = vaiTro == VaiTro.Admin || vaiTro == VaiTro.NhanVien;
 
     var tongXe = Model.TongSoBanGhi;
     var sanSang = Model.DanhSach.Count(x => x.TinhTrang == "Sẵn sàng");
@@ -285,6 +295,17 @@
     .btn-clean.warn:hover { background: #fffbeb; }
     .btn-clean.danger { color: #b91c1c; border-color: #fca5a5; }
     .btn-clean.danger:hover { background: #fef2f2; }
+    .btn-clean.primary {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 4px 12px rgba(59,130,246,.25);
+    }
+    .btn-clean.primary:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(59,130,246,.35);
+    }
 
     .empty-state {
         padding: 80px 24px;
@@ -334,16 +355,31 @@
     <div class="page-wrap">
 
         <div class="xe-hero">
-            <div class="hero-actions">
-                <a asp-action="Create" class="btn btn-light fw-semibold px-4 py-2"
-                   style="border-radius:8px">
-                    + Thêm xe mới
-                </a>
-            </div>
-            <h1>Quản lý xe</h1>
+            @if (laQuanTri)
+            {
+                <div class="hero-actions">
+                    <a asp-action="Create" class="btn btn-light fw-semibold px-4 py-2"
+                       style="border-radius:8px">
+                        + Thêm xe mới
+                    </a>
+                </div>
+            }
+            <h1>@(laQuanTri ? "Quản lý xe" : "Danh sách xe cho thuê")</h1>
             <p class="sub">
-                Danh sách toàn bộ xe cho thuê trong hệ thống. Theo dõi tình trạng,
-                cấu hình giá và kiểm soát khai thác xe.
+                @if (laQuanTri)
+                {
+                    <span>
+                        Danh sách toàn bộ xe cho thuê trong hệ thống. Theo dõi tình trạng,
+                        cấu hình giá và kiểm soát khai thác xe.
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        Xem danh sách xe đang cho thuê. Nhấn <strong>Tìm xe trống</strong>
+                        để tìm theo khoảng thời gian và đặt xe.
+                    </span>
+                }
             </p>
             <div class="stat-row">
                 <div class="stat">
@@ -557,28 +593,20 @@
                                         @xe.SoKmHienTai.ToString("N0") km
                                     </td>
                                     <td class="text-end">
-                                        @{
-                                            var giaHienHanh = xe.BangGiaThues?
-                                                .Where(b => b.TrangThai
-                                                         && b.TuNgay <= DateTime.Today
-                                                         && b.DenNgay >= DateTime.Today)
-                                                .OrderByDescending(b => b.MaXe.HasValue)
-                                                .FirstOrDefault();
-                                        }
-                                        @if (giaHienHanh != null)
-                                        {
-                                            <div class="price-tag">
-                                                @giaHienHanh.DonGiaNgay.ToString("N0") <small>đ</small>
-                                            </div>
-                                            <div class="price-sub">
-                                                Cọc @giaHienHanh.TienCocMacDinh.ToString("N0") đ
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted small">Chưa có giá</span>
-                                        }
-                                    </td>
+    @if (Model.GiaHienHanh.TryGetValue(xe.MaXe, out var gia))
+    {
+        <div class="price-tag">
+            @gia.DonGiaNgay.ToString("N0") <small>đ</small>
+        </div>
+        <div class="price-sub">
+            Cọc @gia.TienCoc.ToString("N0") đ
+        </div>
+    }
+    else
+    {
+        <span class="text-muted small">Chưa có giá</span>
+    }
+</td>
                                     <td>
                                         <span class="status-pill @badge">@xe.TinhTrang</span>
                                     </td>
@@ -586,8 +614,12 @@
                                         <div class="action-cell">
                                             <a asp-action="Details" asp-route-id="@xe.MaXe"
                                                class="btn-clean">Xem</a>
-                                            <a asp-action="Edit" asp-route-id="@xe.MaXe"
-                                               class="btn-clean warn">Sửa</a>
+
+                                            @if (laQuanTri)
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@xe.MaXe"
+                                                   class="btn-clean warn">Sửa</a>
+                                            }
                                         </div>
                                     </td>
                                 </tr>
