@@ -1,74 +1,288 @@
-﻿@*
+﻿@* 
    File: Views/HangXe/Details.cshtml
    Noi dung: Chi tiet hang xe
    Sinh vien thuc hien: Pham Gia Minh Hoang - 23103100087 - SV1
    Module: Module 1 - Tai khoan, Dang nhap, Phan quyen, Loai xe, Hang xe
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.HangXe
-
 @{
-    ViewData["Title"] = "Chi tiet hang xe";
+    ViewData["Title"] = "Chi tiết hãng xe";
 }
 
-<h2>Chi tiet hang xe</h2>
+<style>
+    .detail-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .detail-wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
-<div class="card">
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Ma hang xe</dt>
-            <dd class="col-sm-9">@Model.MaHangXe</dd>
+    .detail-head {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        margin-bottom: 28px; padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .detail-head .back {
+        font-size: 13px; color: #64748b; text-decoration: none;
+        display: inline-block; margin-bottom: 8px;
+    }
+    .detail-head .back:hover { color: #1d4ed8; }
+    .detail-head h1 {
+        font-size: 26px; font-weight: 800; color: #0f172a;
+        letter-spacing: -0.4px; margin: 0 0 8px 0;
+    }
+    .id-chip {
+        display: inline-block;
+        background: #e0e7ff;
+        color: #3730a3;
+        font-weight: 700;
+        font-size: 13px;
+        padding: 4px 12px;
+        border-radius: 8px;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    .status-pill {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+    }
+    .status-pill.on  { background: #dcfce7; color: #166534; }
+    .status-pill.off { background: #f1f5f9; color: #64748b; }
 
-            <dt class="col-sm-3">Ten hang xe</dt>
-            <dd class="col-sm-9">@Model.TenHangXe</dd>
+    .info-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 26px 30px;
+        height: 100%;
+    }
+    .info-card .title {
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        color: #64748b; margin: 0 0 20px 0;
+    }
+    .info-row {
+        display: flex; justify-content: space-between;
+        padding: 13px 0; border-bottom: 1px solid #f1f5f9;
+        font-size: 14px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .lbl { color: #64748b; }
+    .info-row .val {
+        font-weight: 600; color: #0f172a; text-align: right;
+    }
 
-            <dt class="col-sm-3">Quoc gia</dt>
-            <dd class="col-sm-9">@(Model.QuocGia ?? "-")</dd>
+    .country-highlight {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        border-radius: 14px;
+        padding: 26px 30px;
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 20px;
+    }
+    .country-highlight .lbl {
+        font-size: 12px; text-transform: uppercase;
+        letter-spacing: .8px; opacity: .85; margin-bottom: 6px;
+    }
+    .country-highlight .val {
+        font-size: 28px; font-weight: 800;
+        letter-spacing: -0.5px; line-height: 1;
+    }
+    .country-highlight .extra {
+        text-align: right; font-size: 13px; opacity: .9;
+        line-height: 1.8;
+    }
 
-            <dt class="col-sm-3">Mo ta</dt>
-            <dd class="col-sm-9">@(Model.MoTa ?? "-")</dd>
+    .desc-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 18px 20px;
+        font-size: 14px;
+        color: #334155;
+        line-height: 1.7;
+    }
 
-            <dt class="col-sm-3">Trang thai</dt>
-            <dd class="col-sm-9">
-                @if (Model.TrangThai)
-                {
-                    <span class="badge bg-success">Hoat dong</span>
-                }
-                else
-                {
-                    <span class="badge bg-secondary">Ngung</span>
-                }
-            </dd>
-        </dl>
+    .data-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    .data-card .card-head {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .data-card .card-head .title {
+        font-size: 14px; font-weight: 700;
+        color: #0f172a; margin: 0;
+        text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .data-card .card-head .count {
+        font-size: 12px; color: #64748b;
+        background: #f1f5f9;
+        padding: 4px 12px; border-radius: 999px;
+        font-weight: 600;
+    }
 
-        <h4 class="mt-4">Danh sach xe thuoc hang nay (@Model.Xes.Count xe)</h4>
-        @if (Model.Xes.Any())
-        {
-            <table class="table table-sm table-bordered">
-                <thead class="table-light">
-                    <tr>
-                        <th>Bien so</th>
-                        <th>Ten xe</th>
-                        <th>Tinh trang</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var xe in Model.Xes)
+    .data-card table { margin: 0; font-size: 14px; }
+    .data-card thead th {
+        background: #f9fafb;
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        color: #475569; padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .data-card tbody td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .data-card tbody tr:last-child td { border-bottom: none; }
+
+    .badge-soft {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px; font-weight: 700;
+        letter-spacing: .3px;
+    }
+</style>
+
+<div class="detail-shell">
+    <div class="detail-wrap">
+
+        <div class="detail-head">
+            <div>
+                <a asp-action="Index" class="back">← Quay lại danh sách</a>
+                <h1>@Model.TenHangXe</h1>
+                <div>
+                    <span class="id-chip">Mã hãng: #@Model.MaHangXe</span>
+                    @if (Model.TrangThai)
                     {
-                        <tr>
-                            <td>@xe.BienSo</td>
-                            <td>@xe.TenXe</td>
-                            <td>@xe.TinhTrang</td>
-                        </tr>
+                        <span class="status-pill on">Hoạt động</span>
                     }
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <p class="text-muted">Chua co xe nao thuoc hang nay</p>
-        }
+                    else
+                    {
+                        <span class="status-pill off">Ngừng</span>
+                    }
+                </div>
+            </div>
+            <a asp-action="Edit" asp-route-id="@Model.MaHangXe"
+               class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">
+                Sửa hãng xe
+            </a>
+        </div>
+
+        <div class="country-highlight">
+            <div>
+                <div class="lbl">Quốc gia</div>
+                <div class="val">@(string.IsNullOrEmpty(Model.QuocGia) ? "Chưa xác định" : Model.QuocGia)</div>
+            </div>
+            <div class="extra">
+                <div>Số xe thuộc hãng này:</div>
+                <div style="font-size:20px;font-weight:800">@(Model.Xes?.Count ?? 0) xe</div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h6 class="title">Thông tin hãng xe</h6>
+                    <div class="info-row">
+                        <span class="lbl">Mã hãng</span>
+                        <span class="val">#@Model.MaHangXe</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Tên hãng</span>
+                        <span class="val">@Model.TenHangXe</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Quốc gia</span>
+                        <span class="val">@(string.IsNullOrEmpty(Model.QuocGia) ? "—" : Model.QuocGia)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Trạng thái</span>
+                        <span class="val">
+                            @if (Model.TrangThai)
+                            {
+                                <span class="badge-soft" style="background:#dcfce7;color:#166534">Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span class="badge-soft" style="background:#f1f5f9;color:#64748b">Ngừng</span>
+                            }
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.MoTa))
+            {
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h6 class="title">Mô tả</h6>
+                        <div class="desc-box">@Model.MoTa</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="data-card">
+            <div class="card-head">
+                <h6 class="title">Xe thuộc hãng này</h6>
+                <span class="count">@(Model.Xes?.Count ?? 0) xe</span>
+            </div>
+
+            @if (Model.Xes != null && Model.Xes.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width:70px">STT</th>
+                                <th>Biển số</th>
+                                <th>Tên xe</th>
+                                <th>Loại xe</th>
+                                <th>Năm SX</th>
+                                <th>Tình trạng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ int i = 0; }
+                            @foreach (var xe in Model.Xes)
+                            {
+                                i++;
+                                <tr>
+                                    <td class="text-muted">@i</td>
+                                    <td>
+                                        <span class="badge-soft" style="background:#f1f5f9;color:#0f172a">
+                                            @xe.BienSo
+                                        </span>
+                                    </td>
+                                    <td class="fw-semibold">@xe.TenXe</td>
+                                    <td class="text-muted">@(xe.LoaiXe?.TenLoaiXe ?? "-")</td>
+                                    <td class="text-muted">@xe.NamSanXuat</td>
+                                    <td>
+                                        <span class="badge-soft" style="background:#eef2ff;color:#3730a3">
+                                            @xe.TinhTrang
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 text-muted">
+                    <div style="font-size:40px;color:#cbd5e1;letter-spacing:6px">— — —</div>
+                    <div class="mt-2">Chưa có xe nào thuộc hãng này</div>
+                </div>
+            }
+        </div>
     </div>
 </div>
-
-<a asp-action="Edit" asp-route-id="@Model.MaHangXe" class="btn btn-warning">Sua</a>
-<a asp-action="Index" class="btn btn-secondary">Quay lai</a>
