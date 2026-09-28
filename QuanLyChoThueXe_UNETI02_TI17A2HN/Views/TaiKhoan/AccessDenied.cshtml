@@ -1,16 +1,82 @@
-﻿@*
+﻿@* 
    File: Views/TaiKhoan/AccessDenied.cshtml
    Noi dung: Trang bao khong co quyen truy cap
    Sinh vien thuc hien: Pham Gia Minh Hoang - 23103100087 - SV1
    Module: Module 1 - Tai khoan, Dang nhap, Phan quyen, Loai xe, Hang xe
 *@
+
 @{
-    ViewData["Title"] = "Khong co quyen truy cap";
+    ViewData["Title"] = "Không có quyền truy cập";
 }
 
-<div class="text-center mt-5">
-    <h1 class="display-1 text-danger">403</h1>
-    <h3 class="mb-3">Ban khong co quyen truy cap trang nay</h3>
-    <p class="text-muted">Vui long lien he quan tri vien neu ban cho rang day la loi.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Ve trang chu</a>
+<style>
+    .denied-shell {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 24px;
+    }
+
+    .denied-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 48px 40px;
+        text-align: center;
+        max-width: 520px;
+        box-shadow: 0 4px 20px rgba(15,23,42,.06);
+    }
+
+    .denied-code {
+        font-size: 72px;
+        font-weight: 800;
+        letter-spacing: -3px;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    .denied-card h2 {
+        font-size: 22px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.3px;
+        margin: 0 0 8px 0;
+    }
+
+    .denied-card p {
+        font-size: 14px;
+        color: #64748b;
+        line-height: 1.7;
+        margin: 0 0 24px 0;
+    }
+
+    .denied-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+</style>
+
+<div class="denied-shell">
+    <div class="denied-card">
+        <div class="denied-code">403</div>
+        <h2>Bạn không có quyền truy cập</h2>
+        <p>
+            Trang này chỉ dành cho tài khoản có vai trò phù hợp.
+            Vui lòng quay lại trang chủ hoặc liên hệ quản trị viên.
+        </p>
+        <div class="denied-actions">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4">
+                Về trang chủ
+            </a>
+            <a asp-controller="TaiKhoan" asp-action="DangNhap" class="btn btn-outline-secondary px-4">
+                Đăng nhập lại
+            </a>
+        </div>
+    </div>
 </div>

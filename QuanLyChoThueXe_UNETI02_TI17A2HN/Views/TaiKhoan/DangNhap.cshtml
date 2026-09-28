@@ -1,62 +1,172 @@
-﻿@*
+﻿@* 
    File: Views/TaiKhoan/DangNhap.cshtml
-   Noi dung: Man hinh dang nhap
+   Noi dung: Man hinh dang nhap he thong
    Sinh vien thuc hien: Pham Gia Minh Hoang - 23103100087 - SV1
    Module: Module 1 - Tai khoan, Dang nhap, Phan quyen, Loai xe, Hang xe
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.TaiKhoan.DangNhapVM
 
 @{
-    ViewData["Title"] = "Dang nhap";
+    ViewData["Title"] = "Đăng nhập";
     Layout = "_Layout";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white text-center">
-                <h4 class="mb-0">DANG NHAP HE THONG</h4>
-                <small>Quan ly cho thue xe - UNETI02</small>
-            </div>
-            <div class="card-body">
-                <form asp-action="DangNhap" method="post">
-                    <input type="hidden" asp-for="ReturnUrl" />
+<style>
+    .login-shell {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 16px;
+        margin: -24px -12px;
+    }
+    .login-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(15,23,42,.25);
+        width: 100%;
+        max-width: 440px;
+        overflow: hidden;
+    }
+    .login-head {
+        padding: 32px 36px 20px;
+        text-align: center;
+    }
+    .login-logo {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 16px;
+        box-shadow: 0 8px 20px rgba(59,130,246,.35);
+    }
+    .login-head h1 {
+        font-size: 22px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.4px;
+        margin: 0 0 6px 0;
+    }
+    .login-head .sub {
+        font-size: 13px;
+        color: #64748b;
+        margin: 0;
+    }
+    .login-body { padding: 8px 36px 28px; }
+    .login-body .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 6px;
+    }
+    .login-body .form-control {
+        border-radius: 10px;
+        border-color: #d1d5db;
+        font-size: 14px;
+        padding: 10px 14px;
+        height: 46px;
+    }
+    .login-body .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+    }
+    .login-body .form-check-label {
+        font-size: 13px;
+        color: #475569;
+    }
+    .btn-login {
+        width: 100%;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        transition: all .2s;
+        box-shadow: 0 4px 12px rgba(59,130,246,.3);
+    }
+    .btn-login:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(59,130,246,.4);
+    }
+    .login-footer {
+        padding: 20px 36px 24px;
+        background: #f9fafb;
+        border-top: 1px solid #f1f5f9;
+        font-size: 12px;
+        color: #64748b;
+        line-height: 1.8;
+    }
+    .login-footer strong {
+        color: #334155;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+    .login-footer code {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        padding: 2px 8px;
+        border-radius: 6px;
+        color: #1d4ed8;
+        font-weight: 600;
+        font-size: 12px;
+    }
+</style>
 
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="login-shell">
+    <div class="login-card">
 
-                    <div class="mb-3">
-                        <label asp-for="TenDangNhap" class="form-label"></label>
-                        <input asp-for="TenDangNhap" class="form-control" autofocus />
-                        <span asp-validation-for="TenDangNhap" class="text-danger"></span>
-                    </div>
+        <div class="login-head">
+            <div class="login-logo">Q</div>
+            <h1>Đăng nhập hệ thống</h1>
+            <p class="sub">Quản lý cho thuê xe - UNETI02</p>
+        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="MatKhau" class="form-label"></label>
-                        <input asp-for="MatKhau" class="form-control" />
-                        <span asp-validation-for="MatKhau" class="text-danger"></span>
-                    </div>
+        <div class="login-body">
+            <form asp-action="DangNhap" method="post">
+                <input type="hidden" asp-for="ReturnUrl" />
 
-                    <div class="mb-3 form-check">
-                        <input asp-for="GhiNho" class="form-check-input" />
-                        <label asp-for="GhiNho" class="form-check-label"></label>
-                    </div>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">Dang nhap</button>
-                    </div>
-                </form>
-
-                <hr class="my-4" />
-
-                <div class="alert alert-info mb-0">
-                    <strong>Tai khoan kiem thu:</strong>
-                    <ul class="mb-0 mt-2 small">
-                        <li>Admin: <code>admin</code> / <code>admin123</code></li>
-                        <li>Nhan vien: <code>nhanvien01</code> / <code>nv123456</code></li>
-                        <li>Khach hang: <code>kh01</code> / <code>kh123456</code></li>
-                        <li>Tai khoan bi khoa: <code>kh30</code> / <code>kh123456</code></li>
-                    </ul>
+                <div class="mb-3">
+                    <label asp-for="TenDangNhap" class="form-label">Tên đăng nhập</label>
+                    <input asp-for="TenDangNhap" class="form-control"
+                           placeholder="Nhập tên đăng nhập" autofocus />
+                    <span asp-validation-for="TenDangNhap" class="text-danger small"></span>
                 </div>
+
+                <div class="mb-3">
+                    <label asp-for="MatKhau" class="form-label">Mật khẩu</label>
+                    <input asp-for="MatKhau" class="form-control"
+                           placeholder="Nhập mật khẩu" />
+                    <span asp-validation-for="MatKhau" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4 form-check">
+                    <input asp-for="GhiNho" class="form-check-input" />
+                    <label asp-for="GhiNho" class="form-check-label">Ghi nhớ đăng nhập</label>
+                </div>
+
+                <button type="submit" class="btn-login">Đăng nhập</button>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            <strong>Tài khoản kiểm thử</strong>
+            <div class="mt-2">
+                Admin: <code>admin</code> / <code>admin123</code><br />
+                Nhân viên: <code>nhanvien01</code> / <code>nv123456</code><br />
+                Khách hàng: <code>kh01</code> / <code>kh123456</code>
             </div>
         </div>
     </div>
