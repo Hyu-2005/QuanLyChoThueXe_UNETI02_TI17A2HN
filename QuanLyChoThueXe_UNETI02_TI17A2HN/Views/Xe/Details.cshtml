@@ -16,6 +16,7 @@
     var session = HttpContextAccessor.HttpContext?.Session;
     var vaiTro = session?.GetVaiTro() ?? "";
     var laQuanTri = vaiTro == VaiTro.Admin || vaiTro == VaiTro.NhanVien;
+    var laKhachHang = vaiTro == VaiTro.KhachHang;
 
     var badge = Model.TinhTrang switch
     {
@@ -30,10 +31,16 @@
     var anh = string.IsNullOrEmpty(Model.AnhXe) ? "/images/xe/default.jpg" : Model.AnhXe;
     var today = DateTime.Today;
 
-    var giaHienHanh = Model.BangGiaThues?
+    var bangGiaApDung = ViewBag.BangGiaApDung as List<QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.BangGiaThue>
+                        ?? new List<QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.BangGiaThue>();
+
+    var giaHienHanh = bangGiaApDung
         .Where(b => b.TrangThai && b.TuNgay <= today && b.DenNgay >= today)
         .OrderByDescending(b => b.MaXe.HasValue)
         .FirstOrDefault();
+
+    // Chi cho phep dat khi xe San sang va la khach hang
+    var coTheDat = laKhachHang && Model.TinhTrang == "Sẵn sàng";
 }
 
 <style>
@@ -159,6 +166,24 @@
         opacity: .9;
     }
 
+    .btn-book-header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        border: none;
+        padding: 10px 28px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(59,130,246,.25);
+        transition: all .2s;
+    }
+    .btn-book-header:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(59,130,246,.35);
+    }
+
     .data-card {
         background: #fff;
         border: 1px solid #e5e7eb;
@@ -242,6 +267,14 @@
                 <a asp-action="Edit" asp-route-id="@Model.MaXe"
                    class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">
                     Sửa xe
+                </a>
+            }
+            else if (coTheDat)
+            {
+                <a asp-controller="DatXe" asp-action="DatXe"
+                   asp-route-maXe="@Model.MaXe"
+                   class="btn-book-header">
+                    Đặt xe ngay
                 </a>
             }
         </div>
@@ -337,10 +370,10 @@
         <div class="data-card">
             <div class="card-head">
                 <h6 class="title">Bảng giá áp dụng cho xe này</h6>
-                <span class="count">@(Model.BangGiaThues?.Count ?? 0) bảng giá</span>
+                <span class="count">@bangGiaApDung.Count bảng giá</span>
             </div>
 
-            @if (Model.BangGiaThues != null && Model.BangGiaThues.Any())
+            @if (bangGiaApDung.Any())
             {
                 <div class="table-responsive">
                     <table class="table align-middle">
@@ -355,15 +388,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var bg in Model.BangGiaThues
-                                .OrderByDescending(b => b.TrangThai)
-                                .ThenByDescending(b => b.TuNgay))
+                            @foreach (var bg in bangGiaApDung)
                             {
                                 <tr>
                                     <td>
                                         @if (bg.MaXe.HasValue)
                                         {
-                                            <span class="badge-soft" style="background:#d1fae5;color:#065f46">Xe này</span>
+                                            <span class="badge-soft" style="background:#d1fae5;color:#065f46">
+                                                Riêng xe này
+                                            </span>
                                         }
                                         else if (bg.MaLoaiXe.HasValue)
                                         {
@@ -390,11 +423,15 @@
                                     <td class="text-center">
                                         @if (bg.TrangThai)
                                         {
-                                            <span class="badge-soft" style="background:#dcfce7;color:#166534">Đang áp dụng</span>
+                                            <span class="badge-soft" style="background:#dcfce7;color:#166534">
+                                                Đang áp dụng
+                                            </span>
                                         }
                                         else
                                         {
-                                            <span class="badge-soft" style="background:#f1f5f9;color:#64748b">Ngừng</span>
+                                            <span class="badge-soft" style="background:#f1f5f9;color:#64748b">
+                                                Ngừng
+                                            </span>
                                         }
                                     </td>
                                 </tr>
