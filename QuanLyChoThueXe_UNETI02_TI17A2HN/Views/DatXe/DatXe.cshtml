@@ -1,0 +1,195 @@
+﻿@*
+    DatXe.cshtml - form xac nhan dat xe (khach hang)
+    Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lich
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.DatXe.DatXeFormVM
+@{
+    ViewData["Title"] = "Xác nhận đặt xe";
+}
+
+<style>
+    .page-shell {
+        background: #f5f7fa;
+        min-height: 100vh;
+        padding: 32px 0;
+    }
+
+    .page-wrap {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .dx-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+        .dx-card .head {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+            .dx-card .head h5 {
+                font-size: 16px;
+                font-weight: 700;
+                color: #0f172a;
+                margin: 0;
+            }
+
+        .dx-card .body {
+            padding: 24px;
+        }
+
+    .xe-summary {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+    }
+
+        .xe-summary img {
+            width: 120px;
+            height: 88px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .xe-summary .name {
+            font-weight: 700;
+            font-size: 17px;
+            color: #0f172a;
+        }
+
+        .xe-summary .meta {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .xe-summary .plate {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            font-weight: 700;
+            font-size: 12px;
+            color: #0f172a;
+            margin-top: 6px;
+        }
+
+    .price-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 10px;
+        padding: 16px 18px;
+        margin-top: 20px;
+    }
+
+        .price-box .row-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #1e40af;
+            padding: 3px 0;
+        }
+
+            .price-box .row-line.total {
+                font-size: 16px;
+                font-weight: 800;
+                border-top: 1px dashed #93c5fd;
+                margin-top: 6px;
+                padding-top: 8px;
+            }
+
+    .form-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+</style>
+
+<div class="page-shell">
+    <div class="page-wrap">
+        <div class="dx-card">
+            <div class="head"><h5>Xác nhận thông tin đặt xe</h5></div>
+            <div class="body">
+
+                <div class="xe-summary">
+                    <img src="@(string.IsNullOrEmpty(Model.AnhXe) ? "/images/xe/default.jpg" : Model.AnhXe)" alt="@Model.TenXe" />
+                    <div>
+                        <div class="name">@Model.TenXe</div>
+                        <div class="meta">@Model.TenHangXe · @Model.TenLoaiXe</div>
+                        <span class="plate">@Model.BienSo</span>
+                    </div>
+                </div>
+
+                <div class="price-box">
+                    <div class="row-line">
+                        <span>Thời gian nhận</span>
+                        <strong>@Model.ThoiGianNhanDuKien.ToString("HH:mm dd/MM/yyyy")</strong>
+                    </div>
+                    <div class="row-line">
+                        <span>Thời gian trả</span>
+                        <strong>@Model.ThoiGianTraDuKien.ToString("HH:mm dd/MM/yyyy")</strong>
+                    </div>
+                    <div class="row-line">
+                        <span>Đơn giá áp dụng</span>
+                        <strong>@Model.DonGiaApDung.ToString("N0") đ / ngày</strong>
+                    </div>
+                    <div class="row-line">
+                        <span>Tiền cọc</span>
+                        <strong>@Model.TienCoc.ToString("N0") đ</strong>
+                    </div>
+                    <div class="row-line total">
+                        <span>Tổng tiền dự kiến</span>
+                        <span>@Model.TongTienDuKien.ToString("N0") đ</span>
+                    </div>
+                </div>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger mt-3">
+                        <div asp-validation-summary="ModelOnly"></div>
+                    </div>
+                }
+
+                <form method="post" asp-action="DatXe" class="mt-4">
+                    <input type="hidden" asp-for="MaXe" />
+                    <input type="hidden" name="ThoiGianNhanDuKien" value="@Model.ThoiGianNhanDuKien.ToString("yyyy-MM-ddTHH:mm:ss")" />
+                    <input type="hidden" name="ThoiGianTraDuKien" value="@Model.ThoiGianTraDuKien.ToString("yyyy-MM-ddTHH:mm:ss")" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Địa điểm nhận xe</label>
+                            <input asp-for="DiaDiemNhan" class="form-control" placeholder="VD: Sân bay Nội Bài" />
+                            <span asp-validation-for="DiaDiemNhan" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Địa điểm trả xe</label>
+                            <input asp-for="DiaDiemTra" class="form-control" placeholder="VD: Trung tâm Hà Nội" />
+                            <span asp-validation-for="DiaDiemTra" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Ghi chú (không bắt buộc)</label>
+                            <textarea asp-for="GhiChu" class="form-control" rows="3"
+                                      placeholder="VD: Yêu cầu xe sạch, đầy nhiên liệu..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a asp-action="TimXeTrong" class="btn btn-outline-secondary px-4">Hủy, tìm xe khác</a>
+                        <button type="submit" class="btn btn-primary px-4">Xác nhận đặt xe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

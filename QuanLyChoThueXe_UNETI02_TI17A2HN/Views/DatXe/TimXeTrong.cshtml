@@ -1,0 +1,166 @@
+﻿@*
+    TimXeTrong.cshtml - form tim xe trong theo khoang thoi gian (khach hang)
+    Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lich
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.DatXe.TimXeTrongVM
+@{
+    ViewData["Title"] = "Tìm xe trống";
+}
+
+<style>
+    .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .page-wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    .txt-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        border-radius: 14px;
+        padding: 32px 30px;
+        margin-bottom: 24px;
+    }
+    .txt-hero h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.6px; margin: 0 0 6px 0; }
+    .txt-hero .sub { font-size: 14px; opacity: .85; margin: 0; max-width: 560px; }
+
+    .filter-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 24px;
+    }
+    .filter-card .form-label {
+        font-size: 11px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .5px; color: #64748b; margin-bottom: 6px;
+    }
+    .filter-card .form-control, .filter-card .form-select {
+        border-radius: 8px; border-color: #d1d5db; font-size: 14px; height: 40px;
+    }
+
+    .result-head {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 14px;
+    }
+    .result-head h6 { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; }
+    .result-head .count {
+        font-size: 12px; color: #64748b; background: #f1f5f9;
+        padding: 4px 12px; border-radius: 999px; font-weight: 600;
+    }
+
+    .xe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+    .xe-card {
+        background: #fff; border: 1px solid #e5e7eb; border-radius: 14px;
+        overflow: hidden; transition: box-shadow .15s;
+    }
+    .xe-card:hover { box-shadow: 0 6px 18px rgba(15,23,42,.08); }
+    .xe-card .thumb { width: 100%; height: 150px; object-fit: cover; background: #f8fafc; }
+    .xe-card .body { padding: 16px; }
+    .xe-card .name { font-weight: 700; color: #0f172a; font-size: 15px; margin-bottom: 2px; }
+    .xe-card .plate {
+        display: inline-block; padding: 3px 9px; border-radius: 6px;
+        background: #f1f5f9; border: 1px solid #e2e8f0; font-weight: 700;
+        font-size: 12px; color: #0f172a; margin-bottom: 8px;
+    }
+    .xe-card .meta { font-size: 12px; color: #64748b; margin-bottom: 12px; }
+    .xe-card .price { font-weight: 800; color: #1e40af; font-size: 18px; }
+    .xe-card .price small { font-weight: 500; color: #6b7280; font-size: 11px; }
+    .xe-card .deposit { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+
+    .empty-state { padding: 70px 24px; text-align: center; color: #94a3b8; }
+    .empty-state .big { font-size: 40px; font-weight: 700; color: #e5e7eb; letter-spacing: 4px; }
+    .empty-state .msg { font-size: 15px; margin-top: 8px; }
+</style>
+
+<div class="page-shell">
+    <div class="page-wrap">
+
+        <div class="txt-hero">
+            <h1>Tìm xe trống</h1>
+            <p class="sub">
+                Chọn thời gian nhận và trả xe dự kiến, hệ thống sẽ chỉ hiển thị những xe
+                chưa có lịch trùng trong khoảng thời gian bạn chọn.
+            </p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <div asp-validation-summary="ModelOnly"></div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="filter-card">
+            <form method="post" asp-action="TimXeTrong">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Thời gian nhận</label>
+                        <input asp-for="ThoiGianNhan" type="datetime-local" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Thời gian trả</label>
+                        <input asp-for="ThoiGianTra" type="datetime-local" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Loại xe</label>
+                        <select asp-for="MaLoaiXe" class="form-select" asp-items="Model.DanhSachLoaiXe">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Số chỗ tối thiểu</label>
+                        <input asp-for="SoCho" type="number" min="1" class="form-control" placeholder="VD: 4" />
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Tìm xe</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        @if (Model.DaTimKiem)
+        {
+            <div class="result-head">
+                <h6>Kết quả tìm kiếm</h6>
+                <span class="count">@Model.KetQua.Count xe trống</span>
+            </div>
+
+            @if (Model.KetQua.Any())
+            {
+                <div class="xe-grid">
+                    @foreach (var xe in Model.KetQua)
+                    {
+                        <div class="xe-card">
+                            <img src="@(string.IsNullOrEmpty(xe.AnhXe) ? "/images/xe/default.jpg" : xe.AnhXe)"
+                                 class="thumb" alt="@xe.TenXe" />
+                            <div class="body">
+                                <div class="name">@xe.TenXe</div>
+                                <span class="plate">@xe.BienSo</span>
+                                <div class="meta">@xe.TenHangXe · @xe.TenLoaiXe · @xe.SoCho chỗ</div>
+                                <div class="price">
+                                    @xe.TongTienDuKien.ToString("N0") <small>đ / chuyến dự kiến</small>
+                                </div>
+                                <div class="deposit">
+                                    Đơn giá ngày @xe.DonGiaNgay.ToString("N0") đ · Cọc @xe.TienCocMacDinh.ToString("N0") đ
+                                </div>
+                                <a class="btn btn-primary w-100"
+                                   asp-controller="DatXe" asp-action="DatXe"
+                                   asp-route-maXe="@xe.MaXe"
+                                   asp-route-tuNgay="@Model.ThoiGianNhan?.ToString("yyyy-MM-ddTHH:mm")"
+                                   asp-route-denNgay="@Model.ThoiGianTra?.ToString("yyyy-MM-ddTHH:mm")">
+                                    Đặt xe này
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="big">— — —</div>
+                    <div class="msg">Không có xe nào trống trong khoảng thời gian đã chọn</div>
+                </div>
+            }
+        }
+    </div>
+</div>

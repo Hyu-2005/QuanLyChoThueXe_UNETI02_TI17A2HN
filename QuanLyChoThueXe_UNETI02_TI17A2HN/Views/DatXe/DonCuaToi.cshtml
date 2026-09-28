@@ -1,0 +1,273 @@
+﻿@*
+    DonCuaToi.cshtml - danh sach don dat xe cua khach hang dang dang nhap
+    Module: Module 3 - Khach hang tim xe trong, dat xe, kiem tra trung lich
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.DatXe.DonCuaToiVM
+@{
+    ViewData["Title"] = "Đơn của tôi";
+}
+
+<style>
+    .page-shell {
+        background: #f5f7fa;
+        min-height: 100vh;
+        padding: 32px 0;
+    }
+
+    .page-wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .dct-hero {
+        margin-bottom: 22px;
+    }
+
+        .dct-hero h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 4px 0;
+        }
+
+        .dct-hero .sub {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0;
+        }
+
+    .filter-bar {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 20px;
+    }
+
+    .don-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 18px 20px;
+        margin-bottom: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+        .don-card .info .ma {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .don-card .info .xe {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 15px;
+            margin: 2px 0 6px 0;
+        }
+
+        .don-card .info .thoigian {
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .don-card .info .diadiem {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+    .status-pill {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+        .status-pill.cho-duyet {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-pill.da-duyet {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-pill.da-bangiao {
+            background: #cffafe;
+            color: #155e75;
+        }
+
+        .status-pill.dang-thue {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-pill.cho-tt {
+            background: #fce7f3;
+            color: #9d174d;
+        }
+
+        .status-pill.hoan-thanh {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pill.tu-choi {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-pill.da-huy {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+    .empty-state {
+        padding: 70px 24px;
+        text-align: center;
+        color: #94a3b8;
+        background: #fff;
+        border-radius: 14px;
+    }
+
+        .empty-state .big {
+            font-size: 40px;
+            font-weight: 700;
+            color: #e5e7eb;
+            letter-spacing: 4px;
+        }
+</style>
+
+<div class="page-shell">
+    <div class="page-wrap">
+
+        <div class="dct-hero">
+            <h1>Đơn của tôi</h1>
+            <p class="sub">Danh sách các đơn đặt xe bạn đã tạo.</p>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="filter-bar">
+            <form method="get" asp-action="DonCuaToi" class="row g-2 align-items-end">
+                <input type="hidden" name="trang" value="1" />
+                <div class="col-md-5">
+                    <input type="text" name="tuKhoa" value="@Model.TuKhoa" class="form-control"
+                           placeholder="Tìm theo biển số, tên xe..." />
+                </div>
+                <div class="col-md-4">
+                    <select name="trangThai" class="form-select">
+                        <option value="">Tất cả trạng thái</option>
+                        @foreach (var tt in QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.TatCa)
+                        {
+                            <option value="@tt" selected="@(Model.TrangThai == tt)">@tt</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">Lọc</button>
+                    <a asp-action="DonCuaToi" class="btn btn-outline-secondary">Xóa lọc</a>
+                </div>
+            </form>
+        </div>
+
+        @if (Model.DanhSach.Any())
+        {
+            foreach (var don in Model.DanhSach)
+            {
+                var badge = don.TrangThai switch
+                {
+                    "Chờ duyệt" => "cho-duyet",
+                    "Đã duyệt" => "da-duyet",
+                    "Đã bàn giao" => "da-bangiao",
+                    "Đang thuê" => "dang-thue",
+                    "Chờ thanh toán" => "cho-tt",
+                    "Hoàn thành" => "hoan-thanh",
+                    "Từ chối" => "tu-choi",
+                    "Đã hủy" => "da-huy",
+                    _ => "da-huy"
+                };
+
+                <div class="don-card">
+                    <div class="info">
+                        <div class="ma">Đơn #@don.MaDatXe · Đặt ngày @don.NgayDat.ToString("dd/MM/yyyy")</div>
+                        <div class="xe">@(don.Xe?.TenXe ?? "-") (@(don.Xe?.BienSo ?? "-"))</div>
+                        <div class="thoigian">
+                            @don.ThoiGianNhanDuKien.ToString("HH:mm dd/MM") →
+                            @don.ThoiGianTraDuKien.ToString("HH:mm dd/MM/yyyy")
+                            · @don.DonGiaApDung.ToString("N0") đ/ngày
+                        </div>
+                        <div class="diadiem">@don.DiaDiemNhan → @don.DiaDiemTra</div>
+                        @if (don.TrangThai == "Từ chối" && !string.IsNullOrEmpty(don.LyDoTuChoi))
+                        {
+                            <div class="diadiem text-danger">Lý do từ chối: @don.LyDoTuChoi</div>
+                        }
+                    </div>
+                    <div class="text-end">
+                        <span class="status-pill @badge">@don.TrangThai</span>
+                        @if (don.CoTheHuy())
+                        {
+                            <form method="post" asp-action="Huy" asp-route-id="@don.MaDatXe" class="mt-2"
+                                  onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn này?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Hủy đơn</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (Model.TongSoTrang > 1)
+            {
+                <nav class="mt-3">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.CoTrangTruoc ? "" : "disabled")">
+                            <a class="page-link" asp-action="DonCuaToi" asp-route-trang="@(Model.Trang - 1)"
+                               asp-route-tuKhoa="@Model.TuKhoa" asp-route-trangThai="@Model.TrangThai">Trước</a>
+                        </li>
+                        @for (int i = 1; i <= Model.TongSoTrang; i++)
+                        {
+                            <li class="page-item @(i == Model.Trang ? "active" : "")">
+                                <a class="page-link" asp-action="DonCuaToi" asp-route-trang="@i"
+                                   asp-route-tuKhoa="@Model.TuKhoa" asp-route-trangThai="@Model.TrangThai">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.CoTrangSau ? "" : "disabled")">
+                            <a class="page-link" asp-action="DonCuaToi" asp-route-trang="@(Model.Trang + 1)"
+                               asp-route-tuKhoa="@Model.TuKhoa" asp-route-trangThai="@Model.TrangThai">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="big">— — —</div>
+                <div class="msg mt-2">Bạn chưa có đơn đặt xe nào</div>
+                <a asp-action="TimXeTrong" class="btn btn-primary mt-3">Tìm xe ngay</a>
+            </div>
+        }
+    </div>
+</div>
