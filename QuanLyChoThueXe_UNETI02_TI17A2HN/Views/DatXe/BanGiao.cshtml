@@ -1,0 +1,95 @@
+﻿@* 
+   File: Views/DatXe/BanGiao.cshtml
+   Noi dung: Giao dien ban giao xe
+   Sinh vien thuc hien: Nguyen Hoang Duc Hieu - 23103100116 - SV4
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.BanGiaoXe
+@{
+    ViewData["Title"] = "Ban giao xe";
+    var datXe = ViewBag.DatXe as QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.DatXe;
+}
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm" style="border-radius:12px; overflow:hidden;">
+        <div class="card-header bg-primary text-white p-3">
+            <h4 class="mb-0">Bàn Giao Xe Cho Khách Hàng</h4>
+        </div>
+        <div class="card-body p-4">
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5 class="text-primary">Thông tin đơn</h5>
+                    <p class="mb-1"><strong>Mã đơn:</strong> #@datXe?.MaDatXe</p>
+                    <p class="mb-1"><strong>Khách hàng:</strong> @datXe?.KhachHang?.HoTen</p>
+                    <p class="mb-1"><strong>Thời gian nhận:</strong> @datXe?.ThoiGianNhanDuKien.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-primary">Thông tin xe</h5>
+                    <p class="mb-1"><strong>Xe:</strong> @datXe?.Xe?.TenXe</p>
+                    <p class="mb-1"><strong>Biển số:</strong> @datXe?.Xe?.BienSo</p>
+                    <p class="mb-1"><strong>Số km hiện tại:</strong> @datXe?.Xe?.SoKmHienTai km</p>
+                </div>
+            </div>
+
+            <form asp-controller="DatXe" asp-action="BanGiao" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="MaDatXe" />
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ThoiGianBanGiao" class="form-label fw-bold">Thời gian bàn giao</label>
+                        <input asp-for="ThoiGianBanGiao" class="form-control" type="datetime-local" required />
+                        <span asp-validation-for="ThoiGianBanGiao" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="NguoiBanGiao" class="form-label fw-bold">Người bàn giao</label>
+                        <input asp-for="NguoiBanGiao" class="form-control" required />
+                        <span asp-validation-for="NguoiBanGiao" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SoKmBanGiao" class="form-label fw-bold">Số km khi giao</label>
+                        <div class="input-group">
+                            <input asp-for="SoKmBanGiao" class="form-control" type="number" step="0.1" min="0" required />
+                            <span class="input-group-text">km</span>
+                        </div>
+                        <span asp-validation-for="SoKmBanGiao" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="MucNhienLieuBanGiao" class="form-label fw-bold">Mức nhiên liệu (%)</label>
+                        <div class="input-group">
+                            <input asp-for="MucNhienLieuBanGiao" class="form-control" type="number" min="0" max="100" required />
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <span asp-validation-for="MucNhienLieuBanGiao" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TinhTrangBanGiao" class="form-label fw-bold">Tình trạng xe (Xây xước, hỏng hóc...)</label>
+                    <textarea asp-for="TinhTrangBanGiao" class="form-control" rows="3" required placeholder="Ghi rõ tình trạng vỏ, nội thất, lốp..."></textarea>
+                    <span asp-validation-for="TinhTrangBanGiao" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="GhiChu" class="form-label fw-bold">Ghi chú thêm</label>
+                    <textarea asp-for="GhiChu" class="form-control" rows="2"></textarea>
+                    <span asp-validation-for="GhiChu" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-controller="DatXe" asp-action="Details" asp-route-id="@datXe?.MaDatXe" class="btn btn-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-primary" onclick="return confirm('Xác nhận lưu thông tin và bàn giao xe?')">Lưu & Bàn Giao</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

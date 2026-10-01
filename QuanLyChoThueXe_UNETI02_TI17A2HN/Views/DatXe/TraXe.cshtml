@@ -1,0 +1,176 @@
+﻿@* 
+   File: Views/DatXe/TraXe.cshtml
+   Noi dung: Giao dien nhan tra xe va tinh phu phi
+   Sinh vien thuc hien: Nguyen Hoang Duc Hieu - 23103100116 - SV4
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.TraXe
+@{
+    ViewData["Title"] = "Nhan tra xe";
+    var datXe = ViewBag.DatXe as QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.DatXe;
+    var banGiao = datXe?.BanGiaoXe;
+}
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm" style="border-radius:12px; overflow:hidden;">
+        <div class="card-header bg-primary text-white p-3">
+            <h4 class="mb-0">Nhận Trả Xe Từ Khách Hàng</h4>
+        </div>
+        <div class="card-body p-4">
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5 class="text-warning">Thông tin lúc bàn giao</h5>
+                    <p class="mb-1"><strong>Thời gian:</strong> @banGiao?.ThoiGianBanGiao.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p class="mb-1"><strong>Số km:</strong> @banGiao?.SoKmBanGiao km</p>
+                    <p class="mb-1"><strong>Nhiên liệu:</strong> @banGiao?.MucNhienLieuBanGiao %</p>
+                    <p class="mb-1"><strong>Tình trạng:</strong> @banGiao?.TinhTrangBanGiao</p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-warning">Dự kiến</h5>
+                    <p class="mb-1"><strong>Thời gian trả Dự kiến:</strong> @datXe?.ThoiGianTraDuKien.ToString("dd/MM/yyyy HH:mm")</p>
+                    
+                </div>
+            </div>
+
+            <form asp-controller="DatXe" asp-action="TraXe" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="MaDatXe" />
+                
+                <h5 class="border-bottom pb-2 mt-4 text-primary">Thông Tin Thực Tế</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="ThoiGianTraThucTe" class="form-label fw-bold">Thời gian trả</label>
+                        <input asp-for="ThoiGianTraThucTe" class="form-control" type="datetime-local" required />
+                        <span asp-validation-for="ThoiGianTraThucTe" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="SoKmTra" class="form-label fw-bold">Số km lúc trả</label>
+                        <div class="input-group">
+                            <input asp-for="SoKmTra" class="form-control" type="number" step="0.1" min="@(banGiao?.SoKmBanGiao ?? 0)" required />
+                            <span class="input-group-text">km</span>
+                        </div>
+                        <span asp-validation-for="SoKmTra" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="MucNhienLieuTra" class="form-label fw-bold">Mức nhiên liệu (%)</label>
+                        <div class="input-group">
+                            <input asp-for="MucNhienLieuTra" class="form-control" type="number" min="0" max="100" required />
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <span asp-validation-for="MucNhienLieuTra" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="TinhTrangTra" class="form-label fw-bold">Tình trạng xe khi trả</label>
+                    <textarea asp-for="TinhTrangTra" class="form-control" rows="3" required placeholder="Xe có phát sinh hỏng hóc, xước xát gì so với lúc giao không?"></textarea>
+                    <span asp-validation-for="TinhTrangTra" class="text-danger"></span>
+                </div>
+
+                <h5 class="border-bottom pb-2 mt-4 text-danger">Tính Phụ Phí (Nếu có)</h5>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="PhiQuaHan" class="form-label fw-bold">Phí quá hạn</label>
+                        <input asp-for="PhiQuaHan" class="form-control" type="number" min="0" />
+                        <span asp-validation-for="PhiQuaHan" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="PhiVuotKm" class="form-label fw-bold">Phí vượt km</label>
+                        <input asp-for="PhiVuotKm" class="form-control" type="number" min="0" />
+                        <span asp-validation-for="PhiVuotKm" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="PhiNhienLieu" class="form-label fw-bold">Phí nhiên liệu</label>
+                        <input asp-for="PhiNhienLieu" class="form-control" type="number" min="0" />
+                        <span asp-validation-for="PhiNhienLieu" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="PhiHuHong" class="form-label fw-bold">Phí hư hỏng</label>
+                        <input asp-for="PhiHuHong" class="form-control" type="number" min="0" />
+                        <span asp-validation-for="PhiHuHong" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                <div class="mt-3 text-end"><h4 class="text-danger fw-bold">Tổng phụ phí: <span id="TongPhuPhiHienThi">0</span> VND</h4></div>
+                    <label asp-for="GhiChu" class="form-label fw-bold">Ghi chú phụ phí</label>
+                    <textarea asp-for="GhiChu" class="form-control" rows="2" placeholder="Ghi rõ cách tính các khoản phụ phí ở trên"></textarea>
+                    <span asp-validation-for="GhiChu" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-controller="DatXe" asp-action="Details" asp-route-id="@datXe?.MaDatXe" class="btn btn-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Xác nhận nhận xe, lưu phụ phí và chuyển sang chờ thanh toán?')">Lưu & Chuyển Thanh Toán</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        var thoiGianTraDuKien = new Date('@(datXe?.ThoiGianTraDuKien.ToString("yyyy-MM-ddTHH:mm:ss"))');
+        var thoiGianBanGiao = new Date('@(banGiao?.ThoiGianBanGiao.ToString("yyyy-MM-ddTHH:mm:ss"))');
+        var soKmBanGiao = parseFloat('@(banGiao?.SoKmBanGiao ?? 0)'.replace(',', '.'));
+        var mucNhienLieuBanGiao = parseFloat('@(banGiao?.MucNhienLieuBanGiao ?? 0)'.replace(',', '.'));
+        var donGiaGio = parseFloat('@(ViewBag.DonGiaGio ?? 0)'.replace(',', '.'));
+        
+        function tinhPhuPhi() {
+            var thoiGianTraThucTe = new Date(document.getElementById('ThoiGianTraThucTe').value);
+            var soKmTra = parseFloat(document.getElementById('SoKmTra').value) || 0;
+            var mucNhienLieuTra = parseFloat(document.getElementById('MucNhienLieuTra').value) || 0;
+            
+            if (isNaN(thoiGianTraThucTe.getTime())) return;
+
+            var phiQuaHan = 0;
+            if (thoiGianTraThucTe > thoiGianTraDuKien) {
+                var diffMs = thoiGianTraThucTe.getTime() - thoiGianTraDuKien.getTime();
+                var diffHrs = Math.ceil(diffMs / (1000 * 60 * 60));
+                phiQuaHan = diffHrs * donGiaGio; 
+            }
+            document.getElementById('PhiQuaHan').value = phiQuaHan;
+
+            var soNgayThue = Math.ceil((thoiGianTraThucTe.getTime() - thoiGianBanGiao.getTime()) / (1000 * 60 * 60 * 24));
+            if (soNgayThue < 1) soNgayThue = 1;
+            var dinhMucKm = soNgayThue * 300; 
+            var kmDaDi = soKmTra - soKmBanGiao;
+            
+            var phiVuotKm = 0;
+            if (kmDaDi > dinhMucKm) {
+                phiVuotKm = (kmDaDi - dinhMucKm) * 5000; 
+            }
+            document.getElementById('PhiVuotKm').value = phiVuotKm;
+
+            var phiNhienLieu = 0;
+            if (mucNhienLieuTra < mucNhienLieuBanGiao) {
+                phiNhienLieu = (mucNhienLieuBanGiao - mucNhienLieuTra) * 20000; 
+            }
+            document.getElementById('PhiNhienLieu').value = phiNhienLieu;
+            
+            tinhTongPhuPhi();
+        }
+        
+        function tinhTongPhuPhi() {
+            var phiQuaHan = parseFloat(document.getElementById('PhiQuaHan').value) || 0;
+            var phiVuotKm = parseFloat(document.getElementById('PhiVuotKm').value) || 0;
+            var phiNhienLieu = parseFloat(document.getElementById('PhiNhienLieu').value) || 0;
+            var phiHuHong = parseFloat(document.getElementById('PhiHuHong').value) || 0;
+            
+            var tong = phiQuaHan + phiVuotKm + phiNhienLieu + phiHuHong;
+            document.getElementById('TongPhuPhiHienThi').innerText = tong.toLocaleString('vi-VN');
+        }
+
+        document.getElementById('ThoiGianTraThucTe').addEventListener('change', tinhPhuPhi);
+        document.getElementById('SoKmTra').addEventListener('input', tinhPhuPhi);
+        document.getElementById('MucNhienLieuTra').addEventListener('input', tinhPhuPhi);
+        
+        document.getElementById('PhiQuaHan').addEventListener('input', tinhTongPhuPhi);
+        document.getElementById('PhiVuotKm').addEventListener('input', tinhTongPhuPhi);
+        document.getElementById('PhiNhienLieu').addEventListener('input', tinhTongPhuPhi);
+        document.getElementById('PhiHuHong').addEventListener('input', tinhTongPhuPhi);
+        
+        // Khoi tao tong phu phi ban dau
+        tinhTongPhuPhi();
+    </script>
+}
