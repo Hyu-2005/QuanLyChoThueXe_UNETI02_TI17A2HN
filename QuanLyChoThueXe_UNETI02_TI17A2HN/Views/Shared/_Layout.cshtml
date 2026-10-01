@@ -268,16 +268,18 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item @ActiveClass("BanGiaoXe")"
-                                           asp-controller="BanGiaoXe" asp-action="Index">
+                                        <!-- BEGIN SV4 (Nguyen Hoang Duc Hieu - 23103100116): Fix Navbar -->
+<a class="dropdown-item @ActiveClass("BanGiaoXe")"
+                                           asp-controller="DatXe" asp-action="Index" asp-route-trangThai="@QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet">
                                             Bàn giao xe
                                         </a>
                                     </li>
                                     <li>
                                         <a class="dropdown-item @ActiveClass("TraXe")"
-                                           asp-controller="TraXe" asp-action="Index">
+                                           asp-controller="DatXe" asp-action="Index" asp-route-trangThai="@QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue">
                                             Trả xe
                                         </a>
+<!-- END SV4 -->
                                     </li>
                                     <li>
                                         <a class="dropdown-item @ActiveClass("ThanhToan")"

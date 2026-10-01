@@ -174,17 +174,47 @@
                 </div>
             </div>
 
-            @if (coTheHuy)
-            {
-                <form asp-action="Huy" asp-route-id="@Model.MaDatXe" method="post" class="m-0">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold"
-                            style="border-radius:8px"
-                            onclick="return confirm('Bạn có chắc muốn hủy đơn này?')">
-                        Hủy đơn
-                    </button>
-                </form>
-            }
+            <div class="d-flex gap-2">
+                @if (coTheHuy)
+                {
+                    <form asp-action="Huy" asp-route-id="@Model.MaDatXe" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold"
+                                style="border-radius:8px"
+                                onclick="return confirm('Bạn có chắc muốn hủy đơn này?')">Hủy đơn</button>
+                    </form>
+                }
+
+                <!-- === BAT DAU CODE CUA SV4: NGUYEN HOANG DUC HIEU (23103100116) === -->
+                @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.ChoDuyet)
+                {
+                    <form asp-action="Duyet" asp-route-id="@Model.MaDatXe" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-success px-4 py-2 fw-semibold text-white"
+                                style="border-radius:8px"
+                                onclick="return confirm('Xác nhận duyệt đơn này?')">Duyệt đơn</button>
+                    </form>
+
+                    <form asp-action="TuChoi" asp-route-id="@Model.MaDatXe" id="formTuChoi" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="lyDoTuChoi" id="inputLyDo" value="" />
+                        <button type="button" class="btn btn-danger px-4 py-2 fw-semibold text-white"
+                                style="border-radius:8px"
+                                onclick="tuChoiDon()">Từ chối</button>
+                    </form>
+                }
+
+                @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet)
+                {
+                    <a asp-controller="DatXe" asp-action="BanGiao" asp-route-id="@Model.MaDatXe" class="btn btn-primary px-4 py-2 fw-semibold text-white" style="border-radius:8px">Bàn giao xe</a>
+                }
+
+                @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue)
+                {
+                    <a asp-controller="DatXe" asp-action="TraXe" asp-route-id="@Model.MaDatXe" class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">Nhận trả xe</a>
+                }
+                <!-- === KET THUC CODE CUA SV4 : NGUYEN HOANG DUC HIEU === -->
+            </div>
         </div>
 
         <!-- XE HERO -->
@@ -312,3 +342,18 @@
         }
     </div>
 </div>
+@section Scripts {
+    <script>
+        // === BAT DAU CODE CUA SV4:  NGUYEN HOANG DUC HIEU (23103100116) ===
+        function tuChoiDon() {
+            var lyDo = prompt('Vui lòng nhập lý do từ chối đơn này:');
+            if (lyDo != null && lyDo.trim() !== '') {
+                document.getElementById('inputLyDo').value = lyDo;
+                document.getElementById('formTuChoi').submit();
+            } else if (lyDo != null) {
+                alert('Bạn phải nhập lý do từ chối!');
+            }
+        }
+        // === KET THUC CODE CUA NGUYEN HOANG DUC HIEU ===
+    </script>
+}

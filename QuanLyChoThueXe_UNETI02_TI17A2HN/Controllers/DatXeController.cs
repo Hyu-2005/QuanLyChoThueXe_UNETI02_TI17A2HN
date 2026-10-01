@@ -12,6 +12,7 @@ using QuanLyChoThueXe_UNETI02_TI17A2HN.Data;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Helpers;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Services.Interfaces;
+using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.DatXe;
 
 namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
@@ -547,6 +548,223 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 _ => query.OrderByDescending(d => d.NgayDat)
             };
         }
+
+        // ============================================================
+        // BAT DAU PHAN CODE CUA SINH VIEN 4
+        // Ho va ten: Nguyen Hoang Duc Hieu
+        // Ma sinh vien: 23103100116
+        // Noi dung thuc hien: Xu ly Duyet don, Tu choi, Ban giao, Tra xe
+        // ============================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Duyet(int id)
+        {
+            var datXe = await _context.DatXes.Include(d => d.Xe).FirstOrDefaultAsync(d => d.MaDatXe == id);
+            if (datXe == null)
+            {
+                TempData["Error"] = "Khong tim thay don dat xe";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (datXe.TrangThai != TrangThaiDatXe.ChoDuyet)
+            {
+                TempData["Error"] = $"Don dang o trang thai '{datXe.TrangThai}', khong the duyet";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            if (datXe.Xe.TinhTrang == TinhTrangXe.BaoDuong || datXe.Xe.TinhTrang == TinhTrangXe.NgungHoatDong)
+            {
+                TempData["Error"] = $"Khong the duyet vi xe dang o tinh trang: {datXe.Xe.TinhTrang}";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            // Gọi service kiểm tra trùng lịch (Do SV3 viết)
+            bool isTrungLich = await _trungLichService.KiemTraTrungLich(
+                datXe.MaXe,
+                datXe.ThoiGianNhanDuKien,
+                datXe.ThoiGianTraDuKien,
+                datXe.MaDatXe);
+
+            if (isTrungLich)
+            {
+                TempData["Error"] = "Khong the duyet vi xe nay da co don khac chiem lich trong khoang thoi gian tren.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            datXe.TrangThai = TrangThaiDatXe.DaDuyet;
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Da duyet don #{datXe.MaDatXe} thanh cong.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TuChoi(int id, string lyDoTuChoi)
+        {
+            var datXe = await _context.DatXes.FindAsync(id);
+            if (datXe == null)
+            {
+                TempData["Error"] = "Khong tim thay don dat xe";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (datXe.TrangThai != TrangThaiDatXe.ChoDuyet)
+            {
+                TempData["Error"] = $"Don dang o trang thai '{datXe.TrangThai}', khong the tu choi";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            if (string.IsNullOrWhiteSpace(lyDoTuChoi))
+            {
+                TempData["Error"] = "Vui long nhap ly do tu choi.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            datXe.TrangThai = TrangThaiDatXe.TuChoi;
+            datXe.LyDoTuChoi = lyDoTuChoi;
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Đã từ chối đơn #{datXe.MaDatXe}.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        // ==============================================================
+        // BEGIN SV4 (Nguyen Hoang Duc Hieu - 23103100116)
+        // Nghiệp vụ: Bàn giao xe & Nhận trả xe
+        // ==============================================================
+        [HttpGet("/BanGiaoXe/{id}")]
+        public async Task<IActionResult> BanGiao(int id)
+        {
+            var datXe = await _context.DatXes
+                .Include(d => d.Xe)
+                .Include(d => d.KhachHang)
+                .FirstOrDefaultAsync(d => d.MaDatXe == id);
+
+            if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DaDuyet)
+                return NotFound();
+            
+            var model = new BanGiaoXe {
+                MaDatXe = id,
+                SoKmBanGiao = datXe.Xe.SoKmHienTai,
+                ThoiGianBanGiao = DateTime.Now,
+                NguoiBanGiao = HttpContext.Session.GetString("HoTen") ?? "Admin",
+                MucNhienLieuBanGiao = 100 // Default 100%
+            };
+
+            ViewBag.DatXe = datXe;
+            return View(model);
+        }
+
+        [HttpPost("/BanGiaoXe/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BanGiao(int id, BanGiaoXe model)
+        {
+            if (id != model.MaDatXe) return BadRequest();
+            
+            var datXe = await _context.DatXes
+                .Include(d => d.Xe)
+                .FirstOrDefaultAsync(d => d.MaDatXe == id);
+
+            if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DaDuyet)
+                return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                datXe.TrangThai = TrangThaiDatXe.DangThue;
+                datXe.Xe.SoKmHienTai = model.SoKmBanGiao;
+                datXe.Xe.TinhTrang = TinhTrangXe.DangChoThue;
+                
+                _context.BanGiaoXes.Add(model);
+                await _context.SaveChangesAsync();
+                
+                TempData["Success"] = "Đã bàn giao xe cho khách hàng thành công.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            ViewBag.DatXe = datXe;
+            return View(model);
+        }
+
+        [HttpGet("/TraXe/{id}")]
+        public async Task<IActionResult> TraXe(int id)
+        {
+            var datXe = await _context.DatXes
+                .Include(d => d.Xe)
+                .Include(d => d.KhachHang)
+                .Include(d => d.BanGiaoXe)
+                .FirstOrDefaultAsync(d => d.MaDatXe == id);
+
+            if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DangThue)
+                return NotFound();
+            
+            var model = new TraXe {
+                MaDatXe = id,
+                ThoiGianTraThucTe = DateTime.Now,
+                SoKmTra = datXe.Xe.SoKmHienTai,
+                MucNhienLieuTra = datXe.BanGiaoXe?.MucNhienLieuBanGiao ?? 100
+            };
+
+            // Lay DonGiaGio tu BangGiaThue
+            var bangGia = await _context.BangGiaThues.FirstOrDefaultAsync(b => b.MaXe == datXe.MaXe && b.TrangThai)
+                       ?? await _context.BangGiaThues.FirstOrDefaultAsync(b => b.MaLoaiXe == datXe.Xe.MaLoaiXe && b.TrangThai);
+            
+            ViewBag.DonGiaGio = bangGia?.DonGiaGio ?? 0;
+            ViewBag.DatXe = datXe;
+            return View(model);
+        }
+
+        [HttpPost("/TraXe/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TraXe(int id, TraXe model)
+        {
+            if (id != model.MaDatXe) return BadRequest();
+            
+            var datXe = await _context.DatXes
+                .Include(d => d.Xe)
+                .FirstOrDefaultAsync(d => d.MaDatXe == id);
+
+            if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DangThue)
+                return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                var banGiao = datXe.BanGiaoXe ?? await _context.BanGiaoXes.FirstOrDefaultAsync(b => b.MaDatXe == id);
+                if (banGiao != null && model.SoKmTra < banGiao.SoKmBanGiao)
+                {
+                    ModelState.AddModelError("SoKmTra", "Số km trả không được nhỏ hơn số km bàn giao.");
+                    ViewBag.DatXe = datXe;
+                    return View(model);
+                }
+
+                datXe.TrangThai = TrangThaiDatXe.ChoThanhToan;
+                datXe.Xe.SoKmHienTai = model.SoKmTra;
+                
+                if (model.PhiHuHong > 0)
+                {
+                    datXe.Xe.TinhTrang = TinhTrangXe.BaoDuong;
+                }
+                else
+                {
+                    datXe.Xe.TinhTrang = TinhTrangXe.SanSang;
+                }
+                
+                _context.TraXes.Add(model);
+                await _context.SaveChangesAsync();
+                
+                TempData["Success"] = "Đã nhận trả xe và ghi nhận phụ phí thành công.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            ViewBag.DatXe = datXe;
+        // ==============================================================
+        // END SV4
+        // ==============================================================
+            return View(model);
+        }
+        // ============================================================
+        // KET THUC PHAN CODE CUA NGUYEN HOANG DUC HIEU
+        // ============================================================
 
         private List<SelectListItem> LayDanhSachTrangThai()
         {
