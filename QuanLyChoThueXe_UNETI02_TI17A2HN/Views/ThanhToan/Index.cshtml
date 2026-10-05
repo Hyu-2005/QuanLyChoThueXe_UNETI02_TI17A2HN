@@ -1,0 +1,462 @@
+﻿@*
+    Index.cshtml - danh sach thanh toan
+    Họ và tên: Duong Lam Huy
+    Mã sinh viên: 23103100120
+    Nội dung thực hiện: Danh sách hóa đơn thanh toán có tìm kiếm, lọc, phân trang
+    Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThanhToan.ThanhToanListVM
+@{
+    ViewData["Title"] = "Thanh toán";
+    int stt = (Model.Trang - 1) * Model.KichThuocTrang;
+}
+
+<style>
+    .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .page-wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
+
+    .page-head {
+        margin-bottom: 24px; padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .page-head h1 {
+        font-size: 26px; font-weight: 800; color: #0f172a;
+        letter-spacing: -0.4px; margin: 0 0 4px 0;
+    }
+    .page-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-left: 4px solid #10b981;
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 20px;
+    }
+    .stat-card .lbl {
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1px;
+        color: #64748b; margin-bottom: 8px;
+    }
+    .stat-card .val {
+        font-size: 28px; font-weight: 800;
+        color: #166534; letter-spacing: -0.6px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .filter-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 18px 22px;
+        margin-bottom: 20px;
+    }
+    .filter-card .form-label {
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .5px;
+        color: #64748b; margin-bottom: 6px;
+    }
+    .filter-card .form-control,
+    .filter-card .form-select {
+        border-radius: 8px; border-color: #d1d5db;
+        font-size: 14px; height: 40px;
+    }
+    .filter-card .form-control:focus,
+    .filter-card .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+
+    .data-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    .data-card .card-head {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 18px 22px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .data-card .card-head .title {
+        font-size: 14px; font-weight: 700; color: #0f172a; margin: 0;
+    }
+    .data-card .card-head .count {
+        font-size: 12px; color: #64748b;
+        background: #f1f5f9;
+        padding: 4px 12px; border-radius: 999px;
+        font-weight: 600;
+    }
+    .data-card table { margin: 0; font-size: 14px; }
+    .data-card thead th {
+        background: #f9fafb;
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .5px;
+        color: #475569; padding: 14px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+    .data-card tbody td {
+        padding: 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .data-card tbody tr:last-child td { border-bottom: none; }
+    .data-card tbody tr:hover { background: #fafbfc; }
+
+    .kh-cell .name {
+        font-weight: 700; color: #0f172a;
+        font-size: 14px; margin-bottom: 2px;
+    }
+    .kh-cell .phone {
+        font-size: 12px; color: #64748b;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .xe-cell { display: flex; align-items: center; gap: 10px; }
+    .xe-thumb {
+        width: 56px; height: 44px;
+        object-fit: cover; border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        flex-shrink: 0;
+    }
+    .xe-name {
+        font-weight: 700; color: #0f172a;
+        font-size: 13px; margin-bottom: 2px;
+    }
+    .xe-plate {
+        display: inline-block;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        font-size: 11px; font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 5px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #0f172a; }
+    .money.big { color: #1d4ed8; font-weight: 800; font-size: 15px; }
+    .money.unit { font-size: 11px; color: #94a3b8; font-weight: 500; margin-left: 2px; }
+
+    .status-pill {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 11px; font-weight: 700;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .status-pill.chua-tt { background: #fef3c7; color: #92400e; }
+    .status-pill.da-tt { background: #dcfce7; color: #166534; }
+    .status-pill.hoan-tien { background: #dbeafe; color: #1e40af; }
+
+    .action-cell {
+        display: flex; justify-content: flex-end;
+        align-items: center; gap: 6px;
+        flex-wrap: nowrap;
+    }
+    .btn-clean {
+        display: inline-flex;
+        align-items: center; justify-content: center;
+        padding: 7px 14px;
+        font-size: 13px; font-weight: 600;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: #fff; color: #374151;
+        text-decoration: none;
+        transition: all .15s;
+        line-height: 1; white-space: nowrap;
+        min-height: 34px;
+    }
+    .btn-clean:hover { border-color: #9ca3af; background: #f9fafb; color: #111827; }
+
+    .btn-clean.primary {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 4px 12px rgba(16,185,129,.25);
+    }
+    .btn-clean.primary:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(16,185,129,.35);
+    }
+
+    .empty-state {
+        padding: 72px 24px; text-align: center; color: #94a3b8;
+    }
+    .empty-state .big {
+        font-size: 42px; font-weight: 700;
+        color: #e5e7eb; letter-spacing: 4px;
+    }
+    .empty-state .msg { font-size: 15px; margin-top: 8px; }
+
+    .pager {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 16px 22px;
+        background: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+        font-size: 13px; color: #64748b;
+    }
+    .pager .pagination { margin: 0; }
+    .pager .page-link {
+        border-radius: 8px; margin: 0 2px;
+        border-color: #e5e7eb; color: #334155;
+        font-size: 13px; font-weight: 600;
+        padding: 6px 12px;
+    }
+    .pager .page-item.active .page-link {
+        background: #1d4ed8; border-color: #1d4ed8;
+    }
+</style>
+
+<div class="page-shell">
+    <div class="page-wrap">
+
+        <div class="page-head">
+            <h1>Thanh toán</h1>
+            <p class="sub">Danh sách hóa đơn thanh toán trong hệ thống</p>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                <strong>Thành công.</strong> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                <strong>Lỗi.</strong> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="stat-card">
+            <div class="lbl">Tổng doanh thu (trang hiện tại)</div>
+            <div class="val">@Model.TongDoanhThu.ToString("N0") đ</div>
+        </div>
+
+        <div class="filter-card">
+            <form method="get" asp-action="Index">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Từ khóa</label>
+                        <input type="text" name="tuKhoa" value="@Model.TuKhoa"
+                               class="form-control" placeholder="Tên KH, biển số..." />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Trạng thái</label>
+                        <select name="trangThaiThanhToan" class="form-select"
+                                asp-items="Model.DanhSachTrangThai">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Phương thức</label>
+                        <select name="phuongThucThanhToan" class="form-select"
+                                asp-items="Model.DanhSachPhuongThuc">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Từ ngày</label>
+                        <input type="date" name="tuNgay"
+                               value="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Đến ngày</label>
+                        <input type="date" name="denNgay"
+                               value="@(Model.DenNgay?.ToString("yyyy-MM-dd"))"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-1 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary w-100">Lọc</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="data-card">
+            <div class="card-head">
+                <h6 class="title">Danh sách hóa đơn</h6>
+                <span class="count">@Model.DanhSach.Count / @Model.TongSoBanGhi hóa đơn</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width:56px">STT</th>
+                            <th>Khách hàng</th>
+                            <th>Xe</th>
+                            <th>Ngày thanh toán</th>
+                            <th class="text-end">Tiền thuê</th>
+                            <th class="text-end">Phụ phí</th>
+                            <th class="text-end">Tổng</th>
+                            <th>Phương thức</th>
+                            <th>Trạng thái</th>
+                            <th class="text-end" style="width:200px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.DanhSach.Any())
+                        {
+                            foreach (var item in Model.DanhSach)
+                            {
+                                stt++;
+                                var statusClass = item.TrangThaiThanhToan switch
+                                {
+                                    "Chưa thanh toán" => "chua-tt",
+                                    "Đã thanh toán" => "da-tt",
+                                    "Hoàn tiền" => "hoan-tien",
+                                    _ => "chua-tt"
+                                };
+
+                                // Chỉ hiện nút "Thanh toán" khi:
+                                // - Hóa đơn chưa thanh toán
+                                // - Có đơn đặt xe liên kết
+                                // - Đơn đặt xe còn ở trạng thái "Chờ thanh toán"
+                                var chuaThanhToan = item.TrangThaiThanhToan == "Chưa thanh toán"
+                                                 && item.DatXe != null
+                                                 && item.DatXe.TrangThai == "Chờ thanh toán";
+
+                                <tr>
+                                    <td class="text-muted">@stt</td>
+
+                                    <td>
+                                        <div class="kh-cell">
+                                            <div class="name">@item.DatXe?.KhachHang?.HoTen</div>
+                                            <div class="phone">@item.DatXe?.KhachHang?.SoDienThoai</div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="xe-cell">
+                                            <img src="@(string.IsNullOrEmpty(item.DatXe?.Xe?.AnhXe) ? "/images/xe/default.jpg" : item.DatXe.Xe.AnhXe)"
+                                                 class="xe-thumb" alt="@item.DatXe?.Xe?.TenXe" />
+                                            <div>
+                                                <div class="xe-name">@item.DatXe?.Xe?.TenXe</div>
+                                                <span class="xe-plate">@item.DatXe?.Xe?.BienSo</span>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-muted">
+                                        @item.NgayThanhToan.ToString("dd/MM/yyyy HH:mm")
+                                    </td>
+
+                                    <td class="text-end">
+                                        <span class="money">@item.TienThue.ToString("N0") đ</span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <span class="money">@item.TongPhuPhi.ToString("N0") đ</span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <span class="money big">@item.TongThanhToan.ToString("N0") đ</span>
+                                    </td>
+
+                                    <td class="text-muted small">@item.PhuongThucThanhToan</td>
+
+                                    <td>
+                                        <span class="status-pill @statusClass">@item.TrangThaiThanhToan</span>
+                                    </td>
+
+                                    <td>
+                                        <div class="action-cell">
+                                            @if (chuaThanhToan)
+                                            {
+                                                <a asp-action="ThanhToan"
+                                                   asp-route-id="@item.DatXe!.MaDatXe"
+                                                   class="btn-clean primary">Thanh toán</a>
+                                            }
+                                            <a asp-action="Details" asp-route-id="@item.MaThanhToan"
+                                               class="btn-clean">Xem</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="10">
+                                    <div class="empty-state">
+                                        <div class="big">— — —</div>
+                                        <div class="msg">Không có hóa đơn nào</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TongSoTrang > 1)
+            {
+                <div class="pager">
+                    <div>
+                        Trang <strong>@Model.Trang</strong> / @Model.TongSoTrang —
+                        hiển thị <strong>@Model.DanhSach.Count</strong> trong
+                        <strong>@Model.TongSoBanGhi</strong> hóa đơn
+                    </div>
+
+                    <nav>
+                        <ul class="pagination pagination-sm">
+                            <li class="page-item @(Model.CoTrangTruoc ? "" : "disabled")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-trang="@(Model.Trang - 1)"
+                                   asp-route-tuKhoa="@Model.TuKhoa"
+                                   asp-route-trangThaiThanhToan="@Model.TrangThaiThanhToan"
+                                   asp-route-phuongThucThanhToan="@Model.PhuongThucThanhToan"
+                                   asp-route-tuNgay="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+                                   asp-route-denNgay="@(Model.DenNgay?.ToString("yyyy-MM-dd"))">Trước</a>
+                            </li>
+
+                            @{
+                                var batDau = Math.Max(1, Model.Trang - 2);
+                                var ketThuc = Math.Min(Model.TongSoTrang, Model.Trang + 2);
+                            }
+
+                            @for (int i = batDau; i <= ketThuc; i++)
+                            {
+                                <li class="page-item @(i == Model.Trang ? "active" : "")">
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-trang="@i"
+                                       asp-route-tuKhoa="@Model.TuKhoa"
+                                       asp-route-trangThaiThanhToan="@Model.TrangThaiThanhToan"
+                                       asp-route-phuongThucThanhToan="@Model.PhuongThucThanhToan"
+                                       asp-route-tuNgay="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+                                       asp-route-denNgay="@(Model.DenNgay?.ToString("yyyy-MM-dd"))">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.CoTrangSau ? "" : "disabled")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-trang="@(Model.Trang + 1)"
+                                   asp-route-tuKhoa="@Model.TuKhoa"
+                                   asp-route-trangThaiThanhToan="@Model.TrangThaiThanhToan"
+                                   asp-route-phuongThucThanhToan="@Model.PhuongThucThanhToan"
+                                   asp-route-tuNgay="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+                                   asp-route-denNgay="@(Model.DenNgay?.ToString("yyyy-MM-dd"))">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
