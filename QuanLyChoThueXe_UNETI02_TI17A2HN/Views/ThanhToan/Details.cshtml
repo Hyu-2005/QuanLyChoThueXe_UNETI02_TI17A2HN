@@ -1,0 +1,193 @@
+﻿@*
+    Details.cshtml - chi tiet hoa don thanh toan
+    sinh vien thuc hien: Duong Lam Huy - 23103100120
+    module 5 - tinh tien, thanh toan, lich su va thong ke
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.ThanhToan
+@{
+    ViewData["Title"] = "Chi tiết hóa đơn";
+}
+
+<style>
+    .detail-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .detail-wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    .detail-head {
+        margin-bottom: 28px; padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .detail-head .back {
+        font-size: 13px; color: #64748b; text-decoration: none;
+        display: inline-block; margin-bottom: 8px;
+    }
+    .detail-head .back:hover { color: #1d4ed8; }
+    .detail-head h1 {
+        font-size: 26px; font-weight: 800; color: #0f172a;
+        letter-spacing: -0.4px; margin: 0 0 8px 0;
+    }
+    .id-chip {
+        display: inline-block;
+        background: #e0e7ff; color: #3730a3;
+        font-weight: 700; font-size: 13px;
+        padding: 4px 12px; border-radius: 8px;
+        margin-right: 8px;
+    }
+    .status-pill {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 12px; font-weight: 700;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+        background: #dcfce7; color: #166534;
+    }
+
+    .info-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 26px 30px;
+        margin-bottom: 20px;
+    }
+    .info-card .title {
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: #64748b; margin: 0 0 18px 0;
+    }
+    .info-row {
+        display: flex; justify-content: space-between;
+        padding: 11px 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 14px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .lbl { color: #64748b; }
+    .info-row .val {
+        font-weight: 600; color: #0f172a;
+        text-align: right; font-variant-numeric: tabular-nums;
+    }
+
+    .price-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 24px 30px;
+        margin-bottom: 20px;
+    }
+    .price-card .title {
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: #64748b; margin: 0 0 18px 0;
+    }
+    .price-row {
+        display: flex; justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 14px;
+    }
+    .price-row:last-child { border-bottom: none; }
+    .price-row .lbl { color: #64748b; }
+    .price-row .val {
+        color: #0f172a; font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+    .price-row.minus .val { color: #059669; }
+    .price-row.total {
+        margin-top: 8px; padding-top: 14px;
+        border-top: 2px solid #cbd5e1;
+        border-bottom: none;
+    }
+    .price-row.total .lbl {
+        color: #0f172a; font-weight: 800; font-size: 15px;
+    }
+    .price-row.total .val {
+        color: #b45309; font-weight: 800; font-size: 20px;
+    }
+</style>
+
+<div class="detail-shell">
+    <div class="detail-wrap">
+
+        <div class="detail-head">
+            <a asp-action="Index" class="back">← Quay lại danh sách</a>
+            <h1>Hóa đơn thanh toán</h1>
+            <div>
+                <span class="id-chip">#@Model.MaThanhToan</span>
+                <span class="status-pill">@Model.TrangThaiThanhToan</span>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h6 class="title">Thông tin đơn đặt xe</h6>
+            <div class="info-row">
+                <span class="lbl">Mã đơn</span>
+                <span class="val">#@Model.MaDatXe</span>
+            </div>
+            <div class="info-row">
+                <span class="lbl">Khách hàng</span>
+                <span class="val">@Model.DatXe?.KhachHang?.HoTen</span>
+            </div>
+            <div class="info-row">
+                <span class="lbl">Số điện thoại</span>
+                <span class="val">@Model.DatXe?.KhachHang?.SoDienThoai</span>
+            </div>
+            <div class="info-row">
+                <span class="lbl">Xe</span>
+                <span class="val">@Model.DatXe?.Xe?.TenXe - @Model.DatXe?.Xe?.BienSo</span>
+            </div>
+            <div class="info-row">
+                <span class="lbl">Thời gian nhận</span>
+                <span class="val">@Model.DatXe?.ThoiGianNhanDuKien.ToString("dd/MM/yyyy HH:mm")</span>
+            </div>
+            <div class="info-row">
+                <span class="lbl">Thời gian trả</span>
+                <span class="val">@Model.DatXe?.ThoiGianTraDuKien.ToString("dd/MM/yyyy HH:mm")</span>
+            </div>
+        </div>
+
+        <div class="price-card">
+            <h6 class="title">Chi tiết thanh toán</h6>
+            <div class="price-row">
+                <span class="lbl">Tiền thuê</span>
+                <span class="val">@Model.TienThue.ToString("N0") đ</span>
+            </div>
+            <div class="price-row">
+                <span class="lbl">Tổng phụ phí</span>
+                <span class="val">@Model.TongPhuPhi.ToString("N0") đ</span>
+            </div>
+            <div class="price-row">
+                <span class="lbl">Tổng thanh toán</span>
+                <span class="val">@Model.TongThanhToan.ToString("N0") đ</span>
+            </div>
+            <div class="price-row minus">
+                <span class="lbl">Tiền cọc đã thu</span>
+                <span class="val">- @Model.TienCocDaThu.ToString("N0") đ</span>
+            </div>
+            <div class="price-row total">
+                <span class="lbl">Số tiền còn lại</span>
+                <span class="val">@Model.SoTienConLai.ToString("N0") đ</span>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h6 class="title">Thông tin thanh toán</h6>
+            <div class="info-row">
+                <span class="lbl">Phương thức</span>
+                <span class="val">@Model.PhuongThucThanhToan</span>
+            </div>
+            <div class="info-row">
+                <span class="lbl">Ngày thanh toán</span>
+                <span class="val">@Model.NgayThanhToan.ToString("dd/MM/yyyy HH:mm")</span>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.GhiChu))
+            {
+                <div class="info-row">
+                    <span class="lbl">Ghi chú</span>
+                    <span class="val">@Model.GhiChu</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>

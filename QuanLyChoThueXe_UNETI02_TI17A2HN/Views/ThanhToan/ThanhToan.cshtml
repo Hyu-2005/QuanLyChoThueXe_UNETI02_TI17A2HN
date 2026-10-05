@@ -1,0 +1,318 @@
+﻿@*
+    ThanhToan.cshtml - form thanh toan don dat xe
+    sinh vien thuc hien: Duong Lam Huy - 23103100120
+    module 5 - tinh tien, thanh toan, lich su va thong ke
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThanhToan.ThanhToanVM
+@{
+    ViewData["Title"] = "Thanh toán đơn đặt xe";
+}
+
+<style>
+    .form-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .form-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    .form-head {
+        margin-bottom: 28px; padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .form-head .back {
+        font-size: 13px; color: #64748b; text-decoration: none;
+        display: inline-block; margin-bottom: 8px;
+    }
+    .form-head .back:hover { color: #1d4ed8; }
+    .form-head h1 {
+        font-size: 26px; font-weight: 800; color: #0f172a;
+        letter-spacing: -0.4px; margin: 0 0 4px 0;
+    }
+    .form-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+
+    .info-summary {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        border-radius: 14px;
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .info-summary .item h6 {
+        font-size: 11px; text-transform: uppercase;
+        letter-spacing: .8px; opacity: .85; margin: 0 0 6px 0;
+    }
+    .info-summary .item .val {
+        font-size: 18px; font-weight: 800;
+        letter-spacing: -0.3px; margin: 0;
+    }
+    .info-summary .item .sub {
+        font-size: 12px; opacity: .8; margin-top: 2px;
+    }
+
+    .form-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(15,23,42,.04);
+    }
+    .form-card .sect {
+        padding: 28px 32px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .form-card .sect:last-of-type { border-bottom: none; }
+    .form-card .sect-title {
+        display: flex; align-items: center; gap: 12px;
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        color: #64748b; margin: 0 0 22px 0;
+    }
+    .form-card .sect-title .num {
+        width: 26px; height: 26px; border-radius: 50%;
+        background: #1d4ed8; color: #fff;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+
+    .form-label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+    .form-label .req { color: #dc2626; margin-left: 2px; }
+    .form-control, .form-select {
+        border-radius: 8px; border-color: #d1d5db;
+        font-size: 14px; padding: 9px 12px; height: 42px;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+
+    .price-breakdown {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 20px 24px;
+    }
+    .price-row {
+        display: flex; justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 14px;
+    }
+    .price-row:last-child { border-bottom: none; }
+    .price-row .lbl { color: #64748b; }
+    .price-row .val {
+        color: #0f172a; font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+    .price-row.highlight .lbl {
+        color: #0f172a; font-weight: 700; font-size: 15px;
+    }
+    .price-row.highlight .val {
+        color: #1d4ed8; font-weight: 800; font-size: 18px;
+    }
+    .price-row.minus .val { color: #059669; }
+    .price-row.total {
+        margin-top: 8px; padding-top: 14px;
+        border-top: 2px solid #cbd5e1;
+        border-bottom: none;
+    }
+    .price-row.total .lbl {
+        color: #0f172a; font-weight: 800; font-size: 15px;
+    }
+    .price-row.total .val {
+        color: #b45309; font-weight: 800; font-size: 22px;
+        letter-spacing: -0.5px;
+    }
+
+    .phi-detail-box {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-top: 16px;
+    }
+    .phi-detail-box h6 {
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .5px;
+        color: #92400e; margin: 0 0 10px 0;
+    }
+    .phi-line {
+        display: flex; justify-content: space-between;
+        font-size: 13px; padding: 4px 0;
+        color: #78350f;
+    }
+    .phi-line .val { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    .form-actions {
+        padding: 20px 32px;
+        background: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+        display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .form-actions .btn { padding: 10px 26px; font-weight: 600; border-radius: 8px; }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: #fff; border: none;
+        box-shadow: 0 4px 12px rgba(16,185,129,.25);
+    }
+    .btn-primary-custom:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(16,185,129,.35);
+    }
+</style>
+
+<div class="form-shell">
+    <div class="form-wrap">
+
+        <div class="form-head">
+            <a asp-action="Index" class="back">← Quay lại danh sách</a>
+            <h1>Thanh toán đơn đặt xe</h1>
+            <p class="sub">Xác nhận thanh toán và hoàn tất đơn thuê xe</p>
+        </div>
+
+        <div class="info-summary">
+            <div class="item">
+                <h6>Đơn đặt xe</h6>
+                <p class="val">#@Model.MaDatXe</p>
+                <div class="sub">@Model.TenKhachHang - @Model.SoDienThoaiKhachHang</div>
+            </div>
+            <div class="item">
+                <h6>Xe</h6>
+                <p class="val">@Model.TenXe</p>
+                <div class="sub">@Model.BienSo</div>
+            </div>
+            <div class="item">
+                <h6>Thời gian thuê</h6>
+                <p class="val">@Model.SoNgayThue ngày</p>
+                <div class="sub">
+                    @Model.ThoiGianNhanDuKien.ToString("dd/MM") →
+                    @(Model.ThoiGianTraThucTe?.ToString("dd/MM") ?? Model.ThoiGianTraDuKien.ToString("dd/MM"))
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="ThanhToan" asp-route-id="@Model.MaDatXe" method="post">
+            <input type="hidden" asp-for="MaDatXe" />
+            <input type="hidden" asp-for="BienSo" />
+            <input type="hidden" asp-for="TenXe" />
+            <input type="hidden" asp-for="TenKhachHang" />
+            <input type="hidden" asp-for="SoDienThoaiKhachHang" />
+            <input type="hidden" asp-for="ThoiGianNhanDuKien" />
+            <input type="hidden" asp-for="ThoiGianTraDuKien" />
+            <input type="hidden" asp-for="SoNgayThue" />
+            <input type="hidden" asp-for="TienThue" />
+            <input type="hidden" asp-for="TongPhuPhi" />
+            <input type="hidden" asp-for="TienCocDaThu" />
+            <input type="hidden" asp-for="TongThanhToan" />
+            <input type="hidden" asp-for="SoTienConLai" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="form-card">
+
+                <!-- SECTION 1: TINH TIEN -->
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">1</span> Chi tiết thanh toán
+                        <span class="hint">Tính tự động từ dữ liệu hệ thống</span>
+                    </h6>
+
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <span class="lbl">Số ngày thuê</span>
+                            <span class="val">@Model.SoNgayThue ngày</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="lbl">Tiền thuê</span>
+                            <span class="val">@Model.TienThue.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="lbl">Tổng phụ phí</span>
+                            <span class="val">@Model.TongPhuPhi.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row highlight">
+                            <span class="lbl">Tổng thanh toán</span>
+                            <span class="val">@Model.TongThanhToan.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row minus">
+                            <span class="lbl">Trừ tiền cọc đã thu</span>
+                            <span class="val">- @Model.TienCocDaThu.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row total">
+                            <span class="lbl">Số tiền còn lại</span>
+                            <span class="val">@Model.SoTienConLai.ToString("N0") đ</span>
+                        </div>
+                    </div>
+
+                    @if (Model.TongPhuPhi > 0)
+                    {
+                        <div class="phi-detail-box">
+                            <h6>Chi tiết phụ phí</h6>
+                            <div class="phi-line">
+                                <span>Phí quá hạn</span>
+                                <span class="val">@Model.PhiQuaHan.ToString("N0") đ</span>
+                            </div>
+                            <div class="phi-line">
+                                <span>Phí vượt km</span>
+                                <span class="val">@Model.PhiVuotKm.ToString("N0") đ</span>
+                            </div>
+                            <div class="phi-line">
+                                <span>Phí nhiên liệu</span>
+                                <span class="val">@Model.PhiNhienLieu.ToString("N0") đ</span>
+                            </div>
+                            <div class="phi-line">
+                                <span>Phí hư hỏng</span>
+                                <span class="val">@Model.PhiHuHong.ToString("N0") đ</span>
+                            </div>
+                        </div>
+                    }
+
+                    <div style="margin-top:16px;font-size:13px;color:#94a3b8">
+                        Tiền thuê và tổng thanh toán được tính tự động, không thể nhập tay.
+                    </div>
+                </div>
+
+                <!-- SECTION 2: PHUONG THUC -->
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">2</span> Phương thức thanh toán
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="PhuongThucThanhToan" class="form-label">
+                                Phương thức <span class="req">*</span>
+                            </label>
+                            <select asp-for="PhuongThucThanhToan"
+                                    asp-items="Model.DanhSachPhuongThuc"
+                                    class="form-select">
+                                <option value="">-- Chọn phương thức --</option>
+                            </select>
+                            <span asp-validation-for="PhuongThucThanhToan" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="GhiChu" class="form-label">Ghi chú</label>
+                            <textarea asp-for="GhiChu" rows="2" class="form-control"
+                                      placeholder="Ghi chú về thanh toán..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-primary-custom"
+                            onclick="return confirm('Xác nhận thanh toán đơn này và chuyển sang Hoàn thành?')">
+                        Xác nhận thanh toán
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

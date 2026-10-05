@@ -1,0 +1,736 @@
+﻿@*
+    ChiTiet.cshtml - Thong ke chi tiet bang LINQ
+    Họ và tên: Duong Lam Huy
+    Mã sinh viên: 23103100120
+    Nội dung thực hiện: Thống kê chi tiết xe, loại xe, hãng xe, doanh thu, khách hàng
+    Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThongKe.ThongKeVM
+@{
+    ViewData["Title"] = "Thống kê chi tiết";
+}
+
+<style>
+    .stat-shell {
+        background: #f5f7fa;
+        min-height: 100vh;
+        padding: 28px 0 40px;
+    }
+    .stat-wrap {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 0 28px;
+    }
+
+    /* ============ HEADER ============ */
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .stat-header .back {
+        font-size: 13px;
+        color: #64748b;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 8px;
+    }
+    .stat-header .back:hover { color: #1d4ed8; }
+    .stat-header h1 {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.6px;
+        margin: 0 0 6px 0;
+    }
+    .stat-header .sub {
+        font-size: 14px;
+        color: #64748b;
+        margin: 0;
+    }
+    .stat-header .sub strong {
+        color: #1d4ed8;
+        font-weight: 700;
+    }
+
+    /* ============ FILTER ============ */
+    .filter-box {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    .filter-box .form-group {
+        flex: 1;
+        min-width: 180px;
+    }
+    .filter-box .form-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: #64748b;
+        margin-bottom: 6px;
+        display: block;
+    }
+    .filter-box .form-control {
+        border-radius: 8px;
+        border-color: #d1d5db;
+        font-size: 14px;
+        height: 42px;
+        width: 100%;
+    }
+    .filter-box .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+    .filter-box .btn-group {
+        display: flex;
+        gap: 8px;
+    }
+    .filter-box .btn {
+        height: 42px;
+        padding: 0 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+    .filter-box .btn-primary {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        border: none;
+        box-shadow: 0 4px 12px rgba(59,130,246,.25);
+    }
+    .filter-box .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(59,130,246,.35);
+    }
+
+    /* ============ SUMMARY GRID ============ */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+    .summary-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 22px 24px;
+        position: relative;
+        overflow: hidden;
+        transition: all .2s;
+    }
+    .summary-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(15,23,42,.08);
+    }
+    .summary-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0;
+        width: 4px; height: 100%;
+    }
+    .summary-card.blue::before { background: linear-gradient(180deg, #1e3a8a, #3b82f6); }
+    .summary-card.green::before { background: linear-gradient(180deg, #059669, #10b981); }
+    .summary-card.amber::before { background: linear-gradient(180deg, #b45309, #f59e0b); }
+    .summary-card.red::before { background: linear-gradient(180deg, #b91c1c, #ef4444); }
+    .summary-card.purple::before { background: linear-gradient(180deg, #6d28d9, #8b5cf6); }
+
+    .summary-card .lbl {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        color: #64748b;
+        margin-bottom: 10px;
+    }
+    .summary-card .num {
+        font-size: 26px;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1;
+        letter-spacing: -0.6px;
+        font-variant-numeric: tabular-nums;
+    }
+    .summary-card.blue .num { color: #1d4ed8; }
+    .summary-card.green .num { color: #059669; }
+    .summary-card.amber .num { color: #b45309; }
+    .summary-card.red .num { color: #b91c1c; }
+    .summary-card.purple .num { color: #6d28d9; }
+
+    .summary-card .sub {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 8px;
+    }
+
+    /* ============ SECTION ============ */
+    .section-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 32px 0 16px 0;
+    }
+    .section-head .icon {
+        width: 8px;
+        height: 24px;
+        background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%);
+        border-radius: 4px;
+    }
+    .section-head h6 {
+        font-size: 15px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.2px;
+        margin: 0;
+    }
+    .section-head .count {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+    }
+
+    /* ============ DATA CARD ============ */
+    .data-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 12px;
+    }
+    .data-card table {
+        margin: 0;
+        font-size: 14px;
+    }
+    .data-card thead th {
+        background: #f9fafb;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: #475569;
+        padding: 14px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+    .data-card tbody td {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .data-card tbody tr:last-child td { border-bottom: none; }
+    .data-card tbody tr:hover { background: #fafbfc; }
+
+    .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #64748b;
+        font-weight: 800;
+        font-size: 13px;
+    }
+    .rank-badge.gold {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: #fff;
+        box-shadow: 0 3px 8px rgba(245,158,11,.35);
+    }
+    .rank-badge.silver {
+        background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+        color: #fff;
+        box-shadow: 0 3px 8px rgba(148,163,184,.35);
+    }
+    .rank-badge.bronze {
+        background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+        color: #fff;
+        box-shadow: 0 3px 8px rgba(234,88,12,.3);
+    }
+
+    .plate-tag {
+        display: inline-block;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        font-weight: 700;
+        font-size: 12px;
+        color: #0f172a;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-variant-numeric: tabular-nums;
+    }
+    .money {
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+        color: #1d4ed8;
+    }
+
+    /* ============ BAR CHART ============ */
+    .chart-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 24px 28px;
+        margin-bottom: 12px;
+    }
+    .bar-item {
+        margin-bottom: 20px;
+    }
+    .bar-item:last-child { margin-bottom: 0; }
+    .bar-item .bar-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 8px;
+    }
+    .bar-item .bar-label .name {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    .bar-item .bar-label .name small {
+        color: #94a3b8;
+        font-weight: 500;
+        font-size: 12px;
+        margin-left: 6px;
+    }
+    .bar-item .bar-label .value {
+        font-size: 14px;
+        font-weight: 800;
+        color: #1d4ed8;
+        font-variant-numeric: tabular-nums;
+    }
+    .bar-track {
+        background: #f1f5f9;
+        border-radius: 999px;
+        height: 12px;
+        overflow: hidden;
+        position: relative;
+    }
+    .bar-fill {
+        background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+        height: 100%;
+        border-radius: 999px;
+        transition: width .4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .bar-fill::after {
+        content: "";
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
+        animation: shine 2s infinite;
+    }
+    @@keyframes shine {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .empty-cell {
+        padding: 60px 20px !important;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 14px;
+    }
+    .empty-cell .icon {
+        font-size: 42px;
+        color: #e5e7eb;
+        margin-bottom: 12px;
+        letter-spacing: 4px;
+    }
+
+    @@media (max-width: 992px) {
+        .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @@media (max-width: 576px) {
+        .summary-grid { grid-template-columns: 1fr; }
+        .stat-header { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+
+<div class="stat-shell">
+    <div class="stat-wrap">
+
+        <!-- HEADER -->
+        <div class="stat-header">
+            <div>
+                <a asp-action="Index" class="back">← Quay lại Dashboard</a>
+                <h1>Thống kê chi tiết</h1>
+                <p class="sub">
+                    Kỳ báo cáo:
+                    <strong>@Model.TuNgay.ToString("dd/MM/yyyy")</strong>
+                    –
+                    <strong>@Model.DenNgay.ToString("dd/MM/yyyy")</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- FILTER -->
+        <div class="filter-box">
+            <form method="get" asp-action="ChiTiet" style="display: contents;">
+                <div class="form-group">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" name="tuNgay"
+                           value="@Model.TuNgay.ToString("yyyy-MM-dd")"
+                           class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" name="denNgay"
+                           value="@Model.DenNgay.ToString("yyyy-MM-dd")"
+                           class="form-control" />
+                </div>
+                <div class="btn-group">
+                    <a asp-action="ChiTiet" class="btn btn-outline-secondary">Xóa lọc</a>
+                    <button type="submit" class="btn btn-primary">Áp dụng</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="summary-grid">
+            <div class="summary-card blue">
+                <div class="lbl">Tổng số đơn</div>
+                <div class="num">@Model.TongSoDon</div>
+                <div class="sub">Trong kỳ báo cáo</div>
+            </div>
+            <div class="summary-card green">
+                <div class="lbl">Tổng doanh thu</div>
+                <div class="num">@Model.TongDoanhThu.ToString("N0")</div>
+                <div class="sub">VNĐ</div>
+            </div>
+            <div class="summary-card amber">
+                <div class="lbl">Tổng phụ phí</div>
+                <div class="num">@Model.TongPhuPhi.ToString("N0")</div>
+                <div class="sub">VNĐ</div>
+            </div>
+            <div class="summary-card red">
+                <div class="lbl">Tỷ lệ hủy / từ chối</div>
+                <div class="num">@Model.TyLeHuy.ToString("N2")%</div>
+                <div class="sub">
+                    @Model.SoDonHuy hủy · @Model.SoDonTuChoi từ chối
+                </div>
+            </div>
+            <div class="summary-card purple">
+                <div class="lbl">Tỷ lệ khai thác</div>
+                <div class="num">@Model.TyLeKhaiThac.ToString("N2")%</div>
+                <div class="sub">TB @Model.ThoiLuongThueTrungBinh ngày/đơn</div>
+            </div>
+        </div>
+
+        <!-- TOP XE -->
+        <div class="section-head">
+            <div class="icon"></div>
+            <h6>Top xe được thuê nhiều nhất</h6>
+            <span class="count">@Model.TopXeThueNhieu.Count xe</span>
+        </div>
+
+        <div class="data-card">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width:70px">Hạng</th>
+                            <th>Biển số</th>
+                            <th>Tên xe</th>
+                            <th>Loại xe</th>
+                            <th class="text-end">Số lần thuê</th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TopXeThueNhieu.Any())
+                        {
+                            int idx = 0;
+                            foreach (var item in Model.TopXeThueNhieu)
+                            {
+                                idx++;
+                                var rankClass = idx switch
+                                {
+                                    1 => "gold",
+                                    2 => "silver",
+                                    3 => "bronze",
+                                    _ => ""
+                                };
+                                <tr>
+                                    <td>
+                                        <span class="rank-badge @rankClass">@idx</span>
+                                    </td>
+                                    <td>
+                                        <span class="plate-tag">@item.BienSo</span>
+                                    </td>
+                                    <td><strong>@item.TenXe</strong></td>
+                                    <td class="text-muted">@item.TenLoaiXe</td>
+                                    <td class="text-end">
+                                        <strong style="font-size:15px">@item.SoLanThue</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="money">@item.DoanhThu.ToString("N0") đ</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="empty-cell">
+                                    <div class="icon">— — —</div>
+                                    Chưa có dữ liệu
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- THEO LOAI XE -->
+        <div class="section-head">
+            <div class="icon"></div>
+            <h6>Thống kê theo loại xe</h6>
+            <span class="count">@Model.ThongKeTheoLoaiXe.Count loại</span>
+        </div>
+
+        <div class="data-card">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Loại xe</th>
+                            <th class="text-end">Số lần thuê</th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ThongKeTheoLoaiXe.Any())
+                        {
+                            foreach (var item in Model.ThongKeTheoLoaiXe)
+                            {
+                                <tr>
+                                    <td><strong>@item.TenLoaiXe</strong></td>
+                                    <td class="text-end">
+                                        <strong style="font-size:15px">@item.SoLanThue</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="money">@item.DoanhThu.ToString("N0") đ</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="empty-cell">
+                                    <div class="icon">— — —</div>
+                                    Chưa có dữ liệu
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- THEO HANG XE -->
+        <div class="section-head">
+            <div class="icon"></div>
+            <h6>Thống kê theo hãng xe</h6>
+            <span class="count">@Model.ThongKeTheoHangXe.Count hãng</span>
+        </div>
+
+        <div class="data-card">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Hãng xe</th>
+                            <th class="text-end">Số lần thuê</th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ThongKeTheoHangXe.Any())
+                        {
+                            foreach (var item in Model.ThongKeTheoHangXe)
+                            {
+                                <tr>
+                                    <td><strong>@item.TenHangXe</strong></td>
+                                    <td class="text-end">
+                                        <strong style="font-size:15px">@item.SoLanThue</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="money">@item.DoanhThu.ToString("N0") đ</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="empty-cell">
+                                    <div class="icon">— — —</div>
+                                    Chưa có dữ liệu
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DOANH THU THEO THANG -->
+        <div class="section-head">
+            <div class="icon"></div>
+            <h6>Doanh thu theo tháng</h6>
+        </div>
+
+        <div class="chart-card">
+            @if (Model.DoanhThuTheoThang.Any())
+            {
+                var maxDoanhThu = Model.DoanhThuTheoThang.Max(x => x.DoanhThu);
+                foreach (var item in Model.DoanhThuTheoThang)
+                {
+                    var phanTram = maxDoanhThu > 0
+                        ? (int)(item.DoanhThu / maxDoanhThu * 100)
+                        : 0;
+
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <div class="name">
+                                Tháng @item.Thang/@item.Nam
+                                <small>@item.SoDon đơn</small>
+                            </div>
+                            <div class="value">@item.DoanhThu.ToString("N0") đ</div>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width:@phanTram%"></div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-cell">
+                    <div class="icon">— — —</div>
+                    Chưa có dữ liệu doanh thu
+                </div>
+            }
+        </div>
+
+        <!-- TOP KHACH HANG -->
+        <div class="section-head">
+            <div class="icon"></div>
+            <h6>Top khách hàng thuê nhiều nhất</h6>
+            <span class="count">@Model.TopKhachHang.Count khách</span>
+        </div>
+
+        <div class="data-card">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width:70px">Hạng</th>
+                            <th>Khách hàng</th>
+                            <th>Số điện thoại</th>
+                            <th class="text-end">Số lần thuê</th>
+                            <th class="text-end">Tổng chi tiêu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TopKhachHang.Any())
+                        {
+                            int idx = 0;
+                            foreach (var item in Model.TopKhachHang)
+                            {
+                                idx++;
+                                var rankClass = idx switch
+                                {
+                                    1 => "gold",
+                                    2 => "silver",
+                                    3 => "bronze",
+                                    _ => ""
+                                };
+                                <tr>
+                                    <td>
+                                        <span class="rank-badge @rankClass">@idx</span>
+                                    </td>
+                                    <td><strong>@item.HoTen</strong></td>
+                                    <td class="text-muted">@item.SoDienThoai</td>
+                                    <td class="text-end">
+                                        <strong style="font-size:15px">@item.SoLanThue</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="money">@item.TongChiTieu.ToString("N0") đ</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="empty-cell">
+                                    <div class="icon">— — —</div>
+                                    Chưa có dữ liệu
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PHU PHI THEO LOAI -->
+        <div class="section-head">
+            <div class="icon"></div>
+            <h6>Tổng phụ phí theo loại</h6>
+        </div>
+
+        <div class="data-card">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Loại phí</th>
+                            <th class="text-end">Số lần phát sinh</th>
+                            <th class="text-end">Tổng tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.PhuPhiTheoLoai)
+                        {
+                            <tr>
+                                <td><strong>@item.LoaiPhi</strong></td>
+                                <td class="text-end">
+                                    <strong style="font-size:15px">@item.SoLan</strong>
+                                </td>
+                                <td class="text-end">
+                                    <span class="money">@item.TongTien.ToString("N0") đ</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
