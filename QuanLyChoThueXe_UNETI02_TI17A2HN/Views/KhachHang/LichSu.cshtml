@@ -1,0 +1,353 @@
+﻿@*
+    LichSu.cshtml - lich su thue cua khach hang
+    sinh vien thuc hien: Duong Lam Huy - 23103100120
+    module 5 - tinh tien, thanh toan, lich su va thong ke
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.KhachHang.LichSuThueVM
+@{
+    ViewData["Title"] = "Lịch sử thuê";
+    var kh = Model.KhachHang;
+    int stt = 0;
+}
+
+<style>
+    .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .page-wrap { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+
+    .page-head {
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .page-head .back {
+        font-size: 13px; color: #64748b; text-decoration: none;
+        display: inline-block; margin-bottom: 8px;
+    }
+    .page-head .back:hover { color: #1d4ed8; }
+    .page-head h1 {
+        font-size: 26px; font-weight: 800; color: #0f172a;
+        letter-spacing: -0.4px; margin: 0 0 4px 0;
+    }
+    .page-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+
+    .stat-strip {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .stat-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 18px 20px;
+        border-left: 4px solid #3b82f6;
+    }
+    .stat-card.green { border-left-color: #10b981; }
+    .stat-card.red { border-left-color: #ef4444; }
+    .stat-card.blue { border-left-color: #3b82f6; }
+    .stat-card.amber { border-left-color: #f59e0b; }
+    .stat-card .lbl {
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .5px;
+        color: #64748b; margin-bottom: 6px;
+    }
+    .stat-card .num {
+        font-size: 22px; font-weight: 800;
+        color: #0f172a; line-height: 1;
+    }
+
+    .kh-info-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+    }
+    .kh-info-card h6 {
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        color: #64748b; margin: 0 0 14px 0;
+    }
+    .kh-info-row {
+        display: flex; gap: 24px;
+        font-size: 14px;
+    }
+    .kh-info-row .item .lbl {
+        font-size: 11px; color: #94a3b8;
+        text-transform: uppercase; letter-spacing: .3px;
+    }
+    .kh-info-row .item .val {
+        font-weight: 700; color: #0f172a;
+        margin-top: 2px;
+    }
+
+    .data-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    .data-card .card-head {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 18px 22px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .data-card .card-head .title {
+        font-size: 14px; font-weight: 700; color: #0f172a; margin: 0;
+    }
+    .data-card .card-head .count {
+        font-size: 12px; color: #64748b;
+        background: #f1f5f9;
+        padding: 4px 12px; border-radius: 999px;
+        font-weight: 600;
+    }
+    .data-card table { margin: 0; font-size: 14px; }
+    .data-card thead th {
+        background: #f9fafb;
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .5px;
+        color: #475569; padding: 14px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+    .data-card tbody td {
+        padding: 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .data-card tbody tr:last-child td { border-bottom: none; }
+
+    .xe-cell { display: flex; align-items: center; gap: 10px; }
+    .xe-thumb {
+        width: 56px; height: 44px;
+        object-fit: cover; border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        flex-shrink: 0;
+    }
+    .xe-name {
+        font-weight: 700; color: #0f172a;
+        font-size: 13px; margin-bottom: 2px;
+    }
+    .xe-plate {
+        display: inline-block;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        font-size: 11px; font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 5px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #0f172a; }
+    .money.primary { color: #1d4ed8; font-weight: 700; }
+
+    .status-pill {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 11px; font-weight: 700;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .status-pill.cho-duyet { background: #fef3c7; color: #92400e; }
+    .status-pill.da-duyet { background: #dbeafe; color: #1e40af; }
+    .status-pill.da-ban-giao { background: #cffafe; color: #155e75; }
+    .status-pill.dang-thue { background: #e0e7ff; color: #3730a3; }
+    .status-pill.cho-thanh-toan { background: #fde68a; color: #78350f; }
+    .status-pill.hoan-thanh { background: #dcfce7; color: #166534; }
+    .status-pill.tu-choi { background: #fee2e2; color: #991b1b; }
+    .status-pill.da-huy { background: #f1f5f9; color: #64748b; }
+
+    .action-cell {
+        display: flex; justify-content: flex-end; gap: 6px;
+    }
+    .btn-clean {
+        display: inline-flex;
+        align-items: center; justify-content: center;
+        padding: 7px 14px;
+        font-size: 13px; font-weight: 600;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: #fff; color: #374151;
+        text-decoration: none;
+        transition: all .15s;
+        line-height: 1; white-space: nowrap;
+        min-height: 34px;
+    }
+    .btn-clean:hover { border-color: #9ca3af; background: #f9fafb; color: #111827; }
+
+    .empty-state {
+        padding: 72px 24px; text-align: center; color: #94a3b8;
+    }
+    .empty-state .big {
+        font-size: 42px; font-weight: 700;
+        color: #e5e7eb; letter-spacing: 4px;
+    }
+    .empty-state .msg { font-size: 15px; margin-top: 8px; }
+</style>
+
+<div class="page-shell">
+    <div class="page-wrap">
+
+        <div class="page-head">
+            <a asp-action="Index" class="back">← Quay lại danh sách khách hàng</a>
+            <h1>Lịch sử thuê xe</h1>
+            <p class="sub">Toàn bộ lịch sử thuê xe của khách hàng</p>
+        </div>
+
+        <!-- THONG TIN KHACH HANG -->
+        <div class="kh-info-card">
+            <h6>Thông tin khách hàng</h6>
+            <div class="kh-info-row">
+                <div class="item">
+                    <div class="lbl">Họ tên</div>
+                    <div class="val">@kh.HoTen</div>
+                </div>
+                <div class="item">
+                    <div class="lbl">Số điện thoại</div>
+                    <div class="val">@kh.SoDienThoai</div>
+                </div>
+                <div class="item">
+                    <div class="lbl">Email</div>
+                    <div class="val">@(string.IsNullOrEmpty(kh.Email) ? "-" : kh.Email)</div>
+                </div>
+                <div class="item">
+                    <div class="lbl">Số GPLX</div>
+                    <div class="val">@(string.IsNullOrEmpty(kh.SoGiayPhepLaiXe) ? "-" : kh.SoGiayPhepLaiXe)</div>
+                </div>
+                <div class="item">
+                    <div class="lbl">Địa chỉ</div>
+                    <div class="val">@(string.IsNullOrEmpty(kh.DiaChi) ? "-" : kh.DiaChi)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stat-strip">
+            <div class="stat-card blue">
+                <div class="lbl">Tổng số đơn</div>
+                <div class="num">@Model.TongSoDon</div>
+            </div>
+            <div class="stat-card green">
+                <div class="lbl">Đơn hoàn thành</div>
+                <div class="num">@Model.SoDonHoanThanh</div>
+            </div>
+            <div class="stat-card red">
+                <div class="lbl">Đơn hủy / từ chối</div>
+                <div class="num">@Model.SoDonHuy</div>
+            </div>
+            <div class="stat-card amber">
+                <div class="lbl">Tổng phụ phí</div>
+                <div class="num">@Model.TongPhuPhi.ToString("N0")</div>
+            </div>
+            <div class="stat-card green">
+                <div class="lbl">Tổng chi tiêu</div>
+                <div class="num">@Model.TongChiTieu.ToString("N0")</div>
+            </div>
+        </div>
+
+        <!-- DANH SACH DON -->
+        <div class="data-card">
+            <div class="card-head">
+                <h6 class="title">Danh sách đơn thuê</h6>
+                <span class="count">@Model.DanhSachDon.Count đơn</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width:56px">STT</th>
+                            <th>Xe</th>
+                            <th>Thời gian nhận</th>
+                            <th>Thời gian trả</th>
+                            <th class="text-end">Đơn giá</th>
+                            <th class="text-end">Phụ phí</th>
+                            <th>Trạng thái</th>
+                            <th class="text-end" style="width:100px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.DanhSachDon.Any())
+                        {
+                            foreach (var don in Model.DanhSachDon)
+                            {
+                                stt++;
+                                var statusClass = don.TrangThai switch
+                                {
+                                    "Chờ duyệt" => "cho-duyet",
+                                    "Đã duyệt" => "da-duyet",
+                                    "Đã bàn giao" => "da-ban-giao",
+                                    "Đang thuê" => "dang-thue",
+                                    "Chờ thanh toán" => "cho-thanh-toan",
+                                    "Hoàn thành" => "hoan-thanh",
+                                    "Từ chối" => "tu-choi",
+                                    "Đã hủy" => "da-huy",
+                                    _ => "da-huy"
+                                };
+
+                                <tr>
+                                    <td class="text-muted">@stt</td>
+
+                                    <td>
+                                        <div class="xe-cell">
+                                            <img src="@(string.IsNullOrEmpty(don.Xe?.AnhXe) ? "/images/xe/default.jpg" : don.Xe.AnhXe)"
+                                                 class="xe-thumb" alt="@don.Xe?.TenXe" />
+                                            <div>
+                                                <div class="xe-name">@don.Xe?.TenXe</div>
+                                                <span class="xe-plate">@don.Xe?.BienSo</span>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-muted">
+                                        @don.ThoiGianNhanDuKien.ToString("dd/MM/yyyy HH:mm")
+                                    </td>
+
+                                    <td class="text-muted">
+                                        @don.ThoiGianTraDuKien.ToString("dd/MM/yyyy HH:mm")
+                                    </td>
+
+                                    <td class="text-end">
+                                        <span class="money">@don.DonGiaApDung.ToString("N0") đ</span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <span class="money">
+                                            @(don.TraXe?.TongPhuPhi.ToString("N0") ?? "0") đ
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="status-pill @statusClass">@don.TrangThai</span>
+                                    </td>
+
+                                    <td>
+                                        <div class="action-cell">
+                                            <a asp-controller="DatXe" asp-action="Details"
+                                               asp-route-id="@don.MaDatXe"
+                                               class="btn-clean">Xem</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <div class="big">— — —</div>
+                                        <div class="msg">Khách hàng chưa có đơn thuê nào</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
