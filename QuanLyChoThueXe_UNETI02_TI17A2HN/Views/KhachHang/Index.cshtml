@@ -1,0 +1,589 @@
+﻿@* 
+   File: Views/KhachHang/Index.cshtml
+   Họ và tên: Vu Tien Dat
+   Mã sinh viên: 23103100119
+   Nội dung thực hiện: Danh sách khách hàng có tìm kiếm, lọc, phân trang
+   Module: Module 3 - Khách hàng
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.KhachHang.KhachHangListVM
+@{
+    ViewData["Title"] = "Khách hàng";
+    int stt = (Model.Trang - 1) * Model.KichThuocTrang;
+
+    var tongKh = Model.TongSoBanGhi;
+    var dangHoatDong = Model.DanhSach.Count(x => x.TrangThai);
+    var dangKhoa = Model.DanhSach.Count(x => !x.TrangThai);
+    var coFilter = !string.IsNullOrEmpty(Model.TuKhoa) || Model.TrangThai.HasValue;
+}
+
+<style>
+    .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .page-wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
+
+    /* HERO */
+    .kh-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        border-radius: 14px;
+        padding: 32px 30px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .kh-hero::before {
+        content: "";
+        position: absolute;
+        top: -60px; right: -60px;
+        width: 220px; height: 220px;
+        background: rgba(255,255,255,.06);
+        border-radius: 50%;
+    }
+    .kh-hero h1 {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+        margin: 0 0 6px 0;
+    }
+    .kh-hero .sub {
+        font-size: 14px;
+        opacity: .85;
+        margin: 0 0 20px 0;
+        max-width: 520px;
+    }
+    .stat-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+    .stat-row .stat {
+        background: rgba(255,255,255,.12);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 10px;
+        padding: 14px 16px;
+    }
+    .stat-row .stat .lbl {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        opacity: .8;
+        margin-bottom: 6px;
+    }
+    .stat-row .stat .num {
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    /* FILTER */
+    .filter-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    .filter-card .head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 22px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .filter-card .head h6 {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #475569;
+        margin: 0;
+    }
+    .filter-toggle {
+        background: transparent;
+        border: none;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1d4ed8;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+    .filter-toggle:hover { background: #eff6ff; }
+    .filter-card .body { padding: 18px 22px; }
+    .filter-card .form-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+    .filter-card .form-control,
+    .filter-card .form-select {
+        border-radius: 8px;
+        border-color: #d1d5db;
+        font-size: 14px;
+        height: 40px;
+    }
+    .filter-card .form-control:focus,
+    .filter-card .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+    .filter-badge {
+        display: inline-block;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 6px;
+        margin-left: 6px;
+    }
+
+    /* TABLE */
+    .data-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    .data-card .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 22px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .data-card .card-head .title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+    .data-card .card-head .count {
+        font-size: 12px;
+        color: #64748b;
+        background: #f1f5f9;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+    .data-card table { margin: 0; font-size: 14px; }
+    .data-card thead th {
+        background: #f9fafb;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: #475569;
+        padding: 14px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+    .data-card tbody td {
+        padding: 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .data-card tbody tr:last-child td { border-bottom: none; }
+    .data-card tbody tr:hover { background: #fafbfc; }
+
+    .user-cell { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 42px; height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+    .user-name { font-weight: 700; color: #0f172a; font-size: 14px; }
+    .user-id { font-size: 12px; color: #94a3b8; }
+
+    .info-line { font-size: 13px; color: #334155; margin-bottom: 2px; }
+    .info-line .lbl { color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: .3px; }
+
+    .gplx-chip {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+    .gplx-chip.valid { background: #dcfce7; color: #166534; }
+    .gplx-chip.expired { background: #fee2e2; color: #991b1b; }
+    .gplx-chip.none { background: #f1f5f9; color: #64748b; }
+
+    .status-pill {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .2px;
+        white-space: nowrap;
+    }
+    .status-pill.on  { background: #dcfce7; color: #166534; }
+    .status-pill.off { background: #f1f5f9; color: #64748b; }
+
+    .action-cell {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+    .btn-clean {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #374151;
+        text-decoration: none;
+        transition: all .15s;
+        line-height: 1;
+        white-space: nowrap;
+        min-height: 34px;
+    }
+    .btn-clean:hover { border-color: #9ca3af; background: #f9fafb; color: #111827; }
+    .btn-clean.warn { color: #b45309; border-color: #fcd34d; }
+    .btn-clean.warn:hover { background: #fffbeb; }
+    .btn-clean.danger { color: #b91c1c; border-color: #fca5a5; }
+    .btn-clean.danger:hover { background: #fef2f2; }
+
+    .empty-state {
+        padding: 80px 24px;
+        text-align: center;
+        color: #94a3b8;
+    }
+    .empty-state .big {
+        font-size: 42px;
+        font-weight: 700;
+        color: #e5e7eb;
+        letter-spacing: 4px;
+    }
+    .empty-state .msg { font-size: 15px; margin-top: 8px; }
+
+    .pager {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 22px;
+        background: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+        font-size: 13px;
+        color: #64748b;
+    }
+    .pager .pagination { margin: 0; }
+    .pager .page-link {
+        border-radius: 8px;
+        margin: 0 2px;
+        border-color: #e5e7eb;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 6px 12px;
+    }
+    .pager .page-item.active .page-link {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+</style>
+
+<div class="page-shell">
+    <div class="page-wrap">
+
+        <!-- HERO -->
+        <div class="kh-hero">
+            <h1>Quản lý khách hàng</h1>
+            <p class="sub">
+                Danh sách khách hàng thuê xe trong hệ thống. Xem lịch sử thuê,
+                khóa hoặc mở khóa tài khoản khách hàng.
+            </p>
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="lbl">Tổng khách hàng</div>
+                    <div class="num">@tongKh</div>
+                </div>
+                <div class="stat">
+                    <div class="lbl">Đang hoạt động</div>
+                    <div class="num">@dangHoatDong</div>
+                </div>
+                <div class="stat">
+                    <div class="lbl">Đã khóa</div>
+                    <div class="num">@dangKhoa</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- THÔNG BÁO -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                <strong>Thành công.</strong> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                <strong>Lỗi.</strong> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- FILTER -->
+        <div class="filter-card">
+            <div class="head">
+                <h6>
+                    Tìm kiếm &amp; lọc
+                    @if (coFilter)
+                    {
+                        <span class="filter-badge">Đang lọc</span>
+                    }
+                </h6>
+                <button type="button" class="filter-toggle" data-bs-toggle="collapse"
+                        data-bs-target="#filterBody" aria-expanded="true">
+                    Ẩn / hiện bộ lọc
+                </button>
+            </div>
+
+            <div class="collapse show" id="filterBody">
+                <div class="body">
+                    <form method="get" asp-action="Index">
+                        <input type="hidden" name="trang" value="1" />
+
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label">Từ khóa</label>
+                                <input type="text" name="tuKhoa" value="@Model.TuKhoa"
+                                       class="form-control"
+                                       placeholder="Họ tên, SĐT, email..." />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Trạng thái</label>
+                                <select name="trangThai" class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="true" selected="@(Model.TrangThai == true)">Hoạt động</option>
+                                    <option value="false" selected="@(Model.TrangThai == false)">Đã khóa</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Hiển thị</label>
+                                <select name="kichThuocTrang" class="form-select">
+                                    <option value="10" selected="@(Model.KichThuocTrang == 10)">10 / trang</option>
+                                    <option value="20" selected="@(Model.KichThuocTrang == 20)">20 / trang</option>
+                                    <option value="50" selected="@(Model.KichThuocTrang == 50)">50 / trang</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 d-flex justify-content-end gap-2">
+                                <a asp-action="Index" class="btn btn-outline-secondary px-3">Xóa lọc</a>
+                                <button type="submit" class="btn btn-primary px-4">Áp dụng</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- DATA -->
+        <div class="data-card">
+            <div class="card-head">
+                <h6 class="title">Danh sách khách hàng</h6>
+                <span class="count">@Model.DanhSach.Count / @Model.TongSoBanGhi khách hàng</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width:56px">STT</th>
+                            <th>Khách hàng</th>
+                            <th>Liên hệ</th>
+                            <th>Địa chỉ</th>
+                            <th>Giấy phép lái xe</th>
+                            <th>Trạng thái</th>
+                            <th class="text-end" style="width:200px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.DanhSach.Any())
+                        {
+                            foreach (var item in Model.DanhSach)
+                            {
+                                stt++;
+
+                                // Kiem tra GPLX
+                                var gplxStatus = "none";
+                                var gplxText = "Chưa có";
+                                if (!string.IsNullOrEmpty(item.SoGiayPhepLaiXe)
+                                    && item.NgayHetHanGPLX.HasValue)
+                                {
+                                    if (item.NgayHetHanGPLX.Value.Date >= DateTime.Today)
+                                    {
+                                        gplxStatus = "valid";
+                                        gplxText = $"{item.SoGiayPhepLaiXe} - HH {item.NgayHetHanGPLX.Value:dd/MM/yyyy}";
+                                    }
+                                    else
+                                    {
+                                        gplxStatus = "expired";
+                                        gplxText = $"{item.SoGiayPhepLaiXe} - Hết hạn {item.NgayHetHanGPLX.Value:dd/MM/yyyy}";
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(item.SoGiayPhepLaiXe))
+                                {
+                                    gplxStatus = "valid";
+                                    gplxText = item.SoGiayPhepLaiXe;
+                                }
+
+                                <tr>
+                                    <td class="text-muted">@stt</td>
+
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar">
+                                                @(item.HoTen?.Length > 0 ? item.HoTen[0].ToString().ToUpper() : "?")
+                                            </div>
+                                            <div>
+                                                <div class="user-name">@item.HoTen</div>
+                                                <div class="user-id">#@item.MaKhachHang</div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="info-line">
+                                            <span class="lbl">SĐT:</span>
+                                            <strong>@item.SoDienThoai</strong>
+                                        </div>
+                                        <div class="info-line">
+                                            <span class="lbl">Email:</span>
+                                            @(string.IsNullOrEmpty(item.Email) ? "-" : item.Email)
+                                        </div>
+                                    </td>
+
+                                    <td class="text-muted">
+                                        @(string.IsNullOrEmpty(item.DiaChi) ? "-" : item.DiaChi)
+                                    </td>
+
+                                    <td>
+                                        <span class="gplx-chip @gplxStatus">@gplxText</span>
+                                    </td>
+
+                                    <td>
+                                        @if (item.TrangThai)
+                                        {
+                                            <span class="status-pill on">Hoạt động</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-pill off">Đã khóa</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="action-cell">
+                                            <a asp-action="LichSu" asp-route-id="@item.MaKhachHang"
+                                               class="btn-clean">Lịch sử</a>
+
+                                            <form asp-action="DoiTrangThai" asp-route-id="@item.MaKhachHang"
+                                                  method="post" class="m-0">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit"
+                                                        class="btn-clean @(item.TrangThai ? "danger" : "")"
+                                                        onclick="return confirm('@(item.TrangThai ? "Khóa" : "Mở khóa") tài khoản khách hàng này?')">
+                                                    @(item.TrangThai ? "Khóa" : "Mở")
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <div class="big">— — —</div>
+                                        <div class="msg">Không có khách hàng nào phù hợp</div>
+                                        @if (coFilter)
+                                        {
+                                            <a asp-action="Index" class="btn btn-outline-primary mt-3">
+                                                Xóa bộ lọc
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TongSoTrang > 1)
+            {
+                <div class="pager">
+                    <div>
+                        Trang <strong>@Model.Trang</strong> / @Model.TongSoTrang —
+                        hiển thị <strong>@Model.DanhSach.Count</strong> trong
+                        <strong>@Model.TongSoBanGhi</strong> khách hàng
+                    </div>
+
+                    <nav>
+                        <ul class="pagination pagination-sm">
+                            <li class="page-item @(Model.CoTrangTruoc ? "" : "disabled")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-trang="@(Model.Trang - 1)"
+                                   asp-route-tuKhoa="@Model.TuKhoa"
+                                   asp-route-trangThai="@Model.TrangThai"
+                                   asp-route-kichThuocTrang="@Model.KichThuocTrang">Trước</a>
+                            </li>
+
+                            @{
+                                var batDau = Math.Max(1, Model.Trang - 2);
+                                var ketThuc = Math.Min(Model.TongSoTrang, Model.Trang + 2);
+                            }
+
+                            @for (int i = batDau; i <= ketThuc; i++)
+                            {
+                                <li class="page-item @(i == Model.Trang ? "active" : "")">
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-trang="@i"
+                                       asp-route-tuKhoa="@Model.TuKhoa"
+                                       asp-route-trangThai="@Model.TrangThai"
+                                       asp-route-kichThuocTrang="@Model.KichThuocTrang">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.CoTrangSau ? "" : "disabled")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-trang="@(Model.Trang + 1)"
+                                   asp-route-tuKhoa="@Model.TuKhoa"
+                                   asp-route-trangThai="@Model.TrangThai"
+                                   asp-route-kichThuocTrang="@Model.KichThuocTrang">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
