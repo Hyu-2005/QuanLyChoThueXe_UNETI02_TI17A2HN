@@ -24,6 +24,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<ITrungLichService, TrungLichService>();
 builder.Services.AddScoped<IXeTrongService, XeTrongService>();
+builder.Services.AddScoped<ITinhTienService, TinhTienService>();
+builder.Services.AddScoped<IThongKeService, ThongKeService>();
 
 var app = builder.Build();
 
