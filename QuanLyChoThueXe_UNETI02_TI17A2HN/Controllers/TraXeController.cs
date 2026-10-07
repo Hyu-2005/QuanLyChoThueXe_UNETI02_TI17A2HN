@@ -10,6 +10,7 @@ using QuanLyChoThueXe_UNETI02_TI17A2HN.Data;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Helpers;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities;
+using QuanLyChoThueXe_UNETI02_TI17A2HN.Services.Interfaces;
 
 namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 {
@@ -17,10 +18,12 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
     public class TraXeController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly ITinhTienService _tinhTienService;
 
-        public TraXeController(AppDbContext context)
+        public TraXeController(AppDbContext context, ITinhTienService tinhTienService)
         {
             _context = context;
+            _tinhTienService = tinhTienService;
         }
 
         [HttpGet("/TraXe/{id}")]
@@ -87,6 +90,24 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 }
                 
                 _context.TraXes.Add(model);
+                
+                // Tự động tạo hóa đơn chờ thanh toán để hiển thị trên màn hình Thanh Toán
+                var ketQua = _tinhTienService.TinhThanhToan(datXe, model);
+                var thanhToan = new ThanhToan
+                {
+                    MaDatXe = datXe.MaDatXe,
+                    TienThue = ketQua.TienThue,
+                    TongPhuPhi = ketQua.TongPhuPhi,
+                    TienCocDaThu = ketQua.TienCocDaThu,
+                    TongThanhToan = ketQua.TongThanhToan,
+                    SoTienConLai = ketQua.SoTienConLai,
+                    PhuongThucThanhToan = QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.PhuongThucThanhToan.TienMat,
+                    NgayThanhToan = DateTime.Now,
+                    TrangThaiThanhToan = TrangThaiThanhToan.ChuaThanhToan,
+                    GhiChu = "Chờ khách thanh toán khi trả xe"
+                };
+                _context.ThanhToans.Add(thanhToan);
+
                 await _context.SaveChangesAsync();
                 
                 TempData["Success"] = "Đã nhận trả xe và ghi nhận phụ phí thành công. Vui lòng tiến hành thanh toán.";
