@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http
 @using QuanLyChoThueXe_UNETI02_TI17A2HN.Helpers
 @using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
 @inject IHttpContextAccessor HttpContextAccessor
@@ -22,12 +22,33 @@
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
 
-    string ActiveClass(string controller, string? action = null)
+    // ==============================================================
+    // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+    // file: Views/Shared/_Layout.cshtml
+    // nội dung: Cập nhật hàm ActiveClass để đọc tham số URL trangThai, giúp menu highlight đúng chức năng đang hiển thị thay vì luôn sáng ở "Đơn đặt xe".
+    // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+    // ==============================================================
+    var currentTrangThai = HttpContextAccessor.HttpContext?.Request.Query["trangThai"].ToString() ?? "";
+
+    string ActiveClass(string controller, string? action = null, string? expectedTrangThai = null)
     {
         if (currentController != controller) return "";
-        if (action == null) return "active";
-        return currentAction == action ? "active" : "";
+        if (action != null && currentAction != action) return "";
+
+        if (expectedTrangThai != null)
+        {
+            return currentTrangThai == expectedTrangThai ? "active" : "";
+        }
+        else if (controller == "DatXe" && action == "Index" && !string.IsNullOrEmpty(currentTrangThai))
+        {
+            return ""; // Hide generic DatXe highlight when filtering by specific TrangThai for BanGiao/TraXe
+        }
+
+        return "active";
     }
+    // ==============================================================
+    // Kết thúc Code của SV4
+    // ==============================================================
 }
 
 <!DOCTYPE html>
@@ -262,24 +283,31 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item @ActiveClass("DatXe")"
+                                        <a class="dropdown-item @ActiveClass("DatXe", "Index")"
                                            asp-controller="DatXe" asp-action="Index">
                                             Đơn đặt xe
                                         </a>
                                     </li>
                                     <li>
-                                        <!-- BEGIN SV4 (Nguyen Hoang Duc Hieu - 23103100116): Fix Navbar -->
-<a class="dropdown-item @ActiveClass("BanGiaoXe")"
+                                        <!-- ============================================================== -->
+                                        <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
+                                        <!-- file: Views/Shared/_Layout.cshtml -->
+                                        <!-- nội dung: Cập nhật tham số của link menu Bàn giao xe và Trả xe để ActiveClass hoạt động đúng. -->
+                                        <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
+                                        <!-- ============================================================== -->
+                                        <a class="dropdown-item @ActiveClass("DatXe", "Index", QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet)"
                                            asp-controller="DatXe" asp-action="Index" asp-route-trangThai="@QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet">
                                             Bàn giao xe
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item @ActiveClass("TraXe")"
+                                        <a class="dropdown-item @ActiveClass("DatXe", "Index", QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue)"
                                            asp-controller="DatXe" asp-action="Index" asp-route-trangThai="@QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue">
                                             Trả xe
                                         </a>
-<!-- END SV4 -->
+                                        <!-- ============================================================== -->
+                                        <!-- Kết thúc Code của SV4 -->
+                                        <!-- ============================================================== -->
                                     </li>
                                     <li>
                                         <a class="dropdown-item @ActiveClass("ThanhToan")"

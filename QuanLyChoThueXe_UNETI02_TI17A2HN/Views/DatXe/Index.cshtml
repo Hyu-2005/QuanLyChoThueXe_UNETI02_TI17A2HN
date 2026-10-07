@@ -1,4 +1,4 @@
-﻿@* 
+@* 
    File: Views/DatXe/Index.cshtml
    Noi dung: Danh sach tat ca don dat xe (admin/nhan vien)
    Sinh vien thuc hien: Vu Tien Dat - 23103100119 - SV3
@@ -6,7 +6,23 @@
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.DatXe.DatXeListVM
 @{
-    ViewData["Title"] = "Quản lý đơn đặt xe";
+    // ==============================================================
+    // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+    // file: Views/DatXe/Index.cshtml
+    // nội dung: Sửa logic để Tiêu đề trang (Title) thay đổi động dựa theo trạng thái lọc (Quản lý đơn đặt xe / Quản lý bàn giao xe / Quản lý nhận trả xe).
+    // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+    // ==============================================================
+    string title = "Quản lý đơn đặt xe";
+    if (Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet) {
+        title = "Quản lý bàn giao xe";
+    } else if (Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue) {
+        title = "Quản lý nhận trả xe";
+    }
+    ViewData["Title"] = title;
+    // ==============================================================
+    // Kết thúc Code của SV4
+    // ==============================================================
+    
     int stt = (Model.Trang - 1) * Model.KichThuocTrang;
 
     var tongDon = Model.TongSoBanGhi;
@@ -333,7 +349,16 @@
 
         <!-- HERO -->
         <div class="dx-hero">
-            <h1>Quản lý đơn đặt xe</h1>
+            <!-- ============================================================== -->
+            <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
+            <!-- file: Views/DatXe/Index.cshtml -->
+            <!-- nội dung: Đổi tiêu đề tĩnh thành động @ViewData["Title"] -->
+            <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
+            <!-- ============================================================== -->
+            <h1>@ViewData["Title"]</h1>
+            <!-- ============================================================== -->
+            <!-- Kết thúc Code của SV4 -->
+            <!-- ============================================================== -->
             <p class="sub">
                 Theo dõi, lọc và xử lý toàn bộ đơn đặt xe trong hệ thống.
                 Duyệt đơn, bàn giao, trả xe và thanh toán ở các module tiếp theo.

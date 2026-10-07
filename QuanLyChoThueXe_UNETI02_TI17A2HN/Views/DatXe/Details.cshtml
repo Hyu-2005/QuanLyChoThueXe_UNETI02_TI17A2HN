@@ -1,4 +1,4 @@
-﻿@* 
+@* 
    File: Views/DatXe/Details.cshtml
    Noi dung: Chi tiet don dat xe
    Sinh vien thuc hien: Vu Tien Dat - 23103100119 - SV3
@@ -204,15 +204,29 @@
                     </form>
                 }
 
+                <!-- ============================================================== -->
+                <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
+                <!-- file: Views/DatXe/Details.cshtml -->
+                <!-- nội dung: Cập nhật đường dẫn nút bấm trỏ về Controller mới (BanGiaoXe, TraXe) và bổ sung thêm nút "Tiến hành Thanh toán". -->
+                <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
+                <!-- ============================================================== -->
                 @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet)
                 {
-                    <a asp-controller="DatXe" asp-action="BanGiao" asp-route-id="@Model.MaDatXe" class="btn btn-primary px-4 py-2 fw-semibold text-white" style="border-radius:8px">Bàn giao xe</a>
+                    <a asp-controller="BanGiaoXe" asp-action="Index" asp-route-id="@Model.MaDatXe" class="btn btn-primary px-4 py-2 fw-semibold text-white" style="border-radius:8px">Bàn giao xe</a>
                 }
 
                 @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue)
                 {
-                    <a asp-controller="DatXe" asp-action="TraXe" asp-route-id="@Model.MaDatXe" class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">Nhận trả xe</a>
+                    <a asp-controller="TraXe" asp-action="Index" asp-route-id="@Model.MaDatXe" class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">Nhận trả xe</a>
                 }
+
+                @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.ChoThanhToan)
+                {
+                    <a asp-controller="ThanhToan" asp-action="ThanhToan" asp-route-id="@Model.MaDatXe" class="btn btn-success px-4 py-2 fw-semibold text-white" style="border-radius:8px">Tiến hành Thanh toán</a>
+                }
+                <!-- ============================================================== -->
+                <!-- Kết thúc Code của SV4 -->
+                <!-- ============================================================== -->
                 <!-- === KET THUC CODE CUA SV4 : NGUYEN HOANG DUC HIEU === -->
             </div>
         </div>

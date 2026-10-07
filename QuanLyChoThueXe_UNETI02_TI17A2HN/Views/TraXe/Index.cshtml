@@ -1,4 +1,4 @@
-﻿@* 
+@* 
    File: Views/DatXe/TraXe.cshtml
    Noi dung: Giao dien nhan tra xe va tinh phu phi
    Sinh vien thuc hien: Nguyen Hoang Duc Hieu - 23103100116 - SV4
@@ -32,7 +32,13 @@
                 </div>
             </div>
 
-            <form asp-controller="DatXe" asp-action="TraXe" method="post">
+            <!-- ============================================================== -->
+            <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
+            <!-- file: Views/TraXe/Index.cshtml -->
+            <!-- nội dung: Đổi action form trỏ về đúng TraXeController. -->
+            <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
+            <!-- ============================================================== -->
+            <form asp-controller="TraXe" asp-action="Index" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="MaDatXe" />
                 
@@ -103,6 +109,9 @@
                     <button type="submit" class="btn btn-warning" onclick="return confirm('Xác nhận nhận xe, lưu phụ phí và chuyển sang chờ thanh toán?')">Lưu & Chuyển Thanh Toán</button>
                 </div>
             </form>
+            <!-- ============================================================== -->
+            <!-- Kết thúc Code của SV4 -->
+            <!-- ============================================================== -->
         </div>
     </div>
 </div>

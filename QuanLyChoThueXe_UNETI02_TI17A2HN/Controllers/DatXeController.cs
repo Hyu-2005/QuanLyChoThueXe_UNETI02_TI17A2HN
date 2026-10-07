@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // File: Controllers/DatXeController.cs
 // Noi dung: Tim xe trong, dat xe, kiem tra trung lich, huy don
 // Sinh vien thuc hien: Vu Tien Dat - 23103100119 - SV3
@@ -553,7 +553,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         // BAT DAU PHAN CODE CUA SINH VIEN 4
         // Ho va ten: Nguyen Hoang Duc Hieu
         // Ma sinh vien: 23103100116
-        // Noi dung thuc hien: Xu ly Duyet don, Tu choi, Ban giao, Tra xe
+        // Noi dung thuc hien: Xu ly Duyet don, Tu choi, 
         // ============================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -629,142 +629,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        // ==============================================================
-        // BEGIN SV4 (Nguyen Hoang Duc Hieu - 23103100116)
-        // Nghiệp vụ: Bàn giao xe & Nhận trả xe
-        // ==============================================================
-        [HttpGet("/BanGiaoXe/{id}")]
-        public async Task<IActionResult> BanGiao(int id)
-        {
-            var datXe = await _context.DatXes
-                .Include(d => d.Xe)
-                .Include(d => d.KhachHang)
-                .FirstOrDefaultAsync(d => d.MaDatXe == id);
-
-            if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DaDuyet)
-                return NotFound();
-            
-            var model = new BanGiaoXe {
-                MaDatXe = id,
-                SoKmBanGiao = datXe.Xe.SoKmHienTai,
-                ThoiGianBanGiao = DateTime.Now,
-                NguoiBanGiao = HttpContext.Session.GetString("HoTen") ?? "Admin",
-                MucNhienLieuBanGiao = 100 // Default 100%
-            };
-
-            ViewBag.DatXe = datXe;
-            return View(model);
-        }
-
-        [HttpPost("/BanGiaoXe/{id}")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> BanGiao(int id, BanGiaoXe model)
-        {
-            if (id != model.MaDatXe) return BadRequest();
-            
-            var datXe = await _context.DatXes
-                .Include(d => d.Xe)
-                .FirstOrDefaultAsync(d => d.MaDatXe == id);
-
-            if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DaDuyet)
-                return NotFound();
-
-            if (ModelState.IsValid)
-            {
-                datXe.TrangThai = TrangThaiDatXe.DangThue;
-                datXe.Xe.SoKmHienTai = model.SoKmBanGiao;
-                datXe.Xe.TinhTrang = TinhTrangXe.DangChoThue;
-                
-                _context.BanGiaoXes.Add(model);
-                await _context.SaveChangesAsync();
-                
-                TempData["Success"] = "Đã bàn giao xe cho khách hàng thành công.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            ViewBag.DatXe = datXe;
-            return View(model);
-        }
-
-        [HttpGet("/TraXe/{id}")]
-        public async Task<IActionResult> TraXe(int id)
-        {
-            var datXe = await _context.DatXes
-                .Include(d => d.Xe)
-                .Include(d => d.KhachHang)
-                .Include(d => d.BanGiaoXe)
-                .FirstOrDefaultAsync(d => d.MaDatXe == id);
-
-            if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DangThue)
-                return NotFound();
-            
-            var model = new TraXe {
-                MaDatXe = id,
-                ThoiGianTraThucTe = DateTime.Now,
-                SoKmTra = datXe.Xe.SoKmHienTai,
-                MucNhienLieuTra = datXe.BanGiaoXe?.MucNhienLieuBanGiao ?? 100
-            };
-
-            // Lay DonGiaGio tu BangGiaThue
-            var bangGia = await _context.BangGiaThues.FirstOrDefaultAsync(b => b.MaXe == datXe.MaXe && b.TrangThai)
-                       ?? await _context.BangGiaThues.FirstOrDefaultAsync(b => b.MaLoaiXe == datXe.Xe.MaLoaiXe && b.TrangThai);
-            
-            ViewBag.DonGiaGio = bangGia?.DonGiaGio ?? 0;
-            ViewBag.DatXe = datXe;
-            return View(model);
-        }
-
-        [HttpPost("/TraXe/{id}")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TraXe(int id, TraXe model)
-        {
-            if (id != model.MaDatXe) return BadRequest();
-            
-            var datXe = await _context.DatXes
-                .Include(d => d.Xe)
-                .FirstOrDefaultAsync(d => d.MaDatXe == id);
-
-            if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DangThue)
-                return NotFound();
-
-            if (ModelState.IsValid)
-            {
-                var banGiao = datXe.BanGiaoXe ?? await _context.BanGiaoXes.FirstOrDefaultAsync(b => b.MaDatXe == id);
-                if (banGiao != null && model.SoKmTra < banGiao.SoKmBanGiao)
-                {
-                    ModelState.AddModelError("SoKmTra", "Số km trả không được nhỏ hơn số km bàn giao.");
-                    ViewBag.DatXe = datXe;
-                    return View(model);
-                }
-
-                datXe.TrangThai = TrangThaiDatXe.ChoThanhToan;
-                datXe.Xe.SoKmHienTai = model.SoKmTra;
-                
-                if (model.PhiHuHong > 0)
-                {
-                    datXe.Xe.TinhTrang = TinhTrangXe.BaoDuong;
-                }
-                else
-                {
-                    datXe.Xe.TinhTrang = TinhTrangXe.SanSang;
-                }
-                
-                _context.TraXes.Add(model);
-                await _context.SaveChangesAsync();
-                
-                TempData["Success"] = "Đã nhận trả xe và ghi nhận phụ phí thành công.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            ViewBag.DatXe = datXe;
-        // ==============================================================
-        // END SV4
-        // ==============================================================
-            return View(model);
-        }
-        // ============================================================
-        // KET THUC PHAN CODE CUA NGUYEN HOANG DUC HIEU
-        // ============================================================
+        
 
         private List<SelectListItem> LayDanhSachTrangThai()
         {

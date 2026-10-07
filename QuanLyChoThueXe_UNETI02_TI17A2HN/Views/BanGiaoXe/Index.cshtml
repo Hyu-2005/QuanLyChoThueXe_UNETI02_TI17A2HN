@@ -1,4 +1,4 @@
-﻿@* 
+@* 
    File: Views/DatXe/BanGiao.cshtml
    Noi dung: Giao dien ban giao xe
    Sinh vien thuc hien: Nguyen Hoang Duc Hieu - 23103100116 - SV4
@@ -31,7 +31,13 @@
                 </div>
             </div>
 
-            <form asp-controller="DatXe" asp-action="BanGiao" method="post">
+            <!-- ============================================================== -->
+            <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
+            <!-- file: Views/BanGiaoXe/Index.cshtml -->
+            <!-- nội dung: Đổi action form trỏ về đúng BanGiaoXeController. -->
+            <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
+            <!-- ============================================================== -->
+            <form asp-controller="BanGiaoXe" asp-action="Index" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="MaDatXe" />
                 
@@ -86,6 +92,9 @@
                     <button type="submit" class="btn btn-primary" onclick="return confirm('Xác nhận lưu thông tin và bàn giao xe?')">Lưu & Bàn Giao</button>
                 </div>
             </form>
+            <!-- ============================================================== -->
+            <!-- Kết thúc Code của SV4 -->
+            <!-- ============================================================== -->
         </div>
     </div>
 </div>
