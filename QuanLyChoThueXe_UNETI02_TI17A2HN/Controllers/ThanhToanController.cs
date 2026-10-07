@@ -1,4 +1,4 @@
-﻿// ThanhToanController.cs - quan ly thanh toan
+// ThanhToanController.cs - quan ly thanh toan
 // sinh vien thuc hien: Duong Lam Huy - 23103100120
 // module 5 - tinh tien, thanh toan, lich su va thong ke
 
@@ -237,22 +237,40 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             // Tinh lai tu DB (khong tin du lieu client)
             var ketQua = _tinhTienService.TinhThanhToan(datXe, datXe.TraXe);
 
-            // Tao ban ghi thanh toan
-            var thanhToan = new Models.Entities.ThanhToan
+            // Kiem tra xem da co ban ghi Chua Thanh Toan nao chua (thuong do Seed tao)
+            var thanhToan = datXe.ThanhToans.FirstOrDefault(t => t.TrangThaiThanhToan == TrangThaiThanhToan.ChuaThanhToan);
+            
+            if (thanhToan != null)
             {
-                MaDatXe = datXe.MaDatXe,
-                TienThue = ketQua.TienThue,
-                TongPhuPhi = ketQua.TongPhuPhi,
-                TienCocDaThu = ketQua.TienCocDaThu,
-                TongThanhToan = ketQua.TongThanhToan,
-                SoTienConLai = ketQua.SoTienConLai,
-                PhuongThucThanhToan = vm.PhuongThucThanhToan,
-                NgayThanhToan = DateTime.Now,
-                TrangThaiThanhToan = TrangThaiThanhToan.DaThanhToan,
-                GhiChu = vm.GhiChu?.Trim()
-            };
-
-            _context.ThanhToans.Add(thanhToan);
+                // Cap nhat ban ghi hien tai
+                thanhToan.TienThue = ketQua.TienThue;
+                thanhToan.TongPhuPhi = ketQua.TongPhuPhi;
+                thanhToan.TienCocDaThu = ketQua.TienCocDaThu;
+                thanhToan.TongThanhToan = ketQua.TongThanhToan;
+                thanhToan.SoTienConLai = ketQua.SoTienConLai;
+                thanhToan.PhuongThucThanhToan = vm.PhuongThucThanhToan;
+                thanhToan.NgayThanhToan = DateTime.Now;
+                thanhToan.TrangThaiThanhToan = TrangThaiThanhToan.DaThanhToan;
+                thanhToan.GhiChu = vm.GhiChu?.Trim();
+            }
+            else
+            {
+                // Tao ban ghi thanh toan moi
+                thanhToan = new Models.Entities.ThanhToan
+                {
+                    MaDatXe = datXe.MaDatXe,
+                    TienThue = ketQua.TienThue,
+                    TongPhuPhi = ketQua.TongPhuPhi,
+                    TienCocDaThu = ketQua.TienCocDaThu,
+                    TongThanhToan = ketQua.TongThanhToan,
+                    SoTienConLai = ketQua.SoTienConLai,
+                    PhuongThucThanhToan = vm.PhuongThucThanhToan,
+                    NgayThanhToan = DateTime.Now,
+                    TrangThaiThanhToan = TrangThaiThanhToan.DaThanhToan,
+                    GhiChu = vm.GhiChu?.Trim()
+                };
+                _context.ThanhToans.Add(thanhToan);
+            }
 
             // Chuyen don sang Hoan thanh
             datXe.TrangThai = TrangThaiDatXe.HoanThanh;
