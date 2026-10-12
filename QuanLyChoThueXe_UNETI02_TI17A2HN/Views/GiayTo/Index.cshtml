@@ -1,0 +1,167 @@
+@* 
+   File: Views/GiayTo/Index.cshtml
+   Họ và tên: [Điền họ tên]
+   Mã sinh viên: [Điền mã sinh viên]
+   Nội dung thực hiện: Nhân viên/Admin kiểm tra, xác minh hoặc từ chối giấy tờ khách hàng
+   Module: Module 3 - Khách hàng
+*@
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.GiayTo.GiayToDuyetVM
+
+@{
+    ViewData["Title"] = "Kiểm tra giấy tờ";
+
+    string BadgeClass(string trangThai) =>
+        trangThai == TrangThaiGiayTo.DaXacMinh ? "ok"
+        : trangThai == TrangThaiGiayTo.TuChoi ? "bad"
+        : "wait";
+
+    var soCho = Model.DanhSach.Count(d => d.TrangThai == TrangThaiGiayTo.ChoKiemTra);
+}
+
+<style>
+    .gt-shell { background: #f5f7fa; padding: 28px 0; }
+    .gt-wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
+    .gt-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff; border-radius: 14px; padding: 28px 30px; margin-bottom: 22px;
+    }
+    .gt-hero h1 { font-size: 26px; font-weight: 800; margin: 0 0 6px 0; }
+    .gt-hero p { margin: 0; opacity: .88; font-size: 14px; }
+    .gt-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; overflow: hidden; margin-bottom: 18px; }
+    .gt-card .body { padding: 18px 22px; }
+    .gt-card .form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #64748b; }
+    .gt-table { margin: 0; font-size: 14px; }
+    .gt-table thead th {
+        background: #f9fafb; font-size: 11px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .5px; color: #475569; padding: 14px 16px; white-space: nowrap;
+    }
+    .gt-table tbody td { padding: 14px 16px; vertical-align: middle; }
+    .pill { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .pill.ok { background: #dcfce7; color: #166534; }
+    .pill.wait { background: #fef3c7; color: #92400e; }
+    .pill.bad { background: #fee2e2; color: #991b1b; }
+    .small-muted { font-size: 12px; color: #94a3b8; }
+    .reject-form { display: flex; gap: 6px; margin-top: 6px; }
+    .reject-form input { min-width: 160px; }
+</style>
+
+<div class="gt-shell">
+    <div class="gt-wrap">
+
+        <div class="gt-hero">
+            <h1>Kiểm tra giấy tờ khách hàng</h1>
+            <p>Xem ảnh giấy tờ do khách tải lên, xác minh hoặc từ chối kèm lý do. Đang hiển thị <strong>@soCho</strong> giấy tờ chờ kiểm tra.</p>
+        </div>
+
+        <div class="gt-card">
+            <div class="body">
+                <form method="get" asp-action="Index" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Từ khóa</label>
+                        <input type="text" name="tuKhoa" value="@Model.TuKhoa" class="form-control"
+                               placeholder="Họ tên, SĐT, số giấy tờ..." />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Trạng thái</label>
+                        <select name="trangThai" class="form-select">
+                            <option value="">Tất cả</option>
+                            @foreach (var tt in TrangThaiGiayTo.TatCa)
+                            {
+                                <option value="@tt" selected="@(Model.TrangThai == tt)">@tt</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-5 d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-3">Xóa lọc</a>
+                        <button type="submit" class="btn btn-primary px-4">Áp dụng</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="gt-card">
+            <div class="table-responsive">
+                <table class="table gt-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Khách hàng</th>
+                            <th>Loại</th>
+                            <th>Số giấy tờ</th>
+                            <th>Hết hạn</th>
+                            <th>Ảnh</th>
+                            <th>Trạng thái</th>
+                            <th>Tải lúc</th>
+                            <th class="text-end" style="width:320px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.DanhSach.Any())
+                        {
+                            foreach (var g in Model.DanhSach)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">@(g.KhachHang?.HoTen ?? "-")</div>
+                                        <div class="small-muted">@(g.KhachHang?.SoDienThoai)</div>
+                                    </td>
+                                    <td>@LoaiGiayTo.GetDisplayName(g.LoaiGiayTo)</td>
+                                    <td><strong>@g.SoGiayTo</strong></td>
+                                    <td>@(g.NgayHetHan.HasValue ? g.NgayHetHan.Value.ToString("dd/MM/yyyy") : "-")</td>
+                                    <td>
+                                        <a asp-action="Xem" asp-route-id="@g.MaGiayTo" asp-route-mat="truoc"
+                                           target="_blank">Mặt trước</a>
+                                        @if (!string.IsNullOrEmpty(g.DuongDanMatSau))
+                                        {
+                                            <span> · </span>
+                                            <a asp-action="Xem" asp-route-id="@g.MaGiayTo" asp-route-mat="sau"
+                                               target="_blank">Mặt sau</a>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="pill @BadgeClass(g.TrangThai)">@g.TrangThai</span>
+                                        @if (g.TrangThai == TrangThaiGiayTo.TuChoi && !string.IsNullOrEmpty(g.LyDoTuChoi))
+                                        {
+                                            <div class="small-muted mt-1">@g.LyDoTuChoi</div>
+                                        }
+                                        @if (g.NgayKiemTra.HasValue)
+                                        {
+                                            <div class="small-muted">@g.NgayKiemTra.Value.ToString("dd/MM/yyyy") - @g.NguoiKiemTra</div>
+                                        }
+                                    </td>
+                                    <td>@g.NgayTai.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @if (g.TrangThai == TrangThaiGiayTo.ChoKiemTra)
+                                        {
+                                            <div class="d-flex flex-column align-items-end">
+                                                <form asp-action="XacMinh" asp-route-id="@g.MaGiayTo" method="post" class="m-0">
+                                                    <button type="submit" class="btn btn-sm btn-success"
+                                                            onclick="return confirm('Xác minh giấy tờ này?')">Xác minh</button>
+                                                </form>
+                                                <form asp-action="TuChoi" asp-route-id="@g.MaGiayTo" method="post" class="reject-form">
+                                                    <input type="text" name="lyDo" maxlength="300" required
+                                                           class="form-control form-control-sm" placeholder="Lý do từ chối" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Từ chối</button>
+                                                </form>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-end small-muted">Đã xử lý</div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-5">Không có giấy tờ nào phù hợp</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

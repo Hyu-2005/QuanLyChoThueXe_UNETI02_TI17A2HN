@@ -35,7 +35,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 .Include(d => d.BanGiaoXe)
                 .FirstOrDefaultAsync(d => d.MaDatXe == id);
 
-            if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DangThue)
+            if (datXe == null || datXe.Xe == null || datXe.TrangThai != TrangThaiDatXe.DangThue)
                 return NotFound();
             
             var model = new TraXe {
@@ -56,7 +56,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
         [HttpPost("/TraXe/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(int id, TraXe model)
+        public async Task<IActionResult> Index(int id, TraXe model, bool canBaoDuong = false)
         {
             if (id != model.MaDatXe) return BadRequest();
             
@@ -64,7 +64,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 .Include(d => d.Xe)
                 .FirstOrDefaultAsync(d => d.MaDatXe == id);
 
-            if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DangThue)
+            if (datXe == null || datXe.Xe == null || datXe.TrangThai != TrangThaiDatXe.DangThue)
                 return NotFound();
 
             if (ModelState.IsValid)
@@ -77,10 +77,17 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                     return View(model);
                 }
 
+                // ==============================================================
+                // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+                // file: Controllers/TraXeController.cs
+                // nội dung: Nghiệp vụ 8.7 - Cập nhật trạng thái xe sau trả (Sẵn sàng nếu bình thường; Bảo dưỡng nếu có lỗi hoặc phát sinh phí hư hỏng)
+                // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+                // ==============================================================
                 datXe.TrangThai = TrangThaiDatXe.ChoThanhToan;
                 datXe.Xe.SoKmHienTai = model.SoKmTra;
                 
-                if (model.PhiHuHong > 0)
+                bool phaiBaoDuong = canBaoDuong || (model.PhiHuHong > 0);
+                if (phaiBaoDuong)
                 {
                     datXe.Xe.TinhTrang = TinhTrangXe.BaoDuong;
                 }
@@ -88,6 +95,9 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 {
                     datXe.Xe.TinhTrang = TinhTrangXe.SanSang;
                 }
+                // ==============================================================
+                // Kết thúc Code của SV4
+                // ==============================================================
                 
                 _context.TraXes.Add(model);
                 
@@ -110,7 +120,18 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
                 await _context.SaveChangesAsync();
                 
-                TempData["Success"] = "Đã nhận trả xe và ghi nhận phụ phí thành công. Vui lòng tiến hành thanh toán.";
+                // ==============================================================
+                // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+                // file: Controllers/TraXeController.cs
+                // nội dung: Thông báo rõ ràng trạng thái xe sau trả cho nhân viên
+                // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+                // ==============================================================
+                TempData["Success"] = phaiBaoDuong
+                    ? $"Đã nhận trả xe thành công. Xe '{datXe.Xe?.BienSo}' có lỗi/cần kiểm tra nên đã chuyển sang trạng thái 'Bảo dưỡng'. Vui lòng tiến hành thanh toán."
+                    : $"Đã nhận trả xe thành công. Xe '{datXe.Xe?.BienSo}' bình thường, đã chuyển về trạng thái 'Sẵn sàng'. Vui lòng tiến hành thanh toán.";
+                // ==============================================================
+                // Kết thúc Code của SV4
+                // ==============================================================
                 return RedirectToAction("ThanhToan", "ThanhToan", new { id = id });
             }
 

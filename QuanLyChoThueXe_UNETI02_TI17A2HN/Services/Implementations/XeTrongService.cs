@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // File: Services/Implementations/XeTrongService.cs
 // Noi dung: Cai dat tim xe trong bang EF Core + LINQ
 // Sinh vien thuc hien: Vu Tien Dat - 23103100119 - SV3
@@ -40,6 +40,17 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Services.Implementations
                 .Include(x => x.HangXe)
                 .Where(x => TinhTrangXe.CoTheChoThue.Contains(x.TinhTrang))
                 .AsQueryable();
+
+            // ==============================================================
+            // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+            // file: Services/Implementations/XeTrongService.cs
+            // nội dung: Nghiệp vụ 8.7 - Đảm bảo xe có lỗi / bảo dưỡng tuyệt đối không xuất hiện trong kết quả tìm xe trống
+            // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+            // ==============================================================
+            query = query.Where(x => x.TinhTrang != TinhTrangXe.BaoDuong && x.TinhTrang != TinhTrangXe.NgungHoatDong);
+            // ==============================================================
+            // Kết thúc Code của SV4
+            // ==============================================================
 
             // 2. Loc theo loai xe
             if (maLoaiXe.HasValue)
