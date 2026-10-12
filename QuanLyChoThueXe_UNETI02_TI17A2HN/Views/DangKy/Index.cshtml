@@ -1,0 +1,127 @@
+@* 
+   File: Views/DangKy/Index.cshtml
+   Họ và tên: [Vũ Tiến Đạt]
+   Mã sinh viên: [23103100119]
+   Nội dung thực hiện: Màn hình khách hàng tự đăng ký tài khoản
+   Module: Module 3 - Khách hàng
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.TaiKhoan.DangKyVM
+
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+    Layout = "_Layout";
+}
+
+<style>
+    .reg-shell {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 16px;
+        margin: -24px -12px;
+    }
+    .reg-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(15,23,42,.25);
+        width: 100%;
+        max-width: 560px;
+        overflow: hidden;
+    }
+    .reg-head { padding: 28px 36px 12px; text-align: center; }
+    .reg-head h1 { font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; }
+    .reg-head .sub { font-size: 13px; color: #64748b; margin: 0; }
+    .reg-body { padding: 8px 36px 28px; }
+    .reg-body .form-label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+    .reg-body .form-control {
+        border-radius: 10px; border-color: #d1d5db; font-size: 14px;
+        padding: 10px 14px; height: 44px;
+    }
+    .reg-body .form-control:focus {
+        border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+    }
+    .btn-reg {
+        width: 100%;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff; border: none; border-radius: 10px; padding: 12px;
+        font-size: 15px; font-weight: 700;
+        box-shadow: 0 4px 12px rgba(59,130,246,.3);
+    }
+    .reg-foot {
+        padding: 16px 36px; background: #f9fafb; border-top: 1px solid #f1f5f9;
+        font-size: 13px; color: #64748b; text-align: center;
+    }
+</style>
+
+<div class="reg-shell">
+    <div class="reg-card">
+
+        <div class="reg-head">
+            <h1>Đăng ký tài khoản khách hàng</h1>
+            <p class="sub">Tạo tài khoản để thuê xe và tải giấy tờ xác minh</p>
+        </div>
+
+        <div class="reg-body">
+            <form asp-action="Index" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="TenDangNhap" class="form-label"></label>
+                        <input asp-for="TenDangNhap" class="form-control" autocomplete="username" autofocus />
+                        <span asp-validation-for="TenDangNhap" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="HoTen" class="form-label"></label>
+                        <input asp-for="HoTen" class="form-control" />
+                        <span asp-validation-for="HoTen" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" autocomplete="email" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SoDienThoai" class="form-label"></label>
+                        <input asp-for="SoDienThoai" class="form-control" autocomplete="tel" />
+                        <span asp-validation-for="SoDienThoai" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="DiaChi" class="form-label"></label>
+                        <input asp-for="DiaChi" class="form-control" />
+                        <span asp-validation-for="DiaChi" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="MatKhau" class="form-label"></label>
+                        <input asp-for="MatKhau" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="MatKhau" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="XacNhanMatKhau" class="form-label"></label>
+                        <input asp-for="XacNhanMatKhau" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="XacNhanMatKhau" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-reg mt-4">Đăng ký</button>
+            </form>
+        </div>
+
+        <div class="reg-foot">
+            Đã có tài khoản?
+            <a asp-controller="TaiKhoan" asp-action="DangNhap" class="fw-semibold">Đăng nhập</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

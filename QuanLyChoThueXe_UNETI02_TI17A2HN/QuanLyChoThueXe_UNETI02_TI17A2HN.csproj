@@ -20,6 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ViewModels\GiayTo\" />
+    <Folder Include="Views\DangKy\" />
+    <Folder Include="Views\GiayTo\" />
     <Folder Include="wwwroot\images\Xe\" />
   </ItemGroup>
 
