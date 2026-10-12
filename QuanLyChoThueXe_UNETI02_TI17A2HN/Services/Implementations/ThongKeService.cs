@@ -25,19 +25,21 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Services.Implementations
         public async Task<DashboardVM> LayDashboardAsync()
         {
             var today = DateTime.Today;
-            var thangNay = new DateTime(today.Year, today.Month, 1);
             var ngayMai = today.AddDays(1);
+            var thangNay = new DateTime(today.Year, today.Month, 1);
+            var thangTruoc = thangNay.AddMonths(-1);
+            var thangTruocEnd = thangNay.AddDays(-1);
 
             var vm = new DashboardVM
             {
-                // Xe
+                // ================= XE =================
                 TongSoXe = await _context.Xes.CountAsync(),
                 XeSanSang = await _context.Xes.CountAsync(x => x.TinhTrang == TinhTrangXe.SanSang),
                 XeDangThue = await _context.Xes.CountAsync(x => x.TinhTrang == TinhTrangXe.DangChoThue),
                 XeBaoDuong = await _context.Xes.CountAsync(x => x.TinhTrang == TinhTrangXe.BaoDuong),
                 XeNgung = await _context.Xes.CountAsync(x => x.TinhTrang == TinhTrangXe.NgungHoatDong),
 
-                // Don
+                // ================= DON =================
                 DonChoDuyet = await _context.DatXes.CountAsync(d => d.TrangThai == TrangThaiDatXe.ChoDuyet),
                 DonDaDuyet = await _context.DatXes.CountAsync(d => d.TrangThai == TrangThaiDatXe.DaDuyet),
                 DonDangThue = await _context.DatXes.CountAsync(d => d.TrangThai == TrangThaiDatXe.DangThue),
@@ -46,13 +48,13 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Services.Implementations
                 DonDaHuy = await _context.DatXes.CountAsync(d => d.TrangThai == TrangThaiDatXe.DaHuy),
                 DonTuChoi = await _context.DatXes.CountAsync(d => d.TrangThai == TrangThaiDatXe.TuChoi),
 
-                // Nhan tra trong ngay
+                // ================= TRONG NGAY =================
                 LuotNhanXeHomNay = await _context.BanGiaoXes
                     .CountAsync(b => b.ThoiGianBanGiao >= today && b.ThoiGianBanGiao < ngayMai),
                 LuotTraXeHomNay = await _context.TraXes
                     .CountAsync(t => t.ThoiGianTraThucTe >= today && t.ThoiGianTraThucTe < ngayMai),
 
-                // Doanh thu
+                // ================= DOANH THU =================
                 DoanhThuHomNay = await _context.ThanhToans
                     .Where(t => t.TrangThaiThanhToan == TrangThaiThanhToan.DaThanhToan)
                     .Where(t => t.NgayThanhToan >= today && t.NgayThanhToan < ngayMai)
@@ -61,10 +63,173 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Services.Implementations
                 DoanhThuThangNay = await _context.ThanhToans
                     .Where(t => t.TrangThaiThanhToan == TrangThaiThanhToan.DaThanhToan)
                     .Where(t => t.NgayThanhToan >= thangNay)
-                    .SumAsync(t => (decimal?)t.TongThanhToan) ?? 0
+                    .SumAsync(t => (decimal?)t.TongThanhToan) ?? 0,
+
+                // ================= SO SÁNH THÁNG TRƯỚC =================
+                // Bảng Xe chưa có cột NgayTao → fallback dùng tổng hiện tại
+                TongSoXeThangTruoc = await _context.Xes.CountAsync(),
+                // NOTE: Vì bảng Xe không có cột NgayTao, tạm thời lấy tổng hiện tại.
+                // Nếu muốn chính xác, cần thêm cột NgayTao vào bảng Xe.
             };
 
-            // Don sap den gio nhan (trong 24h toi)
+            // Copy tạm cho các field tháng trước
+            vm.XeSanSangThangTruoc = vm.XeSanSang;
+            vm.XeDangThueThangTruoc = vm.XeDangThue;
+            vm.XeBaoDuongThangTruoc = vm.XeBaoDuong + vm.XeNgung;
+
+            // ============================================
+            // DOANH THU 7 NGÀY GẦN NHẤT
+            // ============================================
+            var sevenDaysAgo = today.AddDays(-6);
+            var thanhToans7Ngay = await _context.ThanhToans
+                .Where(t => t.TrangThaiThanhToan == TrangThaiThanhToan.DaThanhToan)
+                .Where(t => t.NgayThanhToan >= sevenDaysAgo && t.NgayThanhToan < ngayMai)
+                .Select(t => new { t.NgayThanhToan })
+                .ToListAsync();
+
+            var doanhThuTheoNgay = thanhToans7Ngay
+                .GroupBy(t => t.NgayThanhToan.Date)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            vm.DoanhThu7Ngay = new List<DoanhThuNgayItem>();
+            for (int i = 0; i < 7; i++)
+            {
+                var ngay = sevenDaysAgo.AddDays(i);
+                var doanhThuNgay = await _context.ThanhToans
+                    .Where(t => t.TrangThaiThanhToan == TrangThaiThanhToan.DaThanhToan)
+                    .Where(t => t.NgayThanhToan >= ngay && t.NgayThanhToan < ngay.AddDays(1))
+                    .SumAsync(t => (decimal?)t.TongThanhToan) ?? 0;
+
+                vm.DoanhThu7Ngay.Add(new DoanhThuNgayItem
+                {
+                    Ngay = ngay,
+                    DoanhThu = doanhThuNgay,
+                    SoDon = doanhThuTheoNgay.TryGetValue(ngay, out var count) ? count : 0
+                });
+            }
+
+            // ============================================
+            // PHÂN BỐ TRẠNG THÁI ĐƠN
+            // ============================================
+            vm.PhanBoTrangThaiDon = await _context.DatXes
+                .GroupBy(d => d.TrangThai)
+                .Select(g => new TrangThaiDonItem
+                {
+                    TrangThai = g.Key,
+                    SoLuong = g.Count()
+                })
+                .OrderByDescending(x => x.SoLuong)
+                .ToListAsync();
+
+            // ============================================
+            // TOP 5 XE ĐƯỢC THUÊ NHIỀU NHẤT (dựa vào đơn Hoàn thành)
+            // ============================================
+            var topXeData = await _context.DatXes
+                .Where(d => d.TrangThai == TrangThaiDatXe.HoanThanh)
+                .GroupBy(d => d.MaXe)
+                .Select(g => new
+                {
+                    MaXe = g.Key,
+                    SoLanThue = g.Count(),
+                    DoanhThu = g
+                        .SelectMany(d => d.ThanhToans)
+                        .Where(t => t.TrangThaiThanhToan == TrangThaiThanhToan.DaThanhToan)
+                        .Sum(t => (decimal?)t.TongThanhToan) ?? 0
+                })
+                .OrderByDescending(x => x.SoLanThue)
+                .Take(5)
+                .ToListAsync();
+
+            var maXeList = topXeData.Select(x => x.MaXe).ToList();
+            var xeInfo = await _context.Xes
+                .Where(x => maXeList.Contains(x.MaXe))
+                .Select(x => new { x.MaXe, x.BienSo, x.TenXe, x.AnhXe })
+                .ToDictionaryAsync(x => x.MaXe);
+
+            vm.TopXeThueNhieu = topXeData.Select(x => new TopXeItem
+            {
+                MaXe = x.MaXe,
+                SoLanThue = x.SoLanThue,
+                DoanhThu = x.DoanhThu,
+                BienSo = xeInfo.TryGetValue(x.MaXe, out var info) ? info.BienSo : null,
+                TenXe = xeInfo.TryGetValue(x.MaXe, out var info2) ? info2.TenXe : null,
+                AnhXe = xeInfo.TryGetValue(x.MaXe, out var info3) ? info3.AnhXe : null
+            }).ToList();
+
+            // ============================================
+            // HOẠT ĐỘNG GẦN ĐÂY (5 hoạt động mới nhất)
+            // ============================================
+            var hoatDong = new List<HoatDongItem>();
+
+            // Đơn mới đặt (5 cái gần nhất)
+            var donMoi = await _context.DatXes
+                .Include(d => d.KhachHang)
+                .Include(d => d.Xe)
+                .OrderByDescending(d => d.NgayDat)
+                .Take(5)
+                .AsNoTracking()
+                .ToListAsync();
+
+            foreach (var d in donMoi)
+            {
+                hoatDong.Add(new HoatDongItem
+                {
+                    Loai = "don-moi",
+                    TieuDe = "Đơn đặt xe mới",
+                    MoTa = $"{d.KhachHang?.HoTen} - {d.Xe?.TenXe}",
+                    ThoiGian = d.NgayDat
+                });
+            }
+
+            // Thanh toán gần đây
+            var thanhToanGanDay = await _context.ThanhToans
+                .Include(t => t.DatXe)
+                .Where(t => t.TrangThaiThanhToan == TrangThaiThanhToan.DaThanhToan)
+                .OrderByDescending(t => t.NgayThanhToan)
+                .Take(3)
+                .AsNoTracking()
+                .ToListAsync();
+
+            foreach (var t in thanhToanGanDay)
+            {
+                hoatDong.Add(new HoatDongItem
+                {
+                    Loai = "thanh-toan",
+                    TieuDe = "Thanh toán thành công",
+                    MoTa = $"Đơn #{t.MaDatXe} - {t.TongThanhToan:N0}đ",
+                    ThoiGian = t.NgayThanhToan
+                });
+            }
+
+            // Trả xe gần đây
+            var traXeGanDay = await _context.TraXes
+                .Include(t => t.DatXe).ThenInclude(d => d!.KhachHang)
+                .Include(t => t.DatXe).ThenInclude(d => d!.Xe)
+                .OrderByDescending(t => t.ThoiGianTraThucTe)
+                .Take(3)
+                .AsNoTracking()
+                .ToListAsync();
+
+            foreach (var t in traXeGanDay)
+            {
+                hoatDong.Add(new HoatDongItem
+                {
+                    Loai = "tra-xe",
+                    TieuDe = "Xe đã được trả",
+                    MoTa = $"{t.DatXe?.KhachHang?.HoTen} - {t.DatXe?.Xe?.TenXe}",
+                    ThoiGian = t.ThoiGianTraThucTe
+                });
+            }
+
+            // Sắp xếp theo thời gian giảm dần, lấy 5
+            vm.HoatDongGanDay = hoatDong
+                .OrderByDescending(h => h.ThoiGian)
+                .Take(5)
+                .ToList();
+
+            // ============================================
+            // CẢNH BÁO (giữ nguyên)
+            // ============================================
             var sau24h = DateTime.Now.AddHours(24);
             vm.DonSapDenGioNhan = await _context.DatXes
                 .Include(d => d.KhachHang)
@@ -77,7 +242,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Services.Implementations
                 .AsNoTracking()
                 .ToListAsync();
 
-            // Don qua gio tra
             vm.DonQuaGioTra = await _context.DatXes
                 .Include(d => d.KhachHang)
                 .Include(d => d.Xe)

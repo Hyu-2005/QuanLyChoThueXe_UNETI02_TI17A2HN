@@ -1,0 +1,41 @@
+﻿@*
+    _Sparkline.cshtml - Partial render sparkline SVG từ List<double>
+    Sinh viên thực hiện: Dương Lâm Huy - 23103100120 - SV5
+*@
+@model List<double>
+@{
+    var values = Model != null && Model.Any() ? Model : new List<double> { 0 };
+    var max = values.Max();
+    var min = values.Min();
+    var range = max - min;
+    if (range <= 0) range = 1;
+
+    const int width = 200;
+    const int height = 40;
+    var step = (double)width / Math.Max(1, values.Count - 1);
+
+    var points = new List<string>();
+    for (int i = 0; i < values.Count; i++)
+    {
+        var x = i * step;
+        // Đảo trục Y vì SVG có gốc trên-trái
+        var y = height - ((values[i] - min) / range * (height - 8)) - 4;
+        points.Add($"{x:F1},{y:F1}");
+    }
+
+    var pathLine = "M" + string.Join(" L", points);
+    var pathFill = pathLine + $" L{width},{height} L0,{height} Z";
+
+    var gradientId = "sg" + Guid.NewGuid().ToString("N").Substring(0, 8);
+}
+
+<svg viewBox="0 0 @width @height" preserveAspectRatio="none">
+    <defs>
+        <linearGradient id="@gradientId" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3b82f6" stop-opacity=".35" />
+            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+        </linearGradient>
+    </defs>
+    <path d="@pathFill" fill="url(#@gradientId)" />
+    <path d="@pathLine" fill="none" stroke="#3b82f6" stroke-width="2" />
+</svg>
