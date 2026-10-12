@@ -22,12 +22,12 @@
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
 
-    // ==============================================================
-    // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
-    // file: Views/Shared/_Layout.cshtml
-    // nội dung: Cập nhật hàm ActiveClass để đọc tham số URL trangThai, giúp menu highlight đúng chức năng đang hiển thị thay vì luôn sáng ở "Đơn đặt xe".
-    // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
-    // ==============================================================
+    // Ẩn navbar/footer
+    var hideChrome = ViewData["HideChrome"] as bool? ?? false;
+
+    // ✅ TÍNH CLASS RA BIẾN TRƯỚC — tránh lỗi "malformed body tag helper"
+    var bodyClass = hideChrome ? "chrome-hidden" : "";
+
     var currentTrangThai = HttpContextAccessor.HttpContext?.Request.Query["trangThai"].ToString() ?? "";
 
     string ActiveClass(string controller, string? action = null, string? expectedTrangThai = null)
@@ -36,19 +36,13 @@
         if (action != null && currentAction != action) return "";
 
         if (expectedTrangThai != null)
-        {
             return currentTrangThai == expectedTrangThai ? "active" : "";
-        }
-        else if (controller == "DatXe" && action == "Index" && !string.IsNullOrEmpty(currentTrangThai))
-        {
-            return ""; // Hide generic DatXe highlight when filtering by specific TrangThai for BanGiao/TraXe
-        }
+
+        if (controller == "DatXe" && action == "Index" && !string.IsNullOrEmpty(currentTrangThai))
+            return "";
 
         return "active";
     }
-    // ==============================================================
-    // Kết thúc Code của SV4
-    // ==============================================================
 }
 
 <!DOCTYPE html>
@@ -61,75 +55,195 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
     <style>
-        html, body { height: 100%; }
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
             background: #f5f7fa;
             color: #0f172a;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* NAVBAR */
-        .app-navbar {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            box-shadow: 0 2px 8px rgba(15,23,42,.08);
-            padding: 10px 0;
+        /* ============================================================
+           KHI ẨN CHROME (trang đăng nhập/đăng ký)
+           ============================================================ */
+        body.chrome-hidden { background: #fff; }
+        body.chrome-hidden .app-main {
+            flex: 1;
+            padding: 0 !important;
+            margin: 0 !important;
+            min-height: 100vh;
         }
-        .app-navbar .navbar-brand {
-            font-weight: 800;
-            font-size: 18px;
-            letter-spacing: -0.3px;
-            color: #fff;
+
+        /* ============================================================
+           NAVBAR
+           ============================================================ */
+        .app-navbar {
+            background: linear-gradient(135deg, #0b1220 0%, #0f172a 50%, #1e293b 100%);
+            box-shadow:
+                0 1px 0 rgba(255,255,255,.05) inset,
+                0 4px 16px rgba(15,23,42,.15);
+            padding: 0;
+            border-bottom: 1px solid rgba(148,163,184,.08);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            backdrop-filter: blur(10px);
+        }
+
+        .app-navbar .navbar-inner {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 24px;
+            padding: 12px 28px;
+            max-width: 100%;
+        }
+
+        /* Logo */
+        .app-navbar .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 17px;
+            letter-spacing: -0.4px;
+            color: #fff;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: opacity .15s;
+            margin: 0;
+            padding: 0;
+        }
+        .app-navbar .navbar-brand:hover {
+            opacity: .9;
+            color: #fff;
         }
         .app-navbar .navbar-brand .logo {
-            width: 34px; height: 34px;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            border-radius: 9px;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            border-radius: 10px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 800;
-            box-shadow: 0 4px 10px rgba(59,130,246,.35);
+            box-shadow:
+                0 6px 14px rgba(37,99,235,.4),
+                0 0 0 1px rgba(255,255,255,.1) inset;
+            flex-shrink: 0;
+        }
+        .app-navbar .navbar-brand .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.15;
+        }
+        .app-navbar .navbar-brand .brand-text .brand-name {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+        .app-navbar .navbar-brand .brand-text .brand-sub {
+            font-size: 10.5px;
+            font-weight: 500;
+            color: rgba(255,255,255,.5);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+
+        /* Nav links */
+        .app-navbar .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+        }
+        .app-navbar .nav-menu .nav-item {
+            position: relative;
         }
         .app-navbar .nav-link {
-            color: rgba(255,255,255,.78);
-            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,.72);
+            font-size: 13.5px;
             font-weight: 500;
-            padding: 8px 14px !important;
+            padding: 9px 14px !important;
             border-radius: 8px;
-            transition: all .15s;
-            margin: 0 2px;
+            transition: all .15s ease;
+            text-decoration: none;
+            white-space: nowrap;
+            line-height: 1.2;
         }
         .app-navbar .nav-link:hover {
             color: #fff;
-            background: rgba(255,255,255,.08);
+            background: rgba(255,255,255,.06);
         }
         .app-navbar .nav-link.active {
             color: #fff;
-            background: rgba(59,130,246,.22);
+            background: rgba(59,130,246,.18);
             font-weight: 600;
+            box-shadow: 0 0 0 1px rgba(59,130,246,.3) inset;
         }
+        .app-navbar .nav-link .caret {
+            width: 10px;
+            height: 10px;
+            opacity: .6;
+            transition: transform .2s;
+        }
+        .app-navbar .nav-item.show .nav-link .caret,
+        .app-navbar .dropdown-toggle.show .caret {
+            transform: rotate(180deg);
+        }
+
+        /* Dropdown */
         .app-navbar .dropdown-menu {
             border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            box-shadow: 0 8px 24px rgba(15,23,42,.12);
+            border-radius: 12px;
+            box-shadow:
+                0 12px 32px rgba(15,23,42,.12),
+                0 4px 8px rgba(15,23,42,.06);
             padding: 6px;
-            margin-top: 8px;
-            min-width: 220px;
+            margin-top: 10px;
+            min-width: 240px;
+            animation: dropdownFade .15s ease;
+        }
+        @@keyframes dropdownFade {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
         .app-navbar .dropdown-item {
-            font-size: 14px;
-            padding: 8px 14px;
-            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+            font-weight: 500;
+            padding: 9px 12px;
+            border-radius: 8px;
             color: #334155;
             transition: all .12s;
+            text-decoration: none;
         }
         .app-navbar .dropdown-item:hover {
             background: #eff6ff;
@@ -140,20 +254,46 @@
             color: #1d4ed8;
             font-weight: 600;
         }
+        .app-navbar .dropdown-item .icon {
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            opacity: .75;
+            flex-shrink: 0;
+        }
+        .app-navbar .dropdown-header {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #94a3b8;
+            padding: 8px 12px 4px;
+        }
 
-        /* USER BADGE */
-        .user-trigger {
+        /* User trigger */
+        .app-navbar .user-trigger {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 6px 12px 6px 6px !important;
+            padding: 6px 14px 6px 6px !important;
             border-radius: 999px;
-            background: rgba(255,255,255,.08);
+            background: rgba(255,255,255,.06);
             border: 1px solid rgba(255,255,255,.1);
+            transition: all .15s;
+            margin-left: auto;
         }
-        .user-trigger:hover { background: rgba(255,255,255,.14); }
-        .user-avatar {
-            width: 30px; height: 30px;
+        .app-navbar .user-trigger:hover {
+            background: rgba(255,255,255,.12);
+            border-color: rgba(255,255,255,.18);
+        }
+        .app-navbar .user-trigger.active {
+            background: rgba(255,255,255,.12);
+        }
+        .app-navbar .user-avatar {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
             display: inline-flex;
@@ -163,321 +303,570 @@
             font-weight: 700;
             font-size: 13px;
             flex-shrink: 0;
+            box-shadow: 0 0 0 2px rgba(59,130,246,.2);
         }
-        .user-text { line-height: 1.15; }
-        .user-text .name {
+        .app-navbar .user-text {
+            line-height: 1.2;
+            text-align: left;
+        }
+        .app-navbar .user-text .name {
             font-size: 13px;
             font-weight: 700;
             color: #fff;
+            letter-spacing: -0.2px;
         }
-        .user-text .role {
-            font-size: 11px;
-            color: rgba(255,255,255,.6);
+        .app-navbar .user-text .role {
+            font-size: 10.5px;
+            color: rgba(255,255,255,.55);
             text-transform: uppercase;
-            letter-spacing: .5px;
+            letter-spacing: 0.6px;
+            font-weight: 600;
+            margin-top: 1px;
         }
 
-        /* MAIN */
+        /* Toggle (mobile) */
+        .app-navbar .navbar-toggler {
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.1);
+            padding: 8px 10px;
+            border-radius: 8px;
+        }
+        .app-navbar .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.7)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* Mobile collapse */
+        .app-navbar .navbar-collapse {
+            flex-basis: 100%;
+            flex-grow: 1;
+        }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
         .app-main {
             flex: 1;
             padding: 0;
         }
+        .app-content {
+            padding: 0;
+        }
+        .app-content .container-fluid {
+            padding: 24px 28px 0;
+        }
 
-        /* FOOTER */
+        /* ============================================================
+           FOOTER
+           ============================================================ */
         .app-footer {
             background: #fff;
             border-top: 1px solid #e5e7eb;
-            padding: 20px 0;
-            margin-top: 40px;
+            padding: 24px 0;
+            margin-top: 48px;
             font-size: 13px;
             color: #64748b;
-            text-align: center;
+        }
+        .app-footer .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 0 28px;
         }
         .app-footer .brand {
             font-weight: 700;
-            color: #1e293b;
+            color: #0f172a;
+        }
+        .app-footer .divider {
+            color: #cbd5e1;
+            margin: 0 8px;
+        }
+        .app-footer .footer-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .app-footer .footer-links a {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color .15s;
+        }
+        .app-footer .footer-links a:hover {
+            color: #2563eb;
         }
 
-        /* ALERTS */
+        /* ============================================================
+           ALERTS (dùng chung)
+           ============================================================ */
         .alert {
-            border-radius: 10px;
+            border-radius: 12px;
             border: none;
             font-size: 14px;
-            padding: 12px 16px;
+            font-weight: 500;
+            padding: 14px 18px;
             box-shadow: 0 1px 3px rgba(15,23,42,.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
         }
-        .alert-success { background: #f0fdf4; color: #166534; border-left: 4px solid #10b981; }
-        .alert-danger  { background: #fef2f2; color: #991b1b; border-left: 4px solid #ef4444; }
-        .alert-warning { background: #fffbeb; color: #92400e; border-left: 4px solid #f59e0b; }
-        .alert-info    { background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; }
+        .alert strong:first-child {
+            font-weight: 700;
+        }
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border-left: 4px solid #10b981;
+        }
+        .alert-danger {
+            background: #fef2f2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        .alert-warning {
+            background: #fffbeb;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        .alert-info {
+            background: #eff6ff;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
 
-        /* Nếu trang con dùng layout riêng thì ẩn padding */
-        .login-fullscreen .app-main { padding: 0 !important; }
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @@media (max-width: 991.98px) {
+            .app-navbar .navbar-inner {
+                padding: 10px 16px;
+                flex-wrap: wrap;
+            }
+            .app-navbar .navbar-brand .brand-text .brand-sub {
+                display: none;
+            }
+            .app-navbar .navbar-collapse {
+                margin-top: 12px;
+                padding: 12px 0 4px;
+                border-top: 1px solid rgba(255,255,255,.08);
+            }
+            .app-navbar .nav-menu {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 2px;
+            }
+            .app-navbar .nav-link {
+                padding: 10px 14px !important;
+                justify-content: flex-start;
+                width: 100%;
+            }
+            .app-navbar .dropdown-menu {
+                margin-top: 4px;
+                box-shadow: 0 4px 12px rgba(0,0,0,.08);
+            }
+            .app-navbar .user-trigger {
+                margin-left: 0;
+                margin-top: 8px;
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .app-footer .footer-inner {
+                flex-direction: column;
+                text-align: center;
+                padding: 0 16px;
+            }
+            .app-content .container-fluid {
+                padding: 16px 16px 0;
+            }
+        }
     </style>
 </head>
-<body>
+<body class="@bodyClass">
 
-    <header>
-        <nav class="navbar navbar-expand-lg app-navbar">
-            <div class="container-fluid px-4">
+    @if (!hideChrome)
+    {
+        <header>
+            <nav class="navbar navbar-expand-lg app-navbar">
+                <div class="navbar-inner">
 
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <span class="logo">Q</span>
-                    <span>Quản Lý Cho Thuê Xe</span>
-                </a>
+                    <!-- LOGO -->
+                    <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                        <span class="logo">Q</span>
+                        <span class="brand-text">
+                            <span class="brand-name">Quản Lý Cho Thuê Xe</span>
+                            <span class="brand-sub">UNETI02 · TI17A2HN</span>
+                        </span>
+                    </a>
 
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarMain" aria-controls="navbarMain"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                    <!-- TOGGLE (mobile) -->
+                    <button class="navbar-toggler border-0 ms-auto" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                            aria-controls="navbarMain" aria-expanded="false"
+                            aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-                <div class="collapse navbar-collapse" id="navbarMain">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <!-- COLLAPSE -->
+                    <div class="collapse navbar-collapse" id="navbarMain">
 
-                        @if (laQuanTri)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle @ActiveClass("LoaiXe")"
-                                   data-bs-toggle="dropdown" href="#" role="button">
-                                    Quản lý danh mục
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item @ActiveClass("LoaiXe")"
-                                           asp-controller="LoaiXe" asp-action="Index">
-                                            Loại xe
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item @ActiveClass("HangXe")"
-                                           asp-controller="HangXe" asp-action="Index">
-                                            Hãng xe
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item @ActiveClass("Xe")"
-                                           asp-controller="Xe" asp-action="Index">
-                                            Xe
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item @ActiveClass("BangGiaThue")"
-                                           asp-controller="BangGiaThue" asp-action="Index">
-                                            Bảng giá thuê
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                        <ul class="nav-menu">
 
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle @ActiveClass("DatXe")"
-                                   data-bs-toggle="dropdown" href="#" role="button">
-                                    Nghiệp vụ
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item @ActiveClass("KhachHang")"
-                                           asp-controller="KhachHang" asp-action="Index">
-                                            Khách hàng
-                                        </a>
-                                    </li>
-                                    @* ==============================================================
-                                       Bắt Đầu Code của SV3: Vũ Tiến Đạt
-                                       file: Views/Shared/_Layout.cshtml
-                                       nội dung: Thêm menu "Kiểm tra giấy tờ" cho Admin/Nhân viên (xác minh hoặc từ chối giấy tờ khách hàng tải lên).
-                                       sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
-                                       ============================================================== *@
-                                    <li>
-                                        <a class="dropdown-item @ActiveClass("GiayTo")"
-                                           asp-controller="GiayTo" asp-action="Index">
-                                            Kiểm tra giấy tờ
-                                        </a>
-                                    </li>
-                                    @* ==============================================================
-                                       Kết thúc Code của SV3
-                                       ============================================================== *@
-                                    <li>
-                                        <a class="dropdown-item @ActiveClass("DatXe", "Index")"
-                                           asp-controller="DatXe" asp-action="Index">
-                                            Đơn đặt xe
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <!-- ============================================================== -->
-                                        <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
-                                        <!-- file: Views/Shared/_Layout.cshtml -->
-                                        <!-- nội dung: Cập nhật tham số của link menu Bàn giao xe và Trả xe để ActiveClass hoạt động đúng. -->
-                                        <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
-                                        <!-- ============================================================== -->
-                                        <a class="dropdown-item @ActiveClass("DatXe", "Index", QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet)"
-                                           asp-controller="DatXe" asp-action="Index" asp-route-trangThai="@QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet">
-                                            Bàn giao xe
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item @ActiveClass("DatXe", "Index", QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue)"
-                                           asp-controller="DatXe" asp-action="Index" asp-route-trangThai="@QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue">
-                                            Trả xe
-                                        </a>
-                                        <!-- ============================================================== -->
-                                        <!-- Kết thúc Code của SV4 -->
-                                        <!-- ============================================================== -->
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item @ActiveClass("ThanhToan")"
-                                           asp-controller="ThanhToan" asp-action="Index">
-                                            Thanh toán
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                            @if (laQuanTri)
+                            {
+                                <!-- QUẢN LÝ DANH MỤC -->
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @ActiveClass("LoaiXe")"
+                                       data-bs-toggle="dropdown" href="#" role="button">
+                                        <svg class="caret" width="10" height="10" viewBox="0 0 24 24"
+                                             fill="none" stroke="currentColor" stroke-width="2.5"
+                                             stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="6 9 12 15 18 9" />
+                                        </svg>
+                                        Quản lý danh mục
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-header">DANH MỤC XE</li>
+                                        <li>
+                                            <a class="dropdown-item @ActiveClass("LoaiXe")"
+                                               asp-controller="LoaiXe" asp-action="Index">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                                                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                                                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                                                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                                                    </svg>
+                                                </span>
+                                                Loại xe
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item @ActiveClass("HangXe")"
+                                               asp-controller="HangXe" asp-action="Index">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                                        <polyline points="9 22 9 12 15 12 15 22" />
+                                                    </svg>
+                                                </span>
+                                                Hãng xe
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item @ActiveClass("Xe")"
+                                               asp-controller="Xe" asp-action="Index">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M5 17h14M5 17v-4l2-5h10l2 5v4M5 17v3h2v-3m10 0v3h2v-3" />
+                                                    </svg>
+                                                </span>
+                                                Xe
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item @ActiveClass("BangGiaThue")"
+                                               asp-controller="BangGiaThue" asp-action="Index">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <line x1="12" y1="1" x2="12" y2="23" />
+                                                        <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                                                    </svg>
+                                                </span>
+                                                Bảng giá thuê
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link @ActiveClass("ThongKe")"
-                                   asp-controller="ThongKe" asp-action="Index">
-                                    Thống kê
-                                </a>
-                            </li>
-                        }
+                                <!-- NGHIỆP VỤ -->
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @ActiveClass("DatXe")"
+                                       data-bs-toggle="dropdown" href="#" role="button">
+                                        <svg class="caret" width="10" height="10" viewBox="0 0 24 24"
+                                             fill="none" stroke="currentColor" stroke-width="2.5"
+                                             stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="6 9 12 15 18 9" />
+                                        </svg>
+                                        Nghiệp vụ
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-header">XỬ LÝ ĐƠN</li>
+                                        <li>
+                                            <a class="dropdown-item @ActiveClass("DatXe", "Index")"
+                                               asp-controller="DatXe" asp-action="Index">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                                        <polyline points="14 2 14 8 20 8" />
+                                                    </svg>
+                                                </span>
+                                                Đơn đặt xe
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item @ActiveClass("DatXe", "Index", TrangThaiDatXe.DaDuyet)"
+                                               asp-controller="DatXe" asp-action="Index"
+                                               asp-route-trangThai="@TrangThaiDatXe.DaDuyet">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <polyline points="20 6 9 17 4 12" />
+                                                    </svg>
+                                                </span>
+                                                Bàn giao xe
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item @ActiveClass("DatXe", "Index", TrangThaiDatXe.DangThue)"
+                                               asp-controller="DatXe" asp-action="Index"
+                                               asp-route-trangThai="@TrangThaiDatXe.DangThue">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+                                                    </svg>
+                                                </span>
+                                                Trả xe
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li class="dropdown-header">TÀI CHÍNH</li>
+                                        <li>
+                                            <a class="dropdown-item @ActiveClass("ThanhToan")"
+                                               asp-controller="ThanhToan" asp-action="Index">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <rect x="2" y="6" width="20" height="12" rx="2" />
+                                                        <line x1="2" y1="10" x2="22" y2="10" />
+                                                    </svg>
+                                                </span>
+                                                Thanh toán
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
 
-                        @if (laKhachHang)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link @ActiveClass("Home")"
-                                   asp-controller="Home" asp-action="Index">
-                                    Trang chủ
-                                </a>
-                            </li>
-                            <li class="nav-item">
-    <a class="nav-link @ActiveClass("Xe")"
-       asp-controller="Xe" asp-action="Index">
-        Xem xe
-    </a>
-</li>
-                            <li class="nav-item">
-                                <a class="nav-link @ActiveClass("DatXe", "TimXeTrong")"
-                                   asp-controller="DatXe" asp-action="TimXeTrong">
-                                    Tìm xe trống
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link @ActiveClass("DatXe", "DonCuaToi")"
-                                   asp-controller="DatXe" asp-action="DonCuaToi">
-                                    Đơn của tôi
-                                </a>
-                            </li>
-                            @* ==============================================================
-                               Bắt Đầu Code của SV3: Vũ Tiến Đạt
-                               file: Views/Shared/_Layout.cshtml
-                               nội dung: Thêm menu "Giấy tờ của tôi" cho khách hàng (tải và theo dõi trạng thái giấy tờ CCCD, GPLX).
-                               sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
-                               ============================================================== *@
-                            <li class="nav-item">
-                                <a class="nav-link @ActiveClass("GiayTo")"
-                                   asp-controller="GiayTo" asp-action="CuaToi">
-                                    Giấy tờ của tôi
-                                </a>
-                            </li>
-                            @* ==============================================================
-                               Kết thúc Code của SV3
-                               ============================================================== *@
-                        }
-                    </ul>
+                                <!-- KHÁCH HÀNG -->
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @ActiveClass("KhachHang")"
+                                       data-bs-toggle="dropdown" href="#" role="button">
+                                        <svg class="caret" width="10" height="10" viewBox="0 0 24 24"
+                                             fill="none" stroke="currentColor" stroke-width="2.5"
+                                             stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="6 9 12 15 18 9" />
+                                        </svg>
+                                        Khách hàng
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item @ActiveClass("KhachHang")"
+                                               asp-controller="KhachHang" asp-action="Index">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                                        <circle cx="12" cy="7" r="4" />
+                                                    </svg>
+                                                </span>
+                                                Danh sách khách hàng
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item @ActiveClass("GiayTo")"
+                                               asp-controller="GiayTo" asp-action="Index">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                                        <polyline points="14 2 14 8 20 8" />
+                                                        <line x1="9" y1="15" x2="15" y2="15" />
+                                                    </svg>
+                                                </span>
+                                                Kiểm tra giấy tờ
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
 
-                    <ul class="navbar-nav mb-2 mb-lg-0">
-                        @if (daDangNhap)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle user-trigger" data-bs-toggle="dropdown"
-                                   href="#" role="button">
-                                    <span class="user-avatar">@chuCaiDau</span>
-                                    <span class="user-text text-start">
-                                        <div class="name">@hoTen</div>
-                                        <div class="role">@vaiTroText</div>
-                                    </span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item"
-                                           asp-controller="TaiKhoan" asp-action="DoiMatKhau">
-                                            Đổi mật khẩu
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li>
-                                        <form asp-controller="TaiKhoan" asp-action="DangXuat"
-                                              method="post" class="m-0">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit"
-                                                    class="dropdown-item text-danger fw-semibold w-100 text-start border-0 bg-transparent">
-                                                Đăng xuất
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        else
-                        {
-                            @* ==============================================================
-                               Bắt Đầu Code của SV3: Vũ Tiến Đạt
-                               file: Views/Shared/_Layout.cshtml
-                               nội dung: Thêm link "Đăng ký" khi chưa đăng nhập để khách hàng tự tạo tài khoản.
-                               sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
-                               ============================================================== *@
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="DangKy" asp-action="Index">Đăng ký</a>
-                            </li>
-                            @* ==============================================================
-                               Kết thúc Code của SV3
-                               ============================================================== *@
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="TaiKhoan" asp-action="DangNhap">
-                                    Đăng nhập
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                                <!-- THỐNG KÊ -->
+                                <li class="nav-item">
+                                    <a class="nav-link @ActiveClass("ThongKe")"
+                                       asp-controller="ThongKe" asp-action="Index">
+                                        Thống kê
+                                    </a>
+                                </li>
+                            }
+
+                            @if (laKhachHang)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @ActiveClass("Home")"
+                                       asp-controller="Home" asp-action="Index">
+                                        Trang chủ
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @ActiveClass("Xe")"
+                                       asp-controller="Xe" asp-action="Index">
+                                        Xem xe
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @ActiveClass("DatXe", "TimXeTrong")"
+                                       asp-controller="DatXe" asp-action="TimXeTrong">
+                                        Tìm xe trống
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @ActiveClass("DatXe", "DonCuaToi")"
+                                       asp-controller="DatXe" asp-action="DonCuaToi">
+                                        Đơn của tôi
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @ActiveClass("GiayTo")"
+                                       asp-controller="GiayTo" asp-action="CuaToi">
+                                        Giấy tờ của tôi
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+
+                        <!-- RIGHT SIDE -->
+                        <ul class="nav-menu" style="flex: 0 0 auto;">
+                            @if (daDangNhap)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle user-trigger"
+                                       data-bs-toggle="dropdown" href="#" role="button">
+                                        <span class="user-avatar">@chuCaiDau</span>
+                                        <span class="user-text">
+                                            <div class="name">@hoTen</div>
+                                            <div class="role">@vaiTroText</div>
+                                        </span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li class="dropdown-header">@hoTen</li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-controller="TaiKhoan" asp-action="DoiMatKhau">
+                                                <span class="icon">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2">
+                                                        <rect x="3" y="11" width="18" height="11" rx="2" />
+                                                        <path d="M7 11V7a5 5 0 0110 0v4" />
+                                                    </svg>
+                                                </span>
+                                                Đổi mật khẩu
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li>
+                                            <form asp-controller="TaiKhoan" asp-action="DangXuat"
+                                                  method="post" class="m-0">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit"
+                                                        class="dropdown-item text-danger w-100 text-start border-0 bg-transparent">
+                                                    <span class="icon">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24"
+                                                             fill="none" stroke="currentColor" stroke-width="2">
+                                                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                                                            <polyline points="16 17 21 12 16 7" />
+                                                            <line x1="21" y1="12" x2="9" y2="12" />
+                                                        </svg>
+                                                    </span>
+                                                    Đăng xuất
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="DangKy" asp-action="Index">
+                                        Đăng ký
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="TaiKhoan" asp-action="DangNhap"
+                                       style="background: rgba(59,130,246,.18); color: #fff;">
+                                        Đăng nhập
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </nav>
-    </header>
+            </nav>
+        </header>
+    }
 
-    <div class="app-main">
-        <div class="container-fluid px-4 mt-3">
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show">
-                    <strong>Thành công.</strong> @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <strong>Lỗi.</strong> @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-
+    @if (hideChrome)
+    {
+        <div class="app-main">
             <main role="main">
                 @RenderBody()
             </main>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="app-main">
+            <div class="app-content">
+                <div class="container-fluid">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <strong>Thành công.</strong> @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <strong>Lỗi.</strong> @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
 
-    <footer class="app-footer">
-        <div class="container-fluid px-4">
-            <span class="brand">&copy; 2026 Quản Lý Cho Thuê Xe</span>
-            &nbsp;·&nbsp; UNETI02 &nbsp;·&nbsp; Lớp TI17A2HN
+                    <main role="main">
+                        @RenderBody()
+                    </main>
+                </div>
+            </div>
         </div>
-    </footer>
+
+        <footer class="app-footer">
+            <div class="footer-inner">
+                <div>
+                    <span class="brand">© 2026 Quản Lý Cho Thuê Xe</span>
+                    <span class="divider">·</span>
+                    <span>UNETI02</span>
+                    <span class="divider">·</span>
+                    <span>Lớp TI17A2HN</span>
+                </div>
+                <div class="footer-links">
+                    <a asp-controller="Home" asp-action="Privacy">Chính sách bảo mật</a>
+                    <a href="#">Hỗ trợ</a>
+                    <a href="#">Liên hệ</a>
+                </div>
+            </div>
+        </footer>
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Chart.js CDN cho cac trang Thong ke va bieu do gia -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+       <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
