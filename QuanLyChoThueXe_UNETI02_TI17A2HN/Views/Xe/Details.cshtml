@@ -366,6 +366,17 @@
             </div>
         }
 
+        <!-- BIEU DO SO SANH GIA -->
+        <div class="data-card" style="margin-bottom: 24px;">
+            <div class="card-head">
+                <h6 class="title">So sánh giá thuê</h6>
+                <span class="count">Chart.js</span>
+            </div>
+            <div style="padding: 24px; height: 340px;">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </div>
+
         <!-- BẢNG GIÁ -->
         <div class="data-card">
             <div class="card-head">
@@ -450,3 +461,71 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('priceChart');
+            if (!ctx) return;
+
+            var giaXeNay = @(ViewBag.GiaXeNay ?? 0);
+            var giaTrungBinhLoai = @(ViewBag.GiaTrungBinhLoai ?? 0);
+            var giaTrungBinhHang = @(ViewBag.GiaTrungBinhHang ?? 0);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Xe này', 'TB theo loại', 'TB theo hãng'],
+                    datasets: [{
+                        label: 'Đơn giá ngày (VNĐ)',
+                        data: [giaXeNay, giaTrungBinhLoai, giaTrungBinhHang],
+                        backgroundColor: [
+                            'rgba(29,78,216,.85)',
+                            'rgba(16,185,129,.85)',
+                            'rgba(245,158,11,.85)'
+                        ],
+                        borderColor: ['#1d4ed8', '#059669', '#b45309'],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 12,
+                            callbacks: {
+                                label: function (ctx) {
+                                    return new Intl.NumberFormat('vi-VN').format(ctx.parsed.y) + ' đ';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (v) {
+                                    return new Intl.NumberFormat('vi-VN', {
+                                        notation: 'compact',
+                                        compactDisplay: 'short'
+                                    }).format(v);
+                                },
+                                color: '#94a3b8'
+                            },
+                            grid: { color: '#f1f5f9', drawBorder: false }
+                        },
+                        x: {
+                            ticks: { color: '#64748b', font: { size: 12 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

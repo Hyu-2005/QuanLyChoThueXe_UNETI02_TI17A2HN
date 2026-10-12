@@ -223,8 +223,44 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 .AsNoTracking()
                 .ToListAsync();
 
-            // Truyen qua ViewBag (khong dung xe.BangGiaThues vi relationship chi chua bang gia rieng xe)
             ViewBag.BangGiaApDung = bangGiaApDung;
+
+            // =====================================================
+            // Tinh gia trung binh cua loai xe va hang xe (de ve bieu do)
+            // =====================================================
+            var today = DateTime.Today;
+
+            // Gia hien hanh cua xe nay (uu tien gia rieng, sau do gia loai)
+            var giaXeNay = await _context.BangGiaThues
+                .Where(b => b.TrangThai)
+                .Where(b => b.TuNgay <= today && b.DenNgay >= today)
+                .Where(b => b.MaXe == id || b.MaLoaiXe == xe.MaLoaiXe)
+                .OrderByDescending(b => b.MaXe.HasValue)
+                .Select(b => b.DonGiaNgay)
+                .FirstOrDefaultAsync();
+
+            // Gia trung binh cac bang gia theo loai (dang hieu luc)
+            var giaTrungBinhLoai = await _context.BangGiaThues
+                .Where(b => b.TrangThai && b.MaLoaiXe == xe.MaLoaiXe)
+                .Where(b => b.TuNgay <= today && b.DenNgay >= today)
+                .AverageAsync(b => (decimal?)b.DonGiaNgay) ?? 0;
+
+            // Gia trung binh cac bang gia rieng cua xe thuoc cung hang (dang hieu luc)
+            var maXeCungHang = await _context.Xes
+                .Where(x => x.MaHangXe == xe.MaHangXe)
+                .Select(x => x.MaXe)
+                .ToListAsync();
+
+            var giaTrungBinhHang = await _context.BangGiaThues
+                .Where(b => b.TrangThai && b.MaXe != null)
+                .Where(b => b.TuNgay <= today && b.DenNgay >= today)
+                .Where(b => maXeCungHang.Contains(b.MaXe!.Value))
+                .AverageAsync(b => (decimal?)b.DonGiaNgay) ?? 0;
+
+            // Truyen qua ViewBag
+            ViewBag.GiaXeNay = giaXeNay;
+            ViewBag.GiaTrungBinhLoai = giaTrungBinhLoai;
+            ViewBag.GiaTrungBinhHang = giaTrungBinhHang;
 
             return View(xe);
         }
