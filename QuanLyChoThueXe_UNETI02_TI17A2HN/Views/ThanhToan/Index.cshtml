@@ -2,7 +2,7 @@
     Index.cshtml - danh sach thanh toan
     Họ và tên: Duong Lam Huy
     Mã sinh viên: 23103100120
-    Nội dung thực hiện: Danh sách hóa đơn thanh toán có tìm kiếm, lọc, phân trang
+    Nội dung: Danh sách hóa đơn + nút Xuất Excel
     Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThanhToan.ThanhToanListVM
@@ -16,14 +16,36 @@
     .page-wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
 
     .page-head {
+        display: flex; justify-content: space-between; align-items: flex-end;
         margin-bottom: 24px; padding-bottom: 20px;
         border-bottom: 1px solid #e5e7eb;
+        flex-wrap: wrap; gap: 16px;
     }
     .page-head h1 {
         font-size: 26px; font-weight: 800; color: #0f172a;
         letter-spacing: -0.4px; margin: 0 0 4px 0;
     }
     .page-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+
+    /* ===== NÚT XUẤT EXCEL ===== */
+    .btn-export-excel {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 11px 22px;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: #fff;
+        border: none; border-radius: 10px;
+        font-size: 13px; font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(16,185,129,.25);
+        transition: all .2s;
+        white-space: nowrap;
+    }
+    .btn-export-excel:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(16,185,129,.4);
+    }
+    .btn-export-excel .icon { font-size: 16px; }
 
     .stat-card {
         background: #fff;
@@ -214,9 +236,23 @@
 <div class="page-shell">
     <div class="page-wrap">
 
+        <!-- HEADER + NÚT XUẤT EXCEL -->
         <div class="page-head">
-            <h1>Thanh toán</h1>
-            <p class="sub">Danh sách hóa đơn thanh toán trong hệ thống</p>
+            <div>
+                <h1>Thanh toán</h1>
+                <p class="sub">Danh sách hóa đơn thanh toán trong hệ thống</p>
+            </div>
+
+            <a asp-action="XuatExcel"
+               asp-route-tuKhoa="@Model.TuKhoa"
+               asp-route-trangThaiThanhToan="@Model.TrangThaiThanhToan"
+               asp-route-phuongThucThanhToan="@Model.PhuongThucThanhToan"
+               asp-route-tuNgay="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+               asp-route-denNgay="@(Model.DenNgay?.ToString("yyyy-MM-dd"))"
+               class="btn-export-excel">
+                <span class="icon">📊</span>
+                Xuất Excel
+            </a>
         </div>
 
         @if (TempData["Success"] != null)
@@ -321,10 +357,6 @@
                                     _ => "chua-tt"
                                 };
 
-                                // Chỉ hiện nút "Thanh toán" khi:
-                                // - Hóa đơn chưa thanh toán
-                                // - Có đơn đặt xe liên kết
-                                // - Đơn đặt xe còn ở trạng thái "Chờ thanh toán"
                                 var chuaThanhToan = item.TrangThaiThanhToan == "Chưa thanh toán"
                                                  && item.DatXe != null
                                                  && item.DatXe.TrangThai == "Chờ thanh toán";

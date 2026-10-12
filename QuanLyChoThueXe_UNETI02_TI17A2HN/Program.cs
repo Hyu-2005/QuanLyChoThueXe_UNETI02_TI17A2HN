@@ -26,6 +26,9 @@ builder.Services.AddScoped<ITrungLichService, TrungLichService>();
 builder.Services.AddScoped<IXeTrongService, XeTrongService>();
 builder.Services.AddScoped<ITinhTienService, TinhTienService>();
 builder.Services.AddScoped<IThongKeService, ThongKeService>();
+builder.Services.AddScoped<IExportService, ExportService>();
+
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var app = builder.Build();
 

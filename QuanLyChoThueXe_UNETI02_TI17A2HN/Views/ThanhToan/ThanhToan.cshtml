@@ -1,9 +1,10 @@
 ﻿@*
-    ThanhToan.cshtml - form thanh toan don dat xe
-    sinh vien thuc hien: Duong Lam Huy - 23103100120
-    module 5 - tinh tien, thanh toan, lich su va thong ke
+    ThanhToan.cshtml - Form thanh toán tại quầy
+    Sinh viên thực hiện: Dương Lâm Huy - 23103100120
+    Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThanhToan.ThanhToanVM
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
 @{
     ViewData["Title"] = "Thanh toán đơn đặt xe";
 }
@@ -74,6 +75,10 @@
         background: #1d4ed8; color: #fff;
         display: inline-flex; align-items: center; justify-content: center;
         font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .form-card .sect-title .hint {
+        margin-left: auto; font-size: 11px; font-weight: 500;
+        text-transform: none; letter-spacing: 0; color: #94a3b8;
     }
 
     .form-label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
@@ -147,7 +152,8 @@
         padding: 20px 32px;
         background: #f9fafb;
         border-top: 1px solid #e5e7eb;
-        display: flex; justify-content: flex-end; gap: 10px;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 12px;
     }
     .form-actions .btn { padding: 10px 26px; font-weight: 600; border-radius: 8px; }
 
@@ -160,6 +166,22 @@
         color: #fff;
         transform: translateY(-1px);
         box-shadow: 0 6px 18px rgba(16,185,129,.35);
+    }
+
+    .btn-online {
+        background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
+        color: #fff; border: none;
+        box-shadow: 0 4px 12px rgba(139,92,246,.25);
+        padding: 10px 22px; border-radius: 10px;
+        font-weight: 700; font-size: 13px;
+        text-decoration: none;
+        display: inline-flex; align-items: center; gap: 6px;
+        transition: all .2s;
+    }
+    .btn-online:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(139,92,246,.35);
     }
 </style>
 
@@ -303,10 +325,18 @@
 
                 <div class="form-actions">
                     <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
-                    <button type="submit" class="btn btn-primary-custom"
-                            onclick="return confirm('Xác nhận thanh toán đơn này và chuyển sang Hoàn thành?')">
-                        Xác nhận thanh toán
-                    </button>
+                    <div class="d-flex gap-2">
+                        <a asp-controller="ThanhToanOnline"
+                           asp-action="Index"
+                           asp-route-id="@Model.MaDatXe"
+                           class="btn-online">
+                            💳 Thanh toán online
+                        </a>
+                        <button type="submit" class="btn btn-primary-custom"
+                                onclick="return confirm('Xác nhận thanh toán đơn này và chuyển sang Hoàn thành?')">
+                            ✅ Xác nhận thanh toán
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>

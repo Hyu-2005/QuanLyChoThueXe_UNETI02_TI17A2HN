@@ -1,8 +1,7 @@
 ﻿@*
-    Index.cshtml - Dashboard tong quan
-    Họ và tên: Duong Lam Huy
-    Mã sinh viên: 23103100120
-    Nội dung thực hiện: Dashboard hiển thị tổng quan hệ thống và biểu đồ Chart.js
+    Index.cshtml - Dashboard tổng quan
+    Sinh viên thực hiện: Duong Lam Huy - 23103100120
+    Nội dung: Dashboard + biểu đồ + nút Xuất PDF
     Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThongKe.DashboardVM
@@ -18,14 +17,16 @@
     .db-header {
         display: flex; justify-content: space-between; align-items: flex-end;
         margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb;
+        flex-wrap: wrap; gap: 16px;
     }
     .db-header .greeting { font-size: 13px; color: #64748b; font-weight: 500; margin-bottom: 4px; }
     .db-header h1 { font-size: 28px; font-weight: 800; color: #0f172a; letter-spacing: -0.6px; margin: 0; }
     .db-header .sub { font-size: 14px; color: #64748b; margin: 6px 0 0 0; }
-    .db-header .actions { display: flex; gap: 10px; }
+    .db-header .actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .db-header .actions a {
         padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 700;
         text-decoration: none; transition: all .15s;
+        display: inline-flex; align-items: center; gap: 6px;
     }
     .db-header .actions .btn-outline { background: #fff; border: 1px solid #d1d5db; color: #334155; }
     .db-header .actions .btn-outline:hover { border-color: #9ca3af; background: #f9fafb; color: #111827; }
@@ -34,6 +35,19 @@
         color: #fff; border: none; box-shadow: 0 4px 12px rgba(59,130,246,.25);
     }
     .db-header .actions .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(59,130,246,.35); color: #fff; }
+
+    /* ===== NÚT XUẤT PDF ===== */
+    .btn-export-pdf {
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+        color: #fff !important;
+        border: none;
+        box-shadow: 0 4px 12px rgba(220,38,38,.25);
+    }
+    .btn-export-pdf:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(220,38,38,.4) !important;
+        color: #fff !important;
+    }
 
     .section-head { display: flex; align-items: center; gap: 12px; margin: 32px 0 16px 0; }
     .section-head:first-of-type { margin-top: 0; }
@@ -91,7 +105,6 @@
     .mini-stat.purple .num { color: #6d28d9; }
     .mini-stat .sub { font-size: 12px; color: #94a3b8; margin-top: 8px; }
 
-    /* CHART */
     .chart-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 32px; }
     .chart-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; overflow: hidden; }
     .chart-header {
@@ -169,7 +182,7 @@
 <div class="dashboard-shell">
     <div class="dashboard-wrap">
 
-        <!-- HEADER -->
+        <!-- HEADER + NÚT XUẤT PDF -->
         <div class="db-header">
             <div>
                 <div class="greeting">Xin chào, chúc một ngày tốt lành</div>
@@ -180,6 +193,12 @@
                 </p>
             </div>
             <div class="actions">
+                <a asp-action="XuatPdf"
+                   asp-route-tuNgay="@(new DateTime(now.Year, 1, 1).ToString("yyyy-MM-dd"))"
+                   asp-route-denNgay="@now.ToString("yyyy-MM-dd")"
+                   class="btn-export-pdf">
+                    📄 Xuất PDF
+                </a>
                 <a asp-action="ChiTiet" class="btn-outline">Thống kê chi tiết →</a>
                 <a asp-controller="DatXe" asp-action="Index" class="btn-primary">Đơn đặt xe</a>
             </div>
