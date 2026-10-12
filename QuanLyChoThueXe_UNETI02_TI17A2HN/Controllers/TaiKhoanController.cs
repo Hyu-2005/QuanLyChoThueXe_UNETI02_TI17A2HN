@@ -52,8 +52,8 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return View(vm);
             }
 
-            // 3. Kiem tra mat khau (so sanh thuong, co the nang cap hash sau)
-            if (taiKhoan.MatKhau != vm.MatKhau)
+            // 3. Kiem tra mat khau bang BCrypt
+            if (!PasswordHelper.VerifyPassword(vm.MatKhau, taiKhoan.MatKhau))
             {
                 ModelState.AddModelError(string.Empty,
                     "Ten dang nhap hoac mat khau khong dung");
@@ -113,7 +113,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return RedirectToAction("DangNhap");
         }
 
-
         // DOI MAT KHAU
         [SessionAuthorize]
         [HttpGet]
@@ -138,16 +137,16 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             if (taiKhoan == null)
                 return RedirectToAction("DangNhap");
 
-            // Kiem tra mat khau cu
-            if (taiKhoan.MatKhau != vm.MatKhauCu)
+            // Kiem tra mat khau cu bang BCrypt
+            if (!PasswordHelper.VerifyPassword(vm.MatKhauCu, taiKhoan.MatKhau))
             {
                 ModelState.AddModelError(nameof(vm.MatKhauCu),
                     "Mat khau cu khong dung");
                 return View(vm);
             }
 
-            // Cap nhat mat khau moi
-            taiKhoan.MatKhau = vm.MatKhauMoi;
+            // Cap nhat mat khau moi (da hash)
+            taiKhoan.MatKhau = PasswordHelper.HashPassword(vm.MatKhauMoi);
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Doi mat khau thanh cong. Vui long dang nhap lai";
