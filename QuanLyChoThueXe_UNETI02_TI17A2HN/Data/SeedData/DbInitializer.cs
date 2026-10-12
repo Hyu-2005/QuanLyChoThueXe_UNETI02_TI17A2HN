@@ -5,6 +5,7 @@
 // ============================================================
 
 using Microsoft.EntityFrameworkCore;
+using QuanLyChoThueXe_UNETI02_TI17A2HN.Helpers;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants;
 using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities;
 
@@ -23,12 +24,12 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
             // =====================================================
             var taiKhoans = new List<TaiKhoan>
             {
-                new() { TenDangNhap = "admin",      MatKhau = "admin123",   HoTen = "Quan Tri Vien",  Email = "admin@rentcar.vn",      VaiTro = VaiTro.Admin,    TrangThai = true },
-                new() { TenDangNhap = "nhanvien01", MatKhau = "nv123456",   HoTen = "Nguyen Van Hung", Email = "hung.nv@rentcar.vn",   VaiTro = VaiTro.NhanVien, TrangThai = true },
-                new() { TenDangNhap = "nhanvien02", MatKhau = "nv123456",   HoTen = "Tran Thi Lan",    Email = "lan.tt@rentcar.vn",    VaiTro = VaiTro.NhanVien, TrangThai = true },
-                new() { TenDangNhap = "nhanvien03", MatKhau = "nv123456",   HoTen = "Le Minh Tuan",    Email = "tuan.lm@rentcar.vn",   VaiTro = VaiTro.NhanVien, TrangThai = true },
+                new() { TenDangNhap = "admin",      MatKhau = PasswordHelper.HashPassword("admin123"), HoTen = "Quan Tri Vien",  Email = "admin@rentcar.vn",      VaiTro = VaiTro.Admin,    TrangThai = true },
+                new() { TenDangNhap = "nhanvien01", MatKhau = PasswordHelper.HashPassword("nv123456"), HoTen = "Nguyen Van Hung", Email = "hung.nv@rentcar.vn",   VaiTro = VaiTro.NhanVien, TrangThai = true },
+                new() { TenDangNhap = "nhanvien02", MatKhau = PasswordHelper.HashPassword("nv123456"), HoTen = "Tran Thi Lan",    Email = "lan.tt@rentcar.vn",    VaiTro = VaiTro.NhanVien, TrangThai = true },
+                new() { TenDangNhap = "nhanvien03", MatKhau = PasswordHelper.HashPassword("nv123456"), HoTen = "Le Minh Tuan",    Email = "tuan.lm@rentcar.vn",   VaiTro = VaiTro.NhanVien, TrangThai = true },
                 // Tai khoan da bi khoa de test
-                new() { TenDangNhap = "nhanvien04", MatKhau = "nv123456",   HoTen = "Pham Van Khoa",   Email = "khoa.pv@rentcar.vn",   VaiTro = VaiTro.NhanVien, TrangThai = false },
+                new() { TenDangNhap = "nhanvien04", MatKhau = PasswordHelper.HashPassword("nv123456"), HoTen = "Pham Van Khoa",   Email = "khoa.pv@rentcar.vn",   VaiTro = VaiTro.NhanVien, TrangThai = false },
             };
 
             // 30 tai khoan khach hang
@@ -37,7 +38,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 taiKhoans.Add(new TaiKhoan
                 {
                     TenDangNhap = $"kh{i:D2}",
-                    MatKhau = "kh123456",
+                    MatKhau = PasswordHelper.HashPassword("kh123456"),
                     HoTen = $"Khach Hang {i:D2}",
                     Email = $"khachhang{i:D2}@gmail.com",
                     VaiTro = VaiTro.KhachHang,
@@ -237,7 +238,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 });
             }
 
-            // Bang gia rieng cho 3 xe dac biet (gia cao hon 20%)
+            // Bang gia rieng cho 2 xe dac biet
             bangGias.Add(new BangGiaThue
             {
                 MaXe = xeList[0].MaXe,
@@ -290,10 +291,10 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                     NgayHetHanGPLX = i switch
                     {
                         29 => new DateTime(2023, 12, 31), // Het han
-                        28 => new DateTime(2024, 6, 30),  // Het han (so voi 2026)
+                        28 => new DateTime(2024, 6, 30),  // Het han
                         _ => new DateTime(2027, 12, 31)   // Con han
                     },
-                    TrangThai = i != 29 // khach cuoi bi khoa
+                    TrangThai = i != 29
                 });
             }
 
@@ -310,7 +311,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 "San bay Tan Son Nhat", "Ben xe Mien Dong", "Trung tam Q1"
             };
 
-            // Helper lay bang gia hieu luc cho 1 loai xe tai thoi diem
             decimal GetDonGiaNgay(int maLoaiXe, DateTime thoiDiem)
             {
                 var bangGia = bangGias
@@ -327,9 +327,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 return bangGia?.TienCocMacDinh ?? 3000000m;
             }
 
-            // Cac trang thai va so luong:
-            // 8 ChoDuyet, 10 DaDuyet, 7 DaBanGiao, 8 DangThue,
-            // 5 ChoThanhToan, 8 HoanThanh, 2 TuChoi, 2 DaHuy
             var trangThaiList = new[]
             {
                 TrangThaiDatXe.ChoDuyet, TrangThaiDatXe.ChoDuyet, TrangThaiDatXe.ChoDuyet, TrangThaiDatXe.ChoDuyet,
@@ -364,31 +361,26 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 var xe = xeList[i % 25];
                 var trangThai = trangThaiList[i];
 
-                // Tinh thoi gian dua theo trang thai
                 DateTime thoiGianNhan;
                 DateTime thoiGianTra;
 
                 if (trangThai == TrangThaiDatXe.HoanThanh || trangThai == TrangThaiDatXe.ChoThanhToan)
                 {
-                    // Da hoan thanh trong qua khu
                     thoiGianNhan = now.AddDays(-30 - i);
                     thoiGianTra = thoiGianNhan.AddDays(2 + (i % 3));
                 }
                 else if (trangThai == TrangThaiDatXe.DangThue || trangThai == TrangThaiDatXe.DaBanGiao)
                 {
-                    // Dang thue (nhan trong qua khu gan day, tra tuong lai gan)
                     thoiGianNhan = now.AddDays(-2 - (i % 3));
                     thoiGianTra = thoiGianNhan.AddDays(3 + (i % 3));
                 }
                 else if (trangThai == TrangThaiDatXe.DaDuyet)
                 {
-                    // Da duyet - sap toi
                     thoiGianNhan = now.AddDays(3 + i);
                     thoiGianTra = thoiGianNhan.AddDays(2 + (i % 3));
                 }
                 else
                 {
-                    // Cho duyet / Tu choi / Da huy
                     thoiGianNhan = now.AddDays(10 + i);
                     thoiGianTra = thoiGianNhan.AddDays(2 + (i % 3));
                 }
@@ -418,15 +410,11 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 datXes.Add(datXe);
             }
 
-            // Them 1 cap don trung lich CO CHU Y de test (khong nen co trong thuc te)
-            // Cap nay xe 30A-10000 da co don DaDuyet tu 3-5 ngay toi
-            // Nhung duoi day khong add vi da co logic rieng trong DanhSachDaDuyet
-
             await context.DatXes.AddRangeAsync(datXes);
             await context.SaveChangesAsync();
 
             // =====================================================
-            // BUOC 8: BAN GIAO XE (cho cac don DaBanGiao, DangThue, ChoThanhToan, HoanThanh)
+            // BUOC 8: BAN GIAO XE
             // =====================================================
             var banGiaoXes = new List<BanGiaoXe>();
             var nhanVienNames = new[] { "Nguyen Van Hung", "Tran Thi Lan", "Le Minh Tuan" };
@@ -467,7 +455,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
             await context.SaveChangesAsync();
 
             // =====================================================
-            // BUOC 9: TRA XE (cho cac don ChoThanhToan va HoanThanh)
+            // BUOC 9: TRA XE
             // =====================================================
             var traXes = new List<TraXe>();
             var tinhTrangTraList = new[]
@@ -489,37 +477,34 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 var don = donCanTraXe[i];
                 if (!banGiaoDict.TryGetValue(don.MaDatXe, out var bg)) continue;
 
-                // 50% tra dung han, 30% tra tre nhe, 20% tra tre nhieu
                 var thoiGianTraThucTe = don.ThoiGianTraDuKien;
                 decimal phiQuaHan = 0;
-                if (i % 5 == 1) // tra tre 2 gio
+                if (i % 5 == 1)
                 {
                     thoiGianTraThucTe = don.ThoiGianTraDuKien.AddHours(2);
-                    phiQuaHan = 2 * 200000m * 1.5m; // 600000
+                    phiQuaHan = 2 * 200000m * 1.5m;
                 }
-                else if (i % 5 == 2) // tra tre 5 gio
+                else if (i % 5 == 2)
                 {
                     thoiGianTraThucTe = don.ThoiGianTraDuKien.AddHours(5);
-                    phiQuaHan = 5 * 200000m * 1.5m; // 1500000
+                    phiQuaHan = 5 * 200000m * 1.5m;
                 }
 
-                // So km: 50% khong vuot, 30% vuot nhe, 20% vuot nhieu
                 var soNgayThue = Math.Max(1, (int)Math.Ceiling((don.ThoiGianTraDuKien - don.ThoiGianNhanDuKien).TotalDays));
                 var kmChoPhep = 300m * soNgayThue;
-                decimal soKmTraThem = 200 + (i % 3) * 100; // 200, 300, 400 km
+                decimal soKmTraThem = 200 + (i % 3) * 100;
                 decimal phiVuotKm = 0;
                 if (i % 5 == 3)
                 {
-                    soKmTraThem = kmChoPhep + 50; // vuot 50km
-                    phiVuotKm = 50 * 3000m; // 150000
+                    soKmTraThem = kmChoPhep + 50;
+                    phiVuotKm = 50 * 3000m;
                 }
                 else if (i % 5 == 4)
                 {
-                    soKmTraThem = kmChoPhep + 150; // vuot 150km
-                    phiVuotKm = 150 * 3000m; // 450000
+                    soKmTraThem = kmChoPhep + 150;
+                    phiVuotKm = 150 * 3000m;
                 }
 
-                // Nhien lieu: 60% day, 40% thieu
                 var mucNhienLieuTra = 80 - (i % 3) * 10;
                 decimal phiNhienLieu = 0;
                 if (bg.MucNhienLieuBanGiao > mucNhienLieuTra)
@@ -527,7 +512,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                     phiNhienLieu = (bg.MucNhienLieuBanGiao - mucNhienLieuTra) * 20000m;
                 }
 
-                // Hu hong: 20% co hu hong
                 decimal phiHuHong = 0;
                 if (i % 5 == 0 && i > 0)
                 {
@@ -555,7 +539,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
             await context.SaveChangesAsync();
 
             // =====================================================
-            // BUOC 10: THANH TOAN (cho cac don HoanThanh)
+            // BUOC 10: THANH TOAN
             // =====================================================
             var thanhToans = new List<ThanhToan>();
             var phuongThucList = new[]
@@ -577,7 +561,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 var don = donHoanThanh[i];
                 if (!traXeDict.TryGetValue(don.MaDatXe, out var tx)) continue;
 
-                // Tinh tien thue theo so ngay
                 var soNgay = Math.Max(1, (int)Math.Ceiling((don.ThoiGianTraDuKien - don.ThoiGianNhanDuKien).TotalDays));
                 var tienThue = soNgay * don.DonGiaApDung;
                 var tongPhuPhi = tx.TongPhuPhi;
@@ -600,7 +583,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 });
             }
 
-            // 2 don ChoThanhToan cung co ban ghi thanh toan nhung chua thanh toan
+            // 2 don ChoThanhToan co ban ghi thanh toan nhung chua thanh toan
             var donChoThanhToan = datXes
                 .Where(d => d.TrangThai == TrangThaiDatXe.ChoThanhToan)
                 .Take(2)

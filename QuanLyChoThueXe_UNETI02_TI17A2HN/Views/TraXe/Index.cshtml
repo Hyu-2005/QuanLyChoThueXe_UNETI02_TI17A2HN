@@ -104,9 +104,44 @@
                     <span asp-validation-for="GhiChu" class="text-danger"></span>
                 </div>
 
+                <!-- ============================================================== -->
+                <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
+                <!-- file: Views/TraXe/Index.cshtml -->
+                <!-- nội dung: Nghiệp vụ 8.7 - Thêm lựa chọn 'Xe có cần bảo dưỡng hay không' (Có hoặc Không) sau khi trả xe -->
+                <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
+                <!-- ============================================================== -->
+                <div class="card border-info mb-4" style="background: #f8fafc; border-radius: 10px;">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary fw-bold mb-3">
+                            Đánh Giá Kỹ Thuật &amp; Tình Trạng Xe Sau Trả
+                        </h5>
+                        <p class="mb-2 fw-bold text-dark">Xe có cần bảo dưỡng hay không?</p>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="canBaoDuong" id="baoDuongKhong" value="false" checked>
+                                <label class="form-check-label fw-semibold text-success" for="baoDuongKhong">
+                                    🟢 Không - Xe bình thường (Chuyển về trạng thái "Sẵn sàng" để tiếp tục cho thuê)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="canBaoDuong" id="baoDuongCo" value="true">
+                                <label class="form-check-label fw-semibold text-danger" for="baoDuongCo">
+                                    🔴 Có - Cần bảo dưỡng / sửa chữa (Chuyển về trạng thái "Bảo dưỡng", tạm ngừng cho thuê)
+                                </label>
+                            </div>
+                        </div>
+                        <div id="canhBaoBaoDuong" class="alert alert-warning mt-3 py-2 px-3 mb-0" style="display: none; font-size: 13px;">
+                            <strong>⚠️ Lưu ý:</strong> Xe sẽ được tự động chuyển sang trạng thái <strong>Bảo dưỡng</strong> và tạm thời ẩn khỏi kết quả tìm xe trống của khách hàng.
+                        </div>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Kết thúc Code của SV4 -->
+                <!-- ============================================================== -->
+
                 <div class="d-flex justify-content-end gap-2">
                     <a asp-controller="DatXe" asp-action="Details" asp-route-id="@datXe?.MaDatXe" class="btn btn-secondary">Hủy</a>
-                    <button type="submit" class="btn btn-warning" onclick="return confirm('Xác nhận nhận xe, lưu phụ phí và chuyển sang chờ thanh toán?')">Lưu & Chuyển Thanh Toán</button>
+                    <button type="submit" class="btn btn-warning" onclick="return xacNhanNhanXe()">Lưu &amp; Chuyển Thanh Toán</button>
                 </div>
             </form>
             <!-- ============================================================== -->
@@ -168,7 +203,49 @@
             
             var tong = phiQuaHan + phiVuotKm + phiNhienLieu + phiHuHong;
             document.getElementById('TongPhuPhiHienThi').innerText = tong.toLocaleString('vi-VN');
+
+            // Nghiệp vụ 8.7: Tự động phát hiện nếu có phí hư hỏng thì gợi ý/chọn Bảo dưỡng
+            kiemTraBaoDuongTuDong(phiHuHong);
         }
+
+        // ==============================================================
+        // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+        // file: Views/TraXe/Index.cshtml
+        // nội dung: Xử lý JS tự động đồng bộ Phí hư hỏng và lựa chọn Bảo dưỡng, xác nhận trước khi lưu
+        // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+        // ==============================================================
+        function kiemTraBaoDuongTuDong(phiHuHong) {
+            var radioCo = document.getElementById('baoDuongCo');
+            var alertBox = document.getElementById('canhBaoBaoDuong');
+
+            if (phiHuHong > 0) {
+                radioCo.checked = true;
+                alertBox.style.display = 'block';
+            }
+        }
+
+        document.getElementById('baoDuongCo').addEventListener('change', function() {
+            document.getElementById('canhBaoBaoDuong').style.display = this.checked ? 'block' : 'none';
+        });
+
+        document.getElementById('baoDuongKhong').addEventListener('change', function() {
+            var phiHuHong = parseFloat(document.getElementById('PhiHuHong').value) || 0;
+            if (phiHuHong > 0) {
+                alert('Lưu ý: Xe đang phát sinh Phí hư hỏng (> 0đ). Nếu xe vẫn hoạt động bình thường bạn có thể tiếp tục, nhưng khuyến nghị chuyển sang Bảo dưỡng để kiểm tra kỹ thuật!');
+            }
+            document.getElementById('canhBaoBaoDuong').style.display = 'none';
+        });
+
+        function xacNhanNhanXe() {
+            var laBaoDuong = document.getElementById('baoDuongCo').checked;
+            var msg = laBaoDuong 
+                ? "Xác nhận nhận xe và tính phụ phí?\n\n-> XE SẼ ĐƯỢC CHUYỂN SANG TRẠNG THÁI 'BẢO DƯỠNG' (Tạm dừng cho thuê cho đến khi kỹ thuật kiểm tra xong)."
+                : "Xác nhận nhận xe và tính phụ phí?\n\n-> XE SẼ ĐƯỢC CHUYỂN VỀ TRẠNG THÁI 'SẴN SÀNG' (Sẵn sàng phục vụ lượt thuê tiếp theo).";
+            return confirm(msg);
+        }
+        // ==============================================================
+        // Kết thúc Code của SV4
+        // ==============================================================
 
         document.getElementById('ThoiGianTraThucTe').addEventListener('change', tinhPhuPhi);
         document.getElementById('SoKmTra').addEventListener('input', tinhPhuPhi);

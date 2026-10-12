@@ -1,4 +1,4 @@
-﻿@*
+@*
     Details.cshtml - xem chi tiet xe
     sinh vien thuc hien: Dao Gia Hung - 23103100065
     module 2 - quan ly xe, bang gia thue
@@ -250,6 +250,29 @@
 
 <div class="detail-shell">
     <div class="detail-wrap">
+        <!-- ============================================================== -->
+        <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
+        <!-- file: Views/Xe/Details.cshtml -->
+        <!-- nội dung: Nghiệp vụ 8.7 - Hiển thị thông báo và nút 'Hoàn tất bảo dưỡng' đưa xe về trạng thái 'Sẵn sàng' -->
+        <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
+        <!-- ============================================================== -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <strong>Thành công!</strong> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                <strong>Lỗi!</strong> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        <!-- ============================================================== -->
+        <!-- Kết thúc Code của SV4 -->
+        <!-- ============================================================== -->
 
         <!-- HEADER -->
         <div class="detail-head">
@@ -264,10 +287,33 @@
 
             @if (laQuanTri)
             {
-                <a asp-action="Edit" asp-route-id="@Model.MaXe"
-                   class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">
-                    Sửa xe
-                </a>
+                <div class="d-flex gap-2">
+                    <!-- ============================================================== -->
+                    <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
+                    <!-- file: Views/Xe/Details.cshtml -->
+                    <!-- nội dung: Nghiệp vụ 8.7 - Nút nhanh chuyển trạng thái từ 'Bảo dưỡng' về 'Sẵn sàng' khi bảo dưỡng hoàn tất -->
+                    <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
+                    <!-- ============================================================== -->
+                    @if (Model.TinhTrang == TinhTrangXe.BaoDuong)
+                    {
+                        <form asp-controller="Xe" asp-action="DoiTinhTrang" method="post" class="d-inline"
+                              onsubmit="return confirm('Xác nhận xe đã bảo dưỡng xong và sẵn sàng phục vụ khách hàng?')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.MaXe" />
+                            <input type="hidden" name="tinhTrangMoi" value="@TinhTrangXe.SanSang" />
+                            <button type="submit" class="btn btn-success px-4 py-2 fw-semibold" style="border-radius:8px">
+                                ✔ Hoàn tất bảo dưỡng → Sẵn sàng
+                            </button>
+                        </form>
+                    }
+                    <!-- ============================================================== -->
+                    <!-- Kết thúc Code của SV4 -->
+                    <!-- ============================================================== -->
+                    <a asp-action="Edit" asp-route-id="@Model.MaXe"
+                       class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">
+                        Sửa xe
+                    </a>
+                </div>
             }
             else if (coTheDat)
             {

@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // File: Controllers/XeController.cs
 // Noi dung: Quan ly xe (CRUD + tim kiem + loc + sap xep + phan trang + upload anh)
 // Sinh vien thuc hien: Dao Gia Hung - 23103100065 - SV2
@@ -503,11 +503,20 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 }
             }
 
+            // ==============================================================
+            // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+            // file: Controllers/XeController.cs
+            // nội dung: Nghiệp vụ 8.7 - Chuyển hướng về trang chi tiết xe sau khi đổi trạng thái để hiển thị thông báo trực quan
+            // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+            // ==============================================================
             xe.TinhTrang = tinhTrangMoi;
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Da doi tinh trang xe thanh '{tinhTrangMoi}'";
-            return RedirectToAction(nameof(Index));
+            TempData["Success"] = $"Đã đổi tình trạng xe '{xe.BienSo}' thành '{tinhTrangMoi}'.";
+            return RedirectToAction(nameof(Details), new { id });
+            // ==============================================================
+            // Kết thúc Code của SV4
+            // ==============================================================
         }
 
         // =====================================================
