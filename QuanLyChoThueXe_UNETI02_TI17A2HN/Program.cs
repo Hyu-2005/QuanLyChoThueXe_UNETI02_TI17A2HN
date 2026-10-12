@@ -27,6 +27,8 @@ builder.Services.AddScoped<IXeTrongService, XeTrongService>();
 builder.Services.AddScoped<ITinhTienService, TinhTienService>();
 builder.Services.AddScoped<IThongKeService, ThongKeService>();
 builder.Services.AddScoped<IExportService, ExportService>();
+// Đăng ký QR Code Service
+builder.Services.AddScoped<IQRCodeService, QRCodeService>();
 
 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 

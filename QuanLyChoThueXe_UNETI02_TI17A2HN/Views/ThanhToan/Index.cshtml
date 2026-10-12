@@ -1,11 +1,13 @@
 ﻿@*
-    Index.cshtml - danh sach thanh toan
-    Họ và tên: Duong Lam Huy
+    Index.cshtml - Danh sách hóa đơn thanh toán
+    Họ và tên: Dương Lâm Huy
     Mã sinh viên: 23103100120
-    Nội dung: Danh sách hóa đơn + nút Xuất Excel
+    Nội dung: Danh sách hóa đơn có tìm kiếm, lọc, phân trang
+              + Xuất Excel + Thanh toán online
     Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThanhToan.ThanhToanListVM
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
 @{
     ViewData["Title"] = "Thanh toán";
     int stt = (Model.Trang - 1) * Model.KichThuocTrang;
@@ -27,25 +29,21 @@
     }
     .page-head .sub { font-size: 14px; color: #64748b; margin: 0; }
 
-    /* ===== NÚT XUẤT EXCEL ===== */
+    .head-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .head-actions .btn {
+        padding: 10px 20px; font-weight: 700; font-size: 13px;
+        border-radius: 10px; display: inline-flex; align-items: center; gap: 6px;
+    }
     .btn-export-excel {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 11px 22px;
         background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        color: #fff;
-        border: none; border-radius: 10px;
-        font-size: 13px; font-weight: 700;
-        text-decoration: none;
+        color: #fff; border: none;
         box-shadow: 0 4px 12px rgba(16,185,129,.25);
-        transition: all .2s;
-        white-space: nowrap;
     }
     .btn-export-excel:hover {
         color: #fff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(16,185,129,.4);
+        box-shadow: 0 6px 18px rgba(16,185,129,.35);
     }
-    .btn-export-excel .icon { font-size: 16px; }
 
     .stat-card {
         background: #fff;
@@ -205,6 +203,13 @@
         box-shadow: 0 6px 18px rgba(16,185,129,.35);
     }
 
+    .btn-clean.online {
+        color: #6d28d9; border-color: #c4b5fd; background: #faf5ff;
+    }
+    .btn-clean.online:hover {
+        background: #f3e8ff; border-color: #a78bfa; color: #6d28d9;
+    }
+
     .empty-state {
         padding: 72px 24px; text-align: center; color: #94a3b8;
     }
@@ -236,25 +241,26 @@
 <div class="page-shell">
     <div class="page-wrap">
 
-        <!-- HEADER + NÚT XUẤT EXCEL -->
+        <!-- HEADER -->
         <div class="page-head">
             <div>
                 <h1>Thanh toán</h1>
                 <p class="sub">Danh sách hóa đơn thanh toán trong hệ thống</p>
             </div>
-
-            <a asp-action="XuatExcel"
-               asp-route-tuKhoa="@Model.TuKhoa"
-               asp-route-trangThaiThanhToan="@Model.TrangThaiThanhToan"
-               asp-route-phuongThucThanhToan="@Model.PhuongThucThanhToan"
-               asp-route-tuNgay="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
-               asp-route-denNgay="@(Model.DenNgay?.ToString("yyyy-MM-dd"))"
-               class="btn-export-excel">
-                <span class="icon">📊</span>
-                Xuất Excel
-            </a>
+            <div class="head-actions">
+                <a asp-action="XuatExcel"
+                   asp-route-tuKhoa="@Model.TuKhoa"
+                   asp-route-trangThaiThanhToan="@Model.TrangThaiThanhToan"
+                   asp-route-phuongThucThanhToan="@Model.PhuongThucThanhToan"
+                   asp-route-tuNgay="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+                   asp-route-denNgay="@(Model.DenNgay?.ToString("yyyy-MM-dd"))"
+                   class="btn btn-export-excel">
+                    📊 Xuất Excel
+                </a>
+            </div>
         </div>
 
+        <!-- THÔNG BÁO -->
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show">
@@ -269,12 +275,21 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
+        @if (TempData["Warning"] != null)
+        {
+            <div class="alert alert-warning alert-dismissible fade show">
+                <strong>Cảnh báo.</strong> @TempData["Warning"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
 
+        <!-- STAT -->
         <div class="stat-card">
             <div class="lbl">Tổng doanh thu (trang hiện tại)</div>
             <div class="val">@Model.TongDoanhThu.ToString("N0") đ</div>
         </div>
 
+        <!-- FILTER -->
         <div class="filter-card">
             <form method="get" asp-action="Index">
                 <div class="row g-3 align-items-end">
@@ -321,6 +336,7 @@
             </form>
         </div>
 
+        <!-- DATA -->
         <div class="data-card">
             <div class="card-head">
                 <h6 class="title">Danh sách hóa đơn</h6>
@@ -340,7 +356,7 @@
                             <th class="text-end">Tổng</th>
                             <th>Phương thức</th>
                             <th>Trạng thái</th>
-                            <th class="text-end" style="width:200px">Thao tác</th>
+                            <th class="text-end" style="width:280px">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -351,15 +367,15 @@
                                 stt++;
                                 var statusClass = item.TrangThaiThanhToan switch
                                 {
-                                    "Chưa thanh toán" => "chua-tt",
-                                    "Đã thanh toán" => "da-tt",
-                                    "Hoàn tiền" => "hoan-tien",
+                                    TrangThaiThanhToan.ChuaThanhToan => "chua-tt",
+                                    TrangThaiThanhToan.DaThanhToan => "da-tt",
+                                    TrangThaiThanhToan.HoanTien => "hoan-tien",
                                     _ => "chua-tt"
                                 };
 
-                                var chuaThanhToan = item.TrangThaiThanhToan == "Chưa thanh toán"
+                                var chuaThanhToan = item.TrangThaiThanhToan == TrangThaiThanhToan.ChuaThanhToan
                                                  && item.DatXe != null
-                                                 && item.DatXe.TrangThai == "Chờ thanh toán";
+                                                 && item.DatXe.TrangThai == TrangThaiDatXe.ChoThanhToan;
 
                                 <tr>
                                     <td class="text-muted">@stt</td>
@@ -410,7 +426,14 @@
                                             {
                                                 <a asp-action="ThanhToan"
                                                    asp-route-id="@item.DatXe!.MaDatXe"
-                                                   class="btn-clean primary">Thanh toán</a>
+                                                   class="btn-clean primary">Tại quầy</a>
+
+                                                <a asp-controller="ThanhToanOnline"
+                                                   asp-action="Index"
+                                                   asp-route-id="@item.MaThanhToan"
+                                                   class="btn-clean online">
+                                                    💳 Online
+                                                </a>
                                             }
                                             <a asp-action="Details" asp-route-id="@item.MaThanhToan"
                                                class="btn-clean">Xem</a>

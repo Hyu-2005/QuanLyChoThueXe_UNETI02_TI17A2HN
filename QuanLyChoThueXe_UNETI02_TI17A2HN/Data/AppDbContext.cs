@@ -22,6 +22,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data
         public DbSet<TraXe> TraXes { get; set; }
         public DbSet<ThanhToan> ThanhToans { get; set; }
         public DbSet<GiayToKhachHang> GiayToKhachHangs { get; set; }
+        public DbSet<GiaoDichOnline> GiaoDichOnlines { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

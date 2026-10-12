@@ -1,0 +1,287 @@
+﻿@*
+    Index.cshtml - Chọn cổng thanh toán trực tuyến (giả lập)
+    Sinh viên thực hiện: Dương Lâm Huy - 23103100120 - SV5
+    Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThanhToan.ThanhToanOnlineVM
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
+@{
+    ViewData["Title"] = "Thanh toán trực tuyến";
+}
+
+<style>
+    .online-shell {
+        background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+        min-height: 100vh;
+        padding: 40px 0;
+    }
+    .online-wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    .online-card {
+        background: #fff;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(15,23,42,.12);
+    }
+    .online-head {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #fff;
+        padding: 32px 36px;
+    }
+    .online-head h1 {
+        font-size: 26px; font-weight: 800;
+        letter-spacing: -0.5px; margin: 0 0 6px 0;
+    }
+    .online-head p { font-size: 14px; opacity: .9; margin: 0; }
+
+    .online-body { padding: 32px 36px; }
+
+    .invoice-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 22px 26px;
+        margin-bottom: 28px;
+    }
+    .invoice-box .lbl {
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .8px;
+        color: #64748b; margin-bottom: 14px;
+    }
+    .invoice-row {
+        display: flex; justify-content: space-between;
+        padding: 8px 0; font-size: 14px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .invoice-row:last-child { border-bottom: none; }
+    .invoice-row .k { color: #64748b; }
+    .invoice-row .v { font-weight: 700; color: #0f172a; }
+    .invoice-row.total {
+        border-top: 2px solid #cbd5e1;
+        margin-top: 8px; padding-top: 14px;
+    }
+    .invoice-row.total .k {
+        font-size: 15px; font-weight: 700; color: #0f172a;
+    }
+    .invoice-row.total .v {
+        font-size: 26px; font-weight: 800; color: #b45309;
+        letter-spacing: -0.8px;
+    }
+
+    .section-label {
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        color: #64748b; margin: 0 0 16px 0;
+    }
+
+    .payment-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+    .payment-option {
+        position: relative;
+        border: 2px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 20px 22px;
+        cursor: pointer;
+        transition: all .18s;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .payment-option:hover {
+        border-color: #93c5fd;
+        background: #f0f9ff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(59,130,246,.1);
+    }
+    .payment-option input[type="radio"] { display: none; }
+    .payment-option .icon {
+        width: 46px; height: 46px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+        background: #eff6ff;
+    }
+    .payment-option .info { flex: 1; }
+    .payment-option .info .name {
+        font-size: 15px; font-weight: 700;
+        color: #0f172a; margin-bottom: 2px;
+    }
+    .payment-option .info .desc {
+        font-size: 12px; color: #64748b;
+    }
+    .payment-option:has(input[type="radio"]:checked) {
+        border-color: #3b82f6;
+        background: #eff6ff;
+        box-shadow: 0 8px 20px rgba(59,130,246,.15);
+    }
+    .payment-option:has(input[type="radio"]:checked)::after {
+        content: "✓";
+        position: absolute;
+        top: 10px; right: 12px;
+        width: 24px; height: 24px;
+        background: #3b82f6; color: #fff;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .notice {
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        padding: 14px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        color: #92400e;
+        margin-bottom: 24px;
+        line-height: 1.6;
+    }
+
+    .online-actions {
+        display: flex; justify-content: flex-end; gap: 12px;
+        padding-top: 24px;
+        border-top: 1px solid #f1f5f9;
+    }
+    .online-actions .btn {
+        padding: 12px 28px; font-weight: 700;
+        border-radius: 10px; font-size: 14px;
+    }
+    .btn-continue {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: #fff; border: none;
+        box-shadow: 0 4px 12px rgba(16,185,129,.25);
+    }
+    .btn-continue:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(16,185,129,.35);
+    }
+
+    @@media (max-width: 576px) {
+        .payment-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="online-shell">
+    <div class="online-wrap">
+        <div class="online-card">
+
+            <div class="online-head">
+                <h1>💳 Thanh toán trực tuyến</h1>
+                <p>Chọn cổng thanh toán để tiếp tục giao dịch</p>
+            </div>
+
+            <div class="online-body">
+
+                <!-- HÓA ĐƠN -->
+                <div class="invoice-box">
+                    <div class="lbl">Thông tin hóa đơn</div>
+                    <div class="invoice-row">
+                        <span class="k">Khách hàng</span>
+                        <span class="v">@Model.TenKhachHang</span>
+                    </div>
+                    <div class="invoice-row">
+                        <span class="k">Số điện thoại</span>
+                        <span class="v">@Model.SoDienThoai</span>
+                    </div>
+                    <div class="invoice-row">
+                        <span class="k">Xe thuê</span>
+                        <span class="v">@Model.TenXe - @Model.BienSo</span>
+                    </div>
+                    <div class="invoice-row total">
+                        <span class="k">Số tiền cần thanh toán</span>
+                        <span class="v">@Model.SoTien.ToString("N0") đ</span>
+                    </div>
+                </div>
+
+                <!-- FORM CHỌN CỔNG -->
+                <form asp-action="TaoGiaoDich" method="post">
+                    <input type="hidden" asp-for="MaThanhToan" />
+                    <input type="hidden" asp-for="SoTien" />
+                    <input type="hidden" asp-for="TenKhachHang" />
+                    <input type="hidden" asp-for="SoDienThoai" />
+                    <input type="hidden" asp-for="TenXe" />
+                    <input type="hidden" asp-for="BienSo" />
+
+                    <h6 class="section-label">Chọn cổng thanh toán</h6>
+
+                    <div class="payment-grid">
+                        <label class="payment-option">
+                            <input type="radio" asp-for="CongThanhToan"
+                                   value="@CongThanhToan.VNPay" />
+                            <span class="icon">🏦</span>
+                            <div class="info">
+                                <div class="name">VNPay</div>
+                                <div class="desc">Cổng thanh toán quốc gia</div>
+                            </div>
+                        </label>
+
+                        <label class="payment-option">
+                            <input type="radio" asp-for="CongThanhToan"
+                                   value="@CongThanhToan.MoMo" />
+                            <span class="icon">📱</span>
+                            <div class="info">
+                                <div class="name">Ví MoMo</div>
+                                <div class="desc">Ví điện tử phổ biến</div>
+                            </div>
+                        </label>
+
+                        <label class="payment-option">
+                            <input type="radio" asp-for="CongThanhToan"
+                                   value="@CongThanhToan.ZaloPay" />
+                            <span class="icon">💠</span>
+                            <div class="info">
+                                <div class="name">ZaloPay</div>
+                                <div class="desc">Ví điện tử Zalo</div>
+                            </div>
+                        </label>
+
+                        <label class="payment-option">
+                            <input type="radio" asp-for="CongThanhToan"
+                                   value="@CongThanhToan.Banking" />
+                            <span class="icon">🏧</span>
+                            <div class="info">
+                                <div class="name">Banking QR</div>
+                                <div class="desc">Quét QR chuyển khoản</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <span asp-validation-for="CongThanhToan"
+                          class="text-danger small d-block mb-3"></span>
+
+                    <div class="notice">
+                        <strong>ℹ️ Lưu ý:</strong> Đây là
+                        <strong>cổng thanh toán giả lập</strong>
+                        dùng cho mục đích học tập. Không phát sinh giao dịch thật.
+                        Sau khi chọn cổng, hệ thống sẽ tạo mã QR để bạn quét và xác nhận.
+                    </div>
+
+                    <div class="online-actions">
+                        <a asp-controller="ThanhToan" asp-action="Index"
+                           class="btn btn-outline-secondary">
+                            Hủy
+                        </a>
+                        <button type="submit" class="btn btn-continue">
+                            Tiếp tục →
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
