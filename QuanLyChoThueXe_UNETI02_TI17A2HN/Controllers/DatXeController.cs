@@ -572,9 +572,9 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Details), new { id });
             }
 
-            if (datXe.Xe.TinhTrang == TinhTrangXe.BaoDuong || datXe.Xe.TinhTrang == TinhTrangXe.NgungHoatDong)
+            if (datXe.Xe?.TinhTrang == TinhTrangXe.BaoDuong || datXe.Xe?.TinhTrang == TinhTrangXe.NgungHoatDong)
             {
-                TempData["Error"] = $"Khong the duyet vi xe dang o tinh trang: {datXe.Xe.TinhTrang}";
+                TempData["Error"] = $"Không thể duyệt vì xe đang ở tình trạng: {datXe.Xe?.TinhTrang}";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
