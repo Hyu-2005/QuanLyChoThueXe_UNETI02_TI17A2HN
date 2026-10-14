@@ -1,0 +1,225 @@
+﻿@*
+    QRCode.cshtml - Hiển thị mã QR thanh toán và xác nhận
+    Sinh viên thực hiện: Dương Lâm Huy - 23103100120 - SV5
+    Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThanhToan.ThanhToanOnlineVM
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
+@{
+    ViewData["Title"] = "Quét mã QR thanh toán";
+}
+
+<style>
+    .qr-shell {
+        background: linear-gradient(135deg, #ecfdf5 0%, #eff6ff 100%);
+        min-height: 100vh;
+        padding: 40px 0;
+    }
+    .qr-wrap { max-width: 640px; margin: 0 auto; padding: 0 24px; }
+
+    .qr-card {
+        background: #fff;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(15,23,42,.12);
+        text-align: center;
+    }
+    .qr-head {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: #fff;
+        padding: 28px 32px;
+    }
+    .qr-head h1 {
+        font-size: 22px; font-weight: 800;
+        letter-spacing: -0.4px; margin: 0 0 6px 0;
+    }
+    .qr-head p { font-size: 13px; opacity: .9; margin: 0; }
+
+    .qr-body { padding: 32px 36px; }
+
+    .timer-box {
+        background: #fef3c7;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-size: 13px;
+        color: #92400e;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+    .timer-box .countdown {
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        font-size: 15px;
+    }
+
+    .qr-frame {
+        display: inline-block;
+        padding: 16px;
+        background: #fff;
+        border: 3px dashed #3b82f6;
+        border-radius: 16px;
+        margin-bottom: 20px;
+    }
+    .qr-frame img {
+        width: 260px; height: 260px;
+        display: block;
+    }
+
+    .qr-info {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 18px 22px;
+        text-align: left;
+        margin-bottom: 22px;
+        font-size: 14px;
+    }
+    .qr-info .row-item {
+        display: flex; justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .qr-info .row-item:last-child { border-bottom: none; }
+    .qr-info .row-item .k { color: #64748b; }
+    .qr-info .row-item .v {
+        font-weight: 700; color: #0f172a;
+        font-variant-numeric: tabular-nums;
+    }
+    .qr-info .row-item.amount .k {
+        font-weight: 700; color: #0f172a;
+    }
+    .qr-info .row-item.amount .v {
+        color: #b45309; font-size: 22px; font-weight: 800;
+    }
+
+    .qr-actions {
+        display: flex; gap: 12px;
+        justify-content: center;
+    }
+    .qr-actions .btn {
+        padding: 12px 24px;
+        font-weight: 700;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+    .btn-confirm {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: #fff; border: none;
+        box-shadow: 0 4px 12px rgba(16,185,129,.25);
+    }
+    .btn-confirm:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(16,185,129,.35);
+    }
+    .btn-cancel {
+        color: #b91c1c; border: 1px solid #fca5a5; background: #fff;
+    }
+    .btn-cancel:hover { background: #fef2f2; }
+
+    .note-text {
+        margin-top: 18px;
+        font-size: 12px;
+        color: #94a3b8;
+        line-height: 1.6;
+    }
+</style>
+
+<div class="qr-shell">
+    <div class="qr-wrap">
+        <div class="qr-card">
+
+            <div class="qr-head">
+                <h1>📱 Quét mã QR để thanh toán</h1>
+                <p>Cổng: <strong>@Model.CongThanhToan</strong></p>
+            </div>
+
+            <div class="qr-body">
+
+                <div class="timer-box">
+                    ⏳ Vui lòng hoàn tất trong
+                    <span class="countdown" id="countdown">05:00</span>
+                </div>
+
+                <div class="qr-frame">
+                    <img src="data:image/png;base64,@Model.QRCodeBase64"
+                         alt="QR Code thanh toán" />
+                </div>
+
+                <div class="qr-info">
+                    <div class="row-item">
+                        <span class="k">Mã giao dịch</span>
+                        <span class="v">@Model.MaGiaoDichCode</span>
+                    </div>
+                    <div class="row-item">
+                        <span class="k">Khách hàng</span>
+                        <span class="v">@Model.TenKhachHang</span>
+                    </div>
+                    <div class="row-item">
+                        <span class="k">Xe thuê</span>
+                        <span class="v">@Model.TenXe - @Model.BienSo</span>
+                    </div>
+                    <div class="row-item amount">
+                        <span class="k">Số tiền</span>
+                        <span class="v">@Model.SoTien.ToString("N0") đ</span>
+                    </div>
+                </div>
+
+                <!-- NÚT HÀNH ĐỘNG (giả lập callback từ cổng) -->
+                <div class="qr-actions">
+                    <form asp-action="HuyGiaoDich" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="maGiaoDich" value="@Model.MaGiaoDichCode" />
+                        <button type="submit" class="btn btn-cancel"
+                                onclick="return confirm('Bạn có chắc muốn hủy giao dịch này?')">
+                            ✕ Hủy giao dịch
+                        </button>
+                    </form>
+
+                    <form asp-action="XacNhanThanhToan" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="maGiaoDich" value="@Model.MaGiaoDichCode" />
+                        <button type="submit" class="btn btn-confirm"
+                                onclick="return confirm('Xác nhận đã thanh toán thành công?\n\n(Đây là giả lập callback từ cổng thanh toán)')">
+                            ✅ Tôi đã thanh toán
+                        </button>
+                    </form>
+                </div>
+
+                <div class="note-text">
+                    * Nút "Tôi đã thanh toán" mô phỏng callback từ cổng thanh toán về hệ thống.
+                    Trong thực tế, cổng thanh toán sẽ gọi API này tự động sau khi khách quét QR.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Đếm ngược 5 phút
+        var totalSeconds = 5 * 60;
+        var countdownEl = document.getElementById('countdown');
+
+        function updateCountdown() {
+            if (totalSeconds <= 0) {
+                countdownEl.innerText = 'Hết hạn';
+                countdownEl.style.color = '#dc2626';
+                return;
+            }
+
+            var minutes = Math.floor(totalSeconds / 60);
+            var seconds = totalSeconds % 60;
+            countdownEl.innerText =
+                String(minutes).padStart(2, '0') + ':' +
+                String(seconds).padStart(2, '0');
+
+            totalSeconds--;
+            setTimeout(updateCountdown, 1000);
+        }
+
+        updateCountdown();
+    </script>
+}

@@ -1,712 +1,503 @@
 ﻿@*
-    ChiTiet.cshtml - Thong ke chi tiet bang LINQ
-    Họ và tên: Duong Lam Huy
-    Mã sinh viên: 23103100120
-    Nội dung thực hiện: Thống kê chi tiết xe, loại xe, hãng xe, doanh thu, khách hàng
+    ChiTiet.cshtml - Thống kê chi tiết
+    Sinh viên thực hiện: Dương Lâm Huy - 23103100120
+    Nội dung: Thống kê chi tiết xe, loại xe, hãng xe, doanh thu, khách hàng
     Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThongKe.ThongKeVM
+@using System.Text.Json
 @{
     ViewData["Title"] = "Thống kê chi tiết";
 }
 
-<style>
-    .stat-shell {
-        background: #f5f7fa;
-        min-height: 100vh;
-        padding: 28px 0 40px;
-    }
-    .stat-wrap {
-        max-width: 1480px;
-        margin: 0 auto;
-        padding: 0 28px;
-    }
+<!-- ============================================================ -->
+<!-- HEADER + FILTER                                               -->
+<!-- ============================================================ -->
+<section class="tk-header">
+    <div class="tk-header-left">
+        <a asp-action="Index" class="tk-back">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+            </svg>
+            Quay lại Dashboard
+        </a>
+        <h1 class="tk-title">Thống kê chi tiết</h1>
+        <p class="tk-subtitle">
+            Kỳ báo cáo:
+            <strong>@Model.TuNgay.ToString("dd/MM/yyyy")</strong>
+            –
+            <strong>@Model.DenNgay.ToString("dd/MM/yyyy")</strong>
+        </p>
+    </div>
 
-    /* ============ HEADER ============ */
-    .stat-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 24px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #e5e7eb;
-    }
-    .stat-header .back {
-        font-size: 13px;
-        color: #64748b;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        margin-bottom: 8px;
-    }
-    .stat-header .back:hover { color: #1d4ed8; }
-    .stat-header h1 {
-        font-size: 28px;
-        font-weight: 800;
-        color: #0f172a;
-        letter-spacing: -0.6px;
-        margin: 0 0 6px 0;
-    }
-    .stat-header .sub {
-        font-size: 14px;
-        color: #64748b;
-        margin: 0;
-    }
-    .stat-header .sub strong {
-        color: #1d4ed8;
-        font-weight: 700;
-    }
+    <div class="tk-header-actions">
+        <a asp-action="XuatPdf"
+           asp-route-tuNgay="@Model.TuNgay.ToString("yyyy-MM-dd")"
+           asp-route-denNgay="@Model.DenNgay.ToString("yyyy-MM-dd")"
+           class="tk-btn tk-btn-red">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Xuất PDF
+        </a>
+    </div>
+</section>
 
-    /* ============ FILTER ============ */
-    .filter-box {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        padding: 20px 24px;
-        margin-bottom: 24px;
-        display: flex;
-        gap: 16px;
-        align-items: flex-end;
-        flex-wrap: wrap;
-    }
-    .filter-box .form-group {
-        flex: 1;
-        min-width: 180px;
-    }
-    .filter-box .form-label {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-        color: #64748b;
-        margin-bottom: 6px;
-        display: block;
-    }
-    .filter-box .form-control {
-        border-radius: 8px;
-        border-color: #d1d5db;
-        font-size: 14px;
-        height: 42px;
-        width: 100%;
-    }
-    .filter-box .form-control:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
-    }
-    .filter-box .btn-group {
-        display: flex;
-        gap: 8px;
-    }
-    .filter-box .btn {
-        height: 42px;
-        padding: 0 20px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 700;
-    }
-    .filter-box .btn-primary {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-        border: none;
-        box-shadow: 0 4px 12px rgba(59,130,246,.25);
-    }
-    .filter-box .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(59,130,246,.35);
-    }
-
-    /* ============ SUMMARY GRID ============ */
-    .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 16px;
-        margin-bottom: 32px;
-    }
-    .summary-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        padding: 22px 24px;
-        position: relative;
-        overflow: hidden;
-        transition: all .2s;
-    }
-    .summary-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 28px rgba(15,23,42,.08);
-    }
-    .summary-card::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0;
-        width: 4px; height: 100%;
-    }
-    .summary-card.blue::before { background: linear-gradient(180deg, #1e3a8a, #3b82f6); }
-    .summary-card.green::before { background: linear-gradient(180deg, #059669, #10b981); }
-    .summary-card.amber::before { background: linear-gradient(180deg, #b45309, #f59e0b); }
-    .summary-card.red::before { background: linear-gradient(180deg, #b91c1c, #ef4444); }
-    .summary-card.purple::before { background: linear-gradient(180deg, #6d28d9, #8b5cf6); }
-
-    .summary-card .lbl {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .8px;
-        color: #64748b;
-        margin-bottom: 10px;
-    }
-    .summary-card .num {
-        font-size: 26px;
-        font-weight: 800;
-        color: #0f172a;
-        line-height: 1;
-        letter-spacing: -0.6px;
-        font-variant-numeric: tabular-nums;
-    }
-    .summary-card.blue .num { color: #1d4ed8; }
-    .summary-card.green .num { color: #059669; }
-    .summary-card.amber .num { color: #b45309; }
-    .summary-card.red .num { color: #b91c1c; }
-    .summary-card.purple .num { color: #6d28d9; }
-
-    .summary-card .sub {
-        font-size: 12px;
-        color: #94a3b8;
-        margin-top: 8px;
-    }
-
-    /* ============ SECTION ============ */
-    .section-head {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 32px 0 16px 0;
-    }
-    .section-head .icon {
-        width: 8px;
-        height: 24px;
-        background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%);
-        border-radius: 4px;
-    }
-    .section-head h6 {
-        font-size: 15px;
-        font-weight: 800;
-        color: #0f172a;
-        letter-spacing: -0.2px;
-        margin: 0;
-    }
-    .section-head .count {
-        font-size: 11px;
-        font-weight: 700;
-        padding: 4px 10px;
-        border-radius: 999px;
-        background: #eff6ff;
-        color: #1d4ed8;
-        text-transform: uppercase;
-        letter-spacing: .3px;
-    }
-
-    /* ============ DATA CARD ============ */
-    .data-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        overflow: hidden;
-        margin-bottom: 12px;
-    }
-    .data-card table {
-        margin: 0;
-        font-size: 14px;
-    }
-    .data-card thead th {
-        background: #f9fafb;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-        color: #475569;
-        padding: 14px 20px;
-        border-bottom: 1px solid #e5e7eb;
-        white-space: nowrap;
-    }
-    .data-card tbody td {
-        padding: 16px 20px;
-        border-bottom: 1px solid #f1f5f9;
-        vertical-align: middle;
-    }
-    .data-card tbody tr:last-child td { border-bottom: none; }
-    .data-card tbody tr:hover { background: #fafbfc; }
-
-    .rank-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        background: #f1f5f9;
-        color: #64748b;
-        font-weight: 800;
-        font-size: 13px;
-    }
-    .rank-badge.gold {
-        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-        color: #fff;
-        box-shadow: 0 3px 8px rgba(245,158,11,.35);
-    }
-    .rank-badge.silver {
-        background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
-        color: #fff;
-        box-shadow: 0 3px 8px rgba(148,163,184,.35);
-    }
-    .rank-badge.bronze {
-        background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
-        color: #fff;
-        box-shadow: 0 3px 8px rgba(234,88,12,.3);
-    }
-
-    .plate-tag {
-        display: inline-block;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        font-weight: 700;
-        font-size: 12px;
-        color: #0f172a;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-variant-numeric: tabular-nums;
-    }
-    .money {
-        font-variant-numeric: tabular-nums;
-        font-weight: 700;
-        color: #1d4ed8;
-    }
-
-    /* ============ BAR CHART ============ */
-    .chart-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        padding: 24px 28px;
-        margin-bottom: 12px;
-    }
-    .bar-item {
-        margin-bottom: 20px;
-    }
-    .bar-item:last-child { margin-bottom: 0; }
-    .bar-item .bar-label {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        margin-bottom: 8px;
-    }
-    .bar-item .bar-label .name {
-        font-size: 14px;
-        font-weight: 700;
-        color: #0f172a;
-    }
-    .bar-item .bar-label .name small {
-        color: #94a3b8;
-        font-weight: 500;
-        font-size: 12px;
-        margin-left: 6px;
-    }
-    .bar-item .bar-label .value {
-        font-size: 14px;
-        font-weight: 800;
-        color: #1d4ed8;
-        font-variant-numeric: tabular-nums;
-    }
-    .bar-track {
-        background: #f1f5f9;
-        border-radius: 999px;
-        height: 12px;
-        overflow: hidden;
-        position: relative;
-    }
-    .bar-fill {
-        background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
-        height: 100%;
-        border-radius: 999px;
-        transition: width .4s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    .bar-fill::after {
-        content: "";
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
-        animation: shine 2s infinite;
-    }
-    @@keyframes shine {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-    }
-
-    .empty-cell {
-        padding: 60px 20px !important;
-        text-align: center;
-        color: #94a3b8;
-        font-size: 14px;
-    }
-    .empty-cell .icon {
-        font-size: 42px;
-        color: #e5e7eb;
-        margin-bottom: 12px;
-        letter-spacing: 4px;
-    }
-
-    @@media (max-width: 992px) {
-        .summary-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @@media (max-width: 576px) {
-        .summary-grid { grid-template-columns: 1fr; }
-        .stat-header { flex-direction: column; align-items: flex-start; }
-    }
-</style>
-
-<div class="stat-shell">
-    <div class="stat-wrap">
-
-        <!-- HEADER -->
-        <div class="stat-header">
-            <div>
-                <a asp-action="Index" class="back">← Quay lại Dashboard</a>
-                <h1>Thống kê chi tiết</h1>
-                <p class="sub">
-                    Kỳ báo cáo:
-                    <strong>@Model.TuNgay.ToString("dd/MM/yyyy")</strong>
-                    –
-                    <strong>@Model.DenNgay.ToString("dd/MM/yyyy")</strong>
-                </p>
-            </div>
+<!-- ============================================================ -->
+<!-- FILTER BOX                                                    -->
+<!-- ============================================================ -->
+<section class="tk-filter">
+    <form method="get" asp-action="ChiTiet" class="tk-filter-form">
+        <div class="tk-filter-group">
+            <label class="tk-filter-label">Từ ngày</label>
+            <input type="date" name="tuNgay"
+                   value="@Model.TuNgay.ToString("yyyy-MM-dd")"
+                   class="tk-filter-input" />
         </div>
+        <div class="tk-filter-group">
+            <label class="tk-filter-label">Đến ngày</label>
+            <input type="date" name="denNgay"
+                   value="@Model.DenNgay.ToString("yyyy-MM-dd")"
+                   class="tk-filter-input" />
+        </div>
+        <div class="tk-filter-actions">
+            <a asp-action="ChiTiet" class="tk-btn tk-btn-ghost">Xóa lọc</a>
+            <button type="submit" class="tk-btn tk-btn-blue">Áp dụng</button>
+        </div>
+    </form>
+</section>
 
-        <!-- FILTER -->
-        <div class="filter-box">
-            <form method="get" asp-action="ChiTiet" style="display: contents;">
-                <div class="form-group">
-                    <label class="form-label">Từ ngày</label>
-                    <input type="date" name="tuNgay"
-                           value="@Model.TuNgay.ToString("yyyy-MM-dd")"
-                           class="form-control" />
+<!-- ============================================================ -->
+<!-- SUMMARY CARDS - 5 CHỈ SỐ CHÍNH                                -->
+<!-- ============================================================ -->
+<section class="tk-summary">
+
+    <!-- Tổng số đơn -->
+    <div class="tk-sum-card tk-sum-blue">
+        <div class="tk-sum-head">
+            <div class="tk-sum-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+            </div>
+            <div class="tk-sum-label">TỔNG SỐ ĐƠN</div>
+        </div>
+        <div class="tk-sum-value">@Model.TongSoDon</div>
+        <div class="tk-sum-note">Trong kỳ báo cáo</div>
+    </div>
+
+    <!-- Tổng doanh thu -->
+    <div class="tk-sum-card tk-sum-green">
+        <div class="tk-sum-head">
+            <div class="tk-sum-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="1" x2="12" y2="23" />
+                    <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                </svg>
+            </div>
+            <div class="tk-sum-label">TỔNG DOANH THU</div>
+        </div>
+        <div class="tk-sum-value">@Model.TongDoanhThu.ToString("N0")<span class="unit">đ</span></div>
+        <div class="tk-sum-note">VNĐ</div>
+    </div>
+
+    <!-- Tổng phụ phí -->
+    <div class="tk-sum-card tk-sum-amber">
+        <div class="tk-sum-head">
+            <div class="tk-sum-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+            </div>
+            <div class="tk-sum-label">TỔNG PHỤ PHÍ</div>
+        </div>
+        <div class="tk-sum-value">@Model.TongPhuPhi.ToString("N0")<span class="unit">đ</span></div>
+        <div class="tk-sum-note">VNĐ</div>
+    </div>
+
+    <!-- Tỷ lệ hủy -->
+    <div class="tk-sum-card tk-sum-red">
+        <div class="tk-sum-head">
+            <div class="tk-sum-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                    <line x1="9" y1="9" x2="15" y2="15" />
+                </svg>
+            </div>
+            <div class="tk-sum-label">TỶ LỆ HỦY / TỪ CHỐI</div>
+        </div>
+        <div class="tk-sum-value">@Model.TyLeHuy.ToString("N2")<span class="unit">%</span></div>
+        <div class="tk-sum-note">
+            @Model.SoDonHuy hủy · @Model.SoDonTuChoi từ chối
+        </div>
+    </div>
+
+    <!-- Tỷ lệ khai thác -->
+    <div class="tk-sum-card tk-sum-purple">
+        <div class="tk-sum-head">
+            <div class="tk-sum-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+            </div>
+            <div class="tk-sum-label">TỶ LỆ KHAI THÁC</div>
+        </div>
+        <div class="tk-sum-value">@Model.TyLeKhaiThac.ToString("N2")<span class="unit">%</span></div>
+        <div class="tk-sum-note">
+            TB @Model.ThoiLuongThueTrungBinh ngày/đơn
+        </div>
+    </div>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- CHARTS ROW                                                    -->
+<!-- ============================================================ -->
+<section class="tk-charts">
+
+    <!-- Chart 1: Số lượt thuê theo loại xe (Bar) -->
+    <div class="tk-chart-card">
+        <div class="tk-chart-head">
+            <div class="tk-chart-title-wrap">
+                <div class="tk-chart-icon tk-icon-blue">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10" />
+                        <line x1="12" y1="20" x2="12" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="14" />
+                    </svg>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Đến ngày</label>
-                    <input type="date" name="denNgay"
-                           value="@Model.DenNgay.ToString("yyyy-MM-dd")"
-                           class="form-control" />
-                </div>
-                <div class="btn-group">
-                    <a asp-action="ChiTiet" class="btn btn-outline-secondary">Xóa lọc</a>
-                    <button type="submit" class="btn btn-primary">Áp dụng</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- SUMMARY -->
-        <div class="summary-grid">
-            <div class="summary-card blue">
-                <div class="lbl">Tổng số đơn</div>
-                <div class="num">@Model.TongSoDon</div>
-                <div class="sub">Trong kỳ báo cáo</div>
-            </div>
-            <div class="summary-card green">
-                <div class="lbl">Tổng doanh thu</div>
-                <div class="num">@Model.TongDoanhThu.ToString("N0")</div>
-                <div class="sub">VNĐ</div>
-            </div>
-            <div class="summary-card amber">
-                <div class="lbl">Tổng phụ phí</div>
-                <div class="num">@Model.TongPhuPhi.ToString("N0")</div>
-                <div class="sub">VNĐ</div>
-            </div>
-            <div class="summary-card red">
-                <div class="lbl">Tỷ lệ hủy / từ chối</div>
-                <div class="num">@Model.TyLeHuy.ToString("N2")%</div>
-                <div class="sub">
-                    @Model.SoDonHuy hủy · @Model.SoDonTuChoi từ chối
-                </div>
-            </div>
-            <div class="summary-card purple">
-                <div class="lbl">Tỷ lệ khai thác</div>
-                <div class="num">@Model.TyLeKhaiThac.ToString("N2")%</div>
-                <div class="sub">TB @Model.ThoiLuongThueTrungBinh ngày/đơn</div>
+                <h3 class="tk-chart-title">Số lượt thuê theo loại xe</h3>
             </div>
         </div>
-
-        <!-- TOP XE -->
-        <div class="section-head">
-            <div class="icon"></div>
-            <h6>Top xe được thuê nhiều nhất</h6>
-            <span class="count">@Model.TopXeThueNhieu.Count xe</span>
-        </div>
-
-        <div class="data-card">
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
-                        <tr>
-                            <th style="width:70px">Hạng</th>
-                            <th>Biển số</th>
-                            <th>Tên xe</th>
-                            <th>Loại xe</th>
-                            <th class="text-end">Số lần thuê</th>
-                            <th class="text-end">Doanh thu</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.TopXeThueNhieu.Any())
-                        {
-                            int idx = 0;
-                            foreach (var item in Model.TopXeThueNhieu)
-                            {
-                                idx++;
-                                var rankClass = idx switch
-                                {
-                                    1 => "gold",
-                                    2 => "silver",
-                                    3 => "bronze",
-                                    _ => ""
-                                };
-                                <tr>
-                                    <td>
-                                        <span class="rank-badge @rankClass">@idx</span>
-                                    </td>
-                                    <td>
-                                        <span class="plate-tag">@item.BienSo</span>
-                                    </td>
-                                    <td><strong>@item.TenXe</strong></td>
-                                    <td class="text-muted">@item.TenLoaiXe</td>
-                                    <td class="text-end">
-                                        <strong style="font-size:15px">@item.SoLanThue</strong>
-                                    </td>
-                                    <td class="text-end">
-                                        <span class="money">@item.DoanhThu.ToString("N0") đ</span>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="6" class="empty-cell">
-                                    <div class="icon">— — —</div>
-                                    Chưa có dữ liệu
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- THEO LOAI XE -->
-        <div class="section-head">
-            <div class="icon"></div>
-            <h6>Thống kê theo loại xe</h6>
-            <span class="count">@Model.ThongKeTheoLoaiXe.Count loại</span>
-        </div>
-
-        <div class="data-card">
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
-                        <tr>
-                            <th>Loại xe</th>
-                            <th class="text-end">Số lần thuê</th>
-                            <th class="text-end">Doanh thu</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.ThongKeTheoLoaiXe.Any())
-                        {
-                            foreach (var item in Model.ThongKeTheoLoaiXe)
-                            {
-                                <tr>
-                                    <td><strong>@item.TenLoaiXe</strong></td>
-                                    <td class="text-end">
-                                        <strong style="font-size:15px">@item.SoLanThue</strong>
-                                    </td>
-                                    <td class="text-end">
-                                        <span class="money">@item.DoanhThu.ToString("N0") đ</span>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="3" class="empty-cell">
-                                    <div class="icon">— — —</div>
-                                    Chưa có dữ liệu
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- THEO HANG XE -->
-        <div class="section-head">
-            <div class="icon"></div>
-            <h6>Thống kê theo hãng xe</h6>
-            <span class="count">@Model.ThongKeTheoHangXe.Count hãng</span>
-        </div>
-
-        <div class="data-card">
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
-                        <tr>
-                            <th>Hãng xe</th>
-                            <th class="text-end">Số lần thuê</th>
-                            <th class="text-end">Doanh thu</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.ThongKeTheoHangXe.Any())
-                        {
-                            foreach (var item in Model.ThongKeTheoHangXe)
-                            {
-                                <tr>
-                                    <td><strong>@item.TenHangXe</strong></td>
-                                    <td class="text-end">
-                                        <strong style="font-size:15px">@item.SoLanThue</strong>
-                                    </td>
-                                    <td class="text-end">
-                                        <span class="money">@item.DoanhThu.ToString("N0") đ</span>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="3" class="empty-cell">
-                                    <div class="icon">— — —</div>
-                                    Chưa có dữ liệu
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- DOANH THU THEO THANG -->
-        <div class="section-head">
-            <div class="icon"></div>
-            <h6>Doanh thu theo tháng</h6>
-        </div>
-
-        <div class="chart-card">
-            @if (Model.DoanhThuTheoThang.Any())
+        <div class="tk-chart-body">
+            @if (Model.ThongKeTheoLoaiXe.Any())
             {
-                var maxDoanhThu = Model.DoanhThuTheoThang.Max(x => x.DoanhThu);
-                foreach (var item in Model.DoanhThuTheoThang)
-                {
-                    var phanTram = maxDoanhThu > 0
-                        ? (int)(item.DoanhThu / maxDoanhThu * 100)
-                        : 0;
-
-                    <div class="bar-item">
-                        <div class="bar-label">
-                            <div class="name">
-                                Tháng @item.Thang/@item.Nam
-                                <small>@item.SoDon đơn</small>
-                            </div>
-                            <div class="value">@item.DoanhThu.ToString("N0") đ</div>
-                        </div>
-                        <div class="bar-track">
-                            <div class="bar-fill" style="width:@phanTram%"></div>
-                        </div>
-                    </div>
-                }
+                <canvas id="loaiXeChart"></canvas>
             }
             else
             {
-                <div class="empty-cell">
-                    <div class="icon">— — —</div>
-                    Chưa có dữ liệu doanh thu
-                </div>
+                <div class="tk-empty">Chưa có dữ liệu</div>
             }
         </div>
+    </div>
 
-        <!-- TOP KHACH HANG -->
-        <div class="section-head">
-            <div class="icon"></div>
-            <h6>Top khách hàng thuê nhiều nhất</h6>
-            <span class="count">@Model.TopKhachHang.Count khách</span>
+    <!-- Chart 2: Doanh thu theo hãng xe (Pie) -->
+    <div class="tk-chart-card">
+        <div class="tk-chart-head">
+            <div class="tk-chart-title-wrap">
+                <div class="tk-chart-icon tk-icon-green">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                    </svg>
+                </div>
+                <h3 class="tk-chart-title">Doanh thu theo hãng xe</h3>
+            </div>
         </div>
+        <div class="tk-chart-body">
+            @if (Model.ThongKeTheoHangXe.Any())
+            {
+                <canvas id="hangXeChart"></canvas>
+            }
+            else
+            {
+                <div class="tk-empty">Chưa có dữ liệu</div>
+            }
+        </div>
+    </div>
 
-        <div class="data-card">
-            <div class="table-responsive">
-                <table class="table align-middle">
+</section>
+
+<!-- ============================================================ -->
+<!-- CHART LINE: DOANH THU THEO THÁNG                              -->
+<!-- ============================================================ -->
+<section class="tk-charts-full">
+    <div class="tk-chart-card">
+        <div class="tk-chart-head">
+            <div class="tk-chart-title-wrap">
+                <div class="tk-chart-icon tk-icon-purple">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                    </svg>
+                </div>
+                <h3 class="tk-chart-title">Doanh thu theo tháng</h3>
+            </div>
+        </div>
+        <div class="tk-chart-body" style="height: 280px;">
+            @if (Model.DoanhThuTheoThang.Any())
+            {
+                <canvas id="doanhThuThangChart"></canvas>
+            }
+            else
+            {
+                <div class="tk-empty">Chưa có dữ liệu</div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- TABLES                                                        -->
+<!-- ============================================================ -->
+<section class="tk-tables">
+
+    <!-- Bảng 1: Top xe được thuê nhiều nhất -->
+    <div class="tk-table-card">
+        <div class="tk-table-head">
+            <div class="tk-table-title-wrap">
+                <div class="tk-table-icon tk-icon-blue">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 17h14M5 17v-4l2-5h10l2 5v4M5 17v3h2v-3m10 0v3h2v-3" />
+                    </svg>
+                </div>
+                <h3 class="tk-table-title">Top xe được thuê nhiều nhất</h3>
+                <span class="tk-table-badge">@Model.TopXeThueNhieu.Count xe</span>
+            </div>
+        </div>
+        <div class="tk-table-body">
+            @if (Model.TopXeThueNhieu.Any())
+            {
+                <table class="tk-table">
                     <thead>
                         <tr>
-                            <th style="width:70px">Hạng</th>
+                            <th style="width:60px;">Hạng</th>
+                            <th>Biển số</th>
+                            <th>Tên xe</th>
+                            <th>Loại xe</th>
+                            <th class="text-end">Số lượt thuê</th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ int idx = 0; }
+                        @foreach (var item in Model.TopXeThueNhieu)
+                        {
+                            idx++;
+                            var rankCls = idx switch
+                            {
+                                1 => "tk-rank-gold",
+                                2 => "tk-rank-silver",
+                                3 => "tk-rank-bronze",
+                                _ => ""
+                            };
+                            <tr>
+                                <td><span class="tk-rank @rankCls">@idx</span></td>
+                                <td><span class="tk-plate">@item.BienSo</span></td>
+                                <td><strong>@item.TenXe</strong></td>
+                                <td class="text-muted">@item.TenLoaiXe</td>
+                                <td class="text-end"><strong>@item.SoLanThue</strong></td>
+                                <td class="text-end"><span class="tk-money">@item.DoanhThu.ToString("N0") đ</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="tk-empty">Chưa có dữ liệu</div>
+            }
+        </div>
+    </div>
+
+    <!-- Bảng 2: Thống kê theo loại xe -->
+    <div class="tk-table-card">
+        <div class="tk-table-head">
+            <div class="tk-table-title-wrap">
+                <div class="tk-table-icon tk-icon-amber">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                    </svg>
+                </div>
+                <h3 class="tk-table-title">Thống kê theo loại xe</h3>
+                <span class="tk-table-badge">@Model.ThongKeTheoLoaiXe.Count loại</span>
+            </div>
+        </div>
+        <div class="tk-table-body">
+            @if (Model.ThongKeTheoLoaiXe.Any())
+            {
+                <table class="tk-table">
+                    <thead>
+                        <tr>
+                            <th>Loại xe</th>
+                            <th class="text-end">Số lượt thuê</th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ThongKeTheoLoaiXe)
+                        {
+                            <tr>
+                                <td><strong>@item.TenLoaiXe</strong></td>
+                                <td class="text-end"><strong>@item.SoLanThue</strong></td>
+                                <td class="text-end"><span class="tk-money">@item.DoanhThu.ToString("N0") đ</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="tk-empty">Chưa có dữ liệu</div>
+            }
+        </div>
+    </div>
+
+    <!-- Bảng 3: Thống kê theo hãng xe -->
+    <div class="tk-table-card">
+        <div class="tk-table-head">
+            <div class="tk-table-title-wrap">
+                <div class="tk-table-icon tk-icon-green">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <h3 class="tk-table-title">Thống kê theo hãng xe</h3>
+                <span class="tk-table-badge">@Model.ThongKeTheoHangXe.Count hãng</span>
+            </div>
+        </div>
+        <div class="tk-table-body">
+            @if (Model.ThongKeTheoHangXe.Any())
+            {
+                <table class="tk-table">
+                    <thead>
+                        <tr>
+                            <th>Hãng xe</th>
+                            <th class="text-end">Số lượt thuê</th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ThongKeTheoHangXe)
+                        {
+                            <tr>
+                                <td><strong>@item.TenHangXe</strong></td>
+                                <td class="text-end"><strong>@item.SoLanThue</strong></td>
+                                <td class="text-end"><span class="tk-money">@item.DoanhThu.ToString("N0") đ</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="tk-empty">Chưa có dữ liệu</div>
+            }
+        </div>
+    </div>
+
+    <!-- Bảng 4: Top khách hàng -->
+    <div class="tk-table-card">
+        <div class="tk-table-head">
+            <div class="tk-table-title-wrap">
+                <div class="tk-table-icon tk-icon-purple">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                </div>
+                <h3 class="tk-table-title">Top khách hàng thuê nhiều nhất</h3>
+                <span class="tk-table-badge">@Model.TopKhachHang.Count khách</span>
+            </div>
+        </div>
+        <div class="tk-table-body">
+            @if (Model.TopKhachHang.Any())
+            {
+                <table class="tk-table">
+                    <thead>
+                        <tr>
+                            <th style="width:60px;">Hạng</th>
                             <th>Khách hàng</th>
                             <th>Số điện thoại</th>
-                            <th class="text-end">Số lần thuê</th>
+                            <th class="text-end">Số lượt thuê</th>
                             <th class="text-end">Tổng chi tiêu</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model.TopKhachHang.Any())
+                        @{ int idxKh = 0; }
+                        @foreach (var item in Model.TopKhachHang)
                         {
-                            int idx = 0;
-                            foreach (var item in Model.TopKhachHang)
+                            idxKh++;
+                            var rankCls = idxKh switch
                             {
-                                idx++;
-                                var rankClass = idx switch
-                                {
-                                    1 => "gold",
-                                    2 => "silver",
-                                    3 => "bronze",
-                                    _ => ""
-                                };
-                                <tr>
-                                    <td>
-                                        <span class="rank-badge @rankClass">@idx</span>
-                                    </td>
-                                    <td><strong>@item.HoTen</strong></td>
-                                    <td class="text-muted">@item.SoDienThoai</td>
-                                    <td class="text-end">
-                                        <strong style="font-size:15px">@item.SoLanThue</strong>
-                                    </td>
-                                    <td class="text-end">
-                                        <span class="money">@item.TongChiTieu.ToString("N0") đ</span>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
+                                1 => "tk-rank-gold",
+                                2 => "tk-rank-silver",
+                                3 => "tk-rank-bronze",
+                                _ => ""
+                            };
                             <tr>
-                                <td colspan="5" class="empty-cell">
-                                    <div class="icon">— — —</div>
-                                    Chưa có dữ liệu
-                                </td>
+                                <td><span class="tk-rank @rankCls">@idxKh</span></td>
+                                <td><strong>@item.HoTen</strong></td>
+                                <td class="text-muted">@item.SoDienThoai</td>
+                                <td class="text-end"><strong>@item.SoLanThue</strong></td>
+                                <td class="text-end"><span class="tk-money">@item.TongChiTieu.ToString("N0") đ</span></td>
                             </tr>
                         }
                     </tbody>
                 </table>
+            }
+            else
+            {
+                <div class="tk-empty">Chưa có dữ liệu</div>
+            }
+        </div>
+    </div>
+
+    <!-- Bảng 5: Tổng phụ phí theo loại -->
+    <div class="tk-table-card">
+        <div class="tk-table-head">
+            <div class="tk-table-title-wrap">
+                <div class="tk-table-icon tk-icon-red">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                </div>
+                <h3 class="tk-table-title">Tổng phụ phí theo loại</h3>
             </div>
         </div>
-
-        <!-- PHU PHI THEO LOAI -->
-        <div class="section-head">
-            <div class="icon"></div>
-            <h6>Tổng phụ phí theo loại</h6>
-        </div>
-
-        <div class="data-card">
-            <div class="table-responsive">
-                <table class="table align-middle">
+        <div class="tk-table-body">
+            @if (Model.PhuPhiTheoLoai.Any())
+            {
+                <table class="tk-table">
                     <thead>
                         <tr>
                             <th>Loại phí</th>
@@ -719,18 +510,742 @@
                         {
                             <tr>
                                 <td><strong>@item.LoaiPhi</strong></td>
-                                <td class="text-end">
-                                    <strong style="font-size:15px">@item.SoLan</strong>
-                                </td>
-                                <td class="text-end">
-                                    <span class="money">@item.TongTien.ToString("N0") đ</span>
-                                </td>
+                                <td class="text-end"><strong>@item.SoLan</strong></td>
+                                <td class="text-end"><span class="tk-money">@item.TongTien.ToString("N0") đ</span></td>
                             </tr>
                         }
                     </tbody>
                 </table>
-            </div>
+            }
+            else
+            {
+                <div class="tk-empty">Chưa có dữ liệu</div>
+            }
         </div>
-
     </div>
-</div>
+
+</section>
+
+<style>
+    /* ============================================================
+       LAYOUT WRAPPER
+       ============================================================ */
+    .tk-header,
+    .tk-filter,
+    .tk-summary,
+    .tk-charts,
+    .tk-charts-full,
+    .tk-tables {
+        max-width: 1480px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .tk-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 24px;
+        padding: 8px 0 24px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid #e5e7eb;
+        flex-wrap: wrap;
+    }
+    .tk-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 8px;
+        transition: color .15s;
+    }
+    .tk-back:hover { color: #2563eb; }
+    .tk-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.8px;
+        margin: 0 0 6px 0;
+    }
+    .tk-subtitle {
+        font-size: 14px;
+        color: #64748b;
+        margin: 0;
+    }
+    .tk-subtitle strong { color: #1d4ed8; font-weight: 700; }
+
+    .tk-header-actions { display: flex; gap: 10px; }
+
+    /* Buttons */
+    .tk-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all .2s;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .tk-btn-red {
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(220,38,38,.25);
+    }
+    .tk-btn-red:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 22px rgba(220,38,38,.35);
+    }
+    .tk-btn-blue {
+        background: #2563eb;
+        color: #fff;
+    }
+    .tk-btn-blue:hover { background: #1d4ed8; color: #fff; }
+    .tk-btn-ghost {
+        background: #fff;
+        border-color: #d1d5db;
+        color: #374151;
+    }
+    .tk-btn-ghost:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+        color: #111827;
+    }
+
+    /* ============================================================
+       FILTER
+       ============================================================ */
+    .tk-filter {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+    }
+    .tk-filter-form {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    .tk-filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 180px;
+    }
+    .tk-filter-label {
+        font-size: 11.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+    }
+    .tk-filter-input {
+        height: 42px;
+        padding: 0 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #0f172a;
+        outline: none;
+        transition: all .15s;
+    }
+    .tk-filter-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+    .tk-filter-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 10px;
+    }
+
+    /* ============================================================
+       SUMMARY CARDS
+       ============================================================ */
+    .tk-summary {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .tk-sum-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 20px 22px;
+        position: relative;
+        overflow: hidden;
+        transition: all .2s;
+        display: flex;
+        flex-direction: column;
+    }
+    .tk-sum-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+    }
+    .tk-sum-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(15,23,42,.08);
+    }
+    .tk-sum-blue::before { background: linear-gradient(180deg, #1e3a8a, #3b82f6); }
+    .tk-sum-green::before { background: linear-gradient(180deg, #059669, #10b981); }
+    .tk-sum-amber::before { background: linear-gradient(180deg, #b45309, #f59e0b); }
+    .tk-sum-red::before { background: linear-gradient(180deg, #b91c1c, #ef4444); }
+    .tk-sum-purple::before { background: linear-gradient(180deg, #6d28d9, #8b5cf6); }
+
+    .tk-sum-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+    .tk-sum-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .tk-sum-blue .tk-sum-icon { background: #dbeafe; color: #2563eb; }
+    .tk-sum-green .tk-sum-icon { background: #dcfce7; color: #16a34a; }
+    .tk-sum-amber .tk-sum-icon { background: #fef3c7; color: #d97706; }
+    .tk-sum-red .tk-sum-icon { background: #fee2e2; color: #dc2626; }
+    .tk-sum-purple .tk-sum-icon { background: #ede9fe; color: #7c3aed; }
+
+    .tk-sum-label {
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: #64748b;
+    }
+    .tk-sum-value {
+        font-size: 26px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.8px;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+        margin-bottom: 6px;
+    }
+    .tk-sum-value .unit {
+        font-size: 14px;
+        font-weight: 600;
+        color: #94a3b8;
+        margin-left: 4px;
+    }
+    .tk-sum-blue .tk-sum-value { color: #1d4ed8; }
+    .tk-sum-green .tk-sum-value { color: #059669; }
+    .tk-sum-amber .tk-sum-value { color: #b45309; }
+    .tk-sum-red .tk-sum-value { color: #b91c1c; }
+    .tk-sum-purple .tk-sum-value { color: #6d28d9; }
+
+    .tk-sum-note {
+        font-size: 11.5px;
+        color: #94a3b8;
+        line-height: 1.4;
+    }
+
+    /* ============================================================
+       CHARTS
+       ============================================================ */
+    .tk-charts {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    .tk-charts-full {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    .tk-chart-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        transition: all .2s;
+    }
+    .tk-chart-card:hover {
+        box-shadow: 0 12px 28px rgba(15,23,42,.06);
+    }
+    .tk-chart-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .tk-chart-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .tk-chart-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .tk-icon-blue { background: #dbeafe; color: #2563eb; }
+    .tk-icon-green { background: #dcfce7; color: #16a34a; }
+    .tk-icon-amber { background: #fef3c7; color: #d97706; }
+    .tk-icon-red { background: #fee2e2; color: #dc2626; }
+    .tk-icon-purple { background: #ede9fe; color: #7c3aed; }
+
+    .tk-chart-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+    .tk-chart-body {
+        padding: 16px 20px 20px;
+        height: 320px;
+        position: relative;
+    }
+
+    /* ============================================================
+       TABLES
+       ============================================================ */
+    .tk-tables {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    .tk-table-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        transition: all .2s;
+    }
+    .tk-table-card:hover {
+        box-shadow: 0 12px 28px rgba(15,23,42,.06);
+    }
+    .tk-table-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .tk-table-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .tk-table-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .tk-table-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+    .tk-table-badge {
+        font-size: 11px;
+        font-weight: 700;
+        background: #f1f5f9;
+        color: #64748b;
+        padding: 4px 10px;
+        border-radius: 999px;
+        margin-left: 6px;
+    }
+    .tk-table-body { overflow-x: auto; }
+    .tk-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+    .tk-table thead th {
+        background: #f9fafb;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+        white-space: nowrap;
+    }
+    .tk-table tbody td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .tk-table tbody tr:last-child td { border-bottom: none; }
+    .tk-table tbody tr:hover { background: #fafbfc; }
+    .tk-table .text-end { text-align: right; }
+    .tk-table .text-muted { color: #94a3b8; }
+
+    .tk-rank {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 800;
+    }
+    .tk-rank-gold { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #fff; }
+    .tk-rank-silver { background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%); color: #fff; }
+    .tk-rank-bronze { background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%); color: #fff; }
+
+    .tk-plate {
+        display: inline-block;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-variant-numeric: tabular-nums;
+    }
+    .tk-money {
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+        color: #1d4ed8;
+    }
+
+    /* Empty state */
+    .tk-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+        font-size: 13.5px;
+        font-weight: 500;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @@media (max-width: 1200px) {
+        .tk-summary {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    @@media (max-width: 1024px) {
+        .tk-charts,
+        .tk-tables {
+            grid-template-columns: 1fr;
+        }
+        .tk-summary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @@media (max-width: 640px) {
+        .tk-title { font-size: 22px; }
+        .tk-summary { grid-template-columns: 1fr; }
+        .tk-filter-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .tk-filter-group { min-width: auto; }
+        .tk-filter-actions { margin-left: 0; }
+        .tk-filter-actions .tk-btn { flex: 1; justify-content: center; }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        // ============================================================
+        // DATA FROM SERVER
+        // ============================================================
+        var loaiXeLabels = @Html.Raw(JsonSerializer.Serialize(
+            Model.ThongKeTheoLoaiXe.Select(x => x.TenLoaiXe ?? "-").ToList()
+        ));
+        var loaiXeData = @Html.Raw(JsonSerializer.Serialize(
+            Model.ThongKeTheoLoaiXe.Select(x => x.SoLanThue).ToList()
+        ));
+
+        var hangXeLabels = @Html.Raw(JsonSerializer.Serialize(
+            Model.ThongKeTheoHangXe.Select(x => x.TenHangXe ?? "-").ToList()
+        ));
+        var hangXeData = @Html.Raw(JsonSerializer.Serialize(
+            Model.ThongKeTheoHangXe.Select(x => x.DoanhThu).ToList()
+        ));
+
+        var thangLabels = @Html.Raw(JsonSerializer.Serialize(
+            Model.DoanhThuTheoThang.Select(x => "T" + x.Thang + "/" + x.Nam).ToList()
+        ));
+        var thangData = @Html.Raw(JsonSerializer.Serialize(
+            Model.DoanhThuTheoThang.Select(x => x.DoanhThu).ToList()
+        ));
+        var thangSoDon = @Html.Raw(JsonSerializer.Serialize(
+            Model.DoanhThuTheoThang.Select(x => x.SoDon).ToList()
+        ));
+
+        // ============================================================
+        // CHART 1: BAR - Số lượt thuê theo loại xe
+        // ============================================================
+        var loaiXeCanvas = document.getElementById('loaiXeChart');
+        if (loaiXeCanvas) {
+            new Chart(loaiXeCanvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: loaiXeLabels,
+                    datasets: [{
+                        label: 'Số lượt thuê',
+                        data: loaiXeData,
+                        backgroundColor: 'rgba(59,130,246,.85)',
+                        borderColor: '#1d4ed8',
+                        borderWidth: 0,
+                        borderRadius: 8,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function (ctx) {
+                                    return 'Số lượt thuê: ' + ctx.parsed.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                color: '#94a3b8',
+                                font: { size: 11 }
+                            },
+                            grid: { color: '#f1f5f9', drawBorder: false }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 11 }
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        // CHART 2: PIE - Doanh thu theo hãng xe
+        // ============================================================
+        var hangXeCanvas = document.getElementById('hangXeChart');
+        if (hangXeCanvas) {
+            new Chart(hangXeCanvas.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: hangXeLabels,
+                    datasets: [{
+                        data: hangXeData,
+                        backgroundColor: [
+                            '#1d4ed8',
+                            '#10b981',
+                            '#f59e0b',
+                            '#8b5cf6',
+                            '#06b6d4',
+                            '#ef4444',
+                            '#84cc16'
+                        ],
+                        borderWidth: 3,
+                        borderColor: '#fff',
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '55%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 12,
+                                font: { size: 11 },
+                                color: '#475569',
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                boxWidth: 8,
+                                boxHeight: 8
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function (ctx) {
+                                    var total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    var pct = total > 0 ? (ctx.parsed / total * 100).toFixed(1) : 0;
+                                    return ctx.label + ': ' +
+                                        new Intl.NumberFormat('vi-VN').format(ctx.parsed) +
+                                        ' đ (' + pct + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        // CHART 3: LINE - Doanh thu theo tháng
+        // ============================================================
+        var thangCanvas = document.getElementById('doanhThuThangChart');
+        if (thangCanvas) {
+            var ctx = thangCanvas.getContext('2d');
+            var grad = ctx.createLinearGradient(0, 0, 0, 280);
+            grad.addColorStop(0, 'rgba(139,92,246,.35)');
+            grad.addColorStop(1, 'rgba(139,92,246,.02)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: thangLabels,
+                    datasets: [
+                        {
+                            label: 'Doanh thu (VNĐ)',
+                            data: thangData,
+                            borderColor: '#8b5cf6',
+                            backgroundColor: grad,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#8b5cf6',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Số đơn',
+                            data: thangSoDon,
+                            borderColor: '#10b981',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                padding: 14,
+                                font: { size: 11, weight: '600' },
+                                color: '#475569',
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                boxWidth: 8,
+                                boxHeight: 8
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function (ctx) {
+                                    if (ctx.dataset.yAxisID === 'y') {
+                                        return ctx.dataset.label + ': ' +
+                                            new Intl.NumberFormat('vi-VN').format(ctx.parsed.y) + ' đ';
+                                    }
+                                    return ctx.dataset.label + ': ' + ctx.parsed.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            position: 'left',
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { size: 11 },
+                                callback: function (v) {
+                                    return new Intl.NumberFormat('vi-VN', {
+                                        notation: 'compact',
+                                        compactDisplay: 'short'
+                                    }).format(v);
+                                }
+                            },
+                            grid: { color: '#f1f5f9', drawBorder: false }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { size: 11 },
+                                stepSize: 1
+                            },
+                            grid: { display: false }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { size: 11 }
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}

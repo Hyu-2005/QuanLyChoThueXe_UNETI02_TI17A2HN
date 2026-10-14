@@ -1,6 +1,7 @@
 // ThanhToanController.cs - quan ly thanh toan
 // sinh vien thuc hien: Duong Lam Huy - 23103100120
 // module 5 - tinh tien, thanh toan, lich su va thong ke
+// + Chuc nang nang cao: Xuat Excel danh sach + In hoa don PDF
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -16,19 +17,29 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
     [SessionAuthorize]
     public class ThanhToanController : Controller
     {
+        // =====================================================
+        // FIELDS - KHAI BAO DUY NHAT 1 LAN
+        // =====================================================
         private readonly AppDbContext _context;
         private readonly ITinhTienService _tinhTienService;
+        private readonly IExportService _exportService;
 
-        public ThanhToanController(AppDbContext context, ITinhTienService tinhTienService)
+        // =====================================================
+        // CONSTRUCTOR - CHI 1 DUY NHAT
+        // =====================================================
+        public ThanhToanController(
+            AppDbContext context,
+            ITinhTienService tinhTienService,
+            IExportService exportService)
         {
             _context = context;
             _tinhTienService = tinhTienService;
+            _exportService = exportService;
         }
 
         // =====================================================
         // DANH SACH THANH TOAN
         // =====================================================
-
         [HttpGet]
         public async Task<IActionResult> Index(
             string? tuKhoa,
@@ -124,7 +135,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         // =====================================================
         // THANH TOAN DON - GET
         // =====================================================
-
         [HttpGet]
         [SessionAuthorize(Roles = new[] { VaiTro.Admin, VaiTro.NhanVien })]
         public async Task<IActionResult> ThanhToan(int id)
@@ -193,7 +203,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         // =====================================================
         // THANH TOAN DON - POST
         // =====================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [SessionAuthorize(Roles = new[] { VaiTro.Admin, VaiTro.NhanVien })]
@@ -238,8 +247,9 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             var ketQua = _tinhTienService.TinhThanhToan(datXe, datXe.TraXe);
 
             // Kiem tra xem da co ban ghi Chua Thanh Toan nao chua (thuong do Seed tao)
-            var thanhToan = datXe.ThanhToans.FirstOrDefault(t => t.TrangThaiThanhToan == TrangThaiThanhToan.ChuaThanhToan);
-            
+            var thanhToan = datXe.ThanhToans
+                .FirstOrDefault(t => t.TrangThaiThanhToan == TrangThaiThanhToan.ChuaThanhToan);
+
             if (thanhToan != null)
             {
                 // Cap nhat ban ghi hien tai
@@ -284,7 +294,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         // =====================================================
         // CHI TIET THANH TOAN
         // =====================================================
-
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -320,9 +329,76 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         }
 
         // =====================================================
+        // XUAT EXCEL DANH SACH THANH TOAN (Chuc nang nang cao)
+        // =====================================================
+        [HttpGet]
+        [SessionAuthorize(Roles = new[] { VaiTro.Admin, VaiTro.NhanVien })]
+        public async Task<IActionResult> XuatExcel(
+            string? tuKhoa,
+            string? trangThaiThanhToan,
+            string? phuongThucThanhToan,
+            DateTime? tuNgay,
+            DateTime? denNgay)
+        {
+            var query = _context.ThanhToans
+                .Include(t => t.DatXe).ThenInclude(d => d!.KhachHang)
+                .Include(t => t.DatXe).ThenInclude(d => d!.Xe)
+                .AsNoTracking()
+                .AsQueryable();
+
+            // Ap dung filter (giong Index)
+            if (!string.IsNullOrWhiteSpace(tuKhoa))
+            {
+                var kw = tuKhoa.Trim();
+                query = query.Where(t =>
+                    (t.DatXe != null && t.DatXe.KhachHang != null && t.DatXe.KhachHang.HoTen.Contains(kw)) ||
+                    (t.DatXe != null && t.DatXe.Xe != null && t.DatXe.Xe.BienSo.Contains(kw)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(trangThaiThanhToan))
+                query = query.Where(t => t.TrangThaiThanhToan == trangThaiThanhToan);
+
+            if (!string.IsNullOrWhiteSpace(phuongThucThanhToan))
+                query = query.Where(t => t.PhuongThucThanhToan == phuongThucThanhToan);
+
+            if (tuNgay.HasValue)
+                query = query.Where(t => t.NgayThanhToan >= tuNgay.Value);
+            if (denNgay.HasValue)
+                query = query.Where(t => t.NgayThanhToan <= denNgay.Value);
+
+            var danhSach = await query.OrderByDescending(t => t.NgayThanhToan).ToListAsync();
+
+            var bytes = _exportService.XuatDanhSachThanhToanExcel(danhSach);
+            var fileName = $"DanhSachThanhToan_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+
+            return File(bytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
+
+        // =====================================================
+        // XUAT PDF HOA DON (Chuc nang nang cao)
+        // =====================================================
+        [HttpGet]
+        public async Task<IActionResult> XuatHoaDonPdf(int id)
+        {
+            var thanhToan = await _context.ThanhToans
+                .Include(t => t.DatXe).ThenInclude(d => d!.KhachHang)
+                .Include(t => t.DatXe).ThenInclude(d => d!.Xe)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.MaThanhToan == id);
+
+            if (thanhToan == null)
+                return NotFound();
+
+            var bytes = _exportService.XuatHoaDonPdf(thanhToan);
+            return File(bytes, "application/pdf",
+                $"HoaDon_{id}_{DateTime.Now:yyyyMMdd}.pdf");
+        }
+
+        // =====================================================
         // HELPER
         // =====================================================
-
         private async Task LoadThongTinThanhToanAsync(ThanhToanVM vm)
         {
             var datXe = await _context.DatXes
