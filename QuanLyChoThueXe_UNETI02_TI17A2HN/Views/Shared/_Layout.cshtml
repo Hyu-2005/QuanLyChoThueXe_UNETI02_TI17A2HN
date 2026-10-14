@@ -282,21 +282,12 @@
                                             Khách hàng
                                         </a>
                                     </li>
-                                    @* ==============================================================
-                                       Bắt Đầu Code của SV3: Vũ Tiến Đạt
-                                       file: Views/Shared/_Layout.cshtml
-                                       nội dung: Thêm menu "Kiểm tra giấy tờ" cho Admin/Nhân viên (xác minh hoặc từ chối giấy tờ khách hàng tải lên).
-                                       sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
-                                       ============================================================== *@
                                     <li>
                                         <a class="dropdown-item @ActiveClass("GiayTo")"
                                            asp-controller="GiayTo" asp-action="Index">
                                             Kiểm tra giấy tờ
                                         </a>
                                     </li>
-                                    @* ==============================================================
-                                       Kết thúc Code của SV3
-                                       ============================================================== *@
                                     <li>
                                         <a class="dropdown-item @ActiveClass("DatXe", "Index")"
                                            asp-controller="DatXe" asp-action="Index">
@@ -367,21 +358,12 @@
                                     Đơn của tôi
                                 </a>
                             </li>
-                            @* ==============================================================
-                               Bắt Đầu Code của SV3: Vũ Tiến Đạt
-                               file: Views/Shared/_Layout.cshtml
-                               nội dung: Thêm menu "Giấy tờ của tôi" cho khách hàng (tải và theo dõi trạng thái giấy tờ CCCD, GPLX).
-                               sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
-                               ============================================================== *@
                             <li class="nav-item">
                                 <a class="nav-link @ActiveClass("GiayTo")"
                                    asp-controller="GiayTo" asp-action="CuaToi">
                                     Giấy tờ của tôi
                                 </a>
                             </li>
-                            @* ==============================================================
-                               Kết thúc Code của SV3
-                               ============================================================== *@
                         }
                     </ul>
 
@@ -420,18 +402,9 @@
                         }
                         else
                         {
-                            @* ==============================================================
-                               Bắt Đầu Code của SV3: Vũ Tiến Đạt
-                               file: Views/Shared/_Layout.cshtml
-                               nội dung: Thêm link "Đăng ký" khi chưa đăng nhập để khách hàng tự tạo tài khoản.
-                               sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
-                               ============================================================== *@
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="DangKy" asp-action="Index">Đăng ký</a>
                             </li>
-                            @* ==============================================================
-                               Kết thúc Code của SV3
-                               ============================================================== *@
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="TaiKhoan" asp-action="DangNhap">
                                     Đăng nhập
