@@ -1,0 +1,244 @@
+@* ==============================================================
+   Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+   file: Views/BanGiaoXe/BienBanDienTu.cshtml
+   nội dung: STT 9 - Giao diện Biên bản bàn giao điện tử có tích hợp Mã QR Code xác thực nhanh
+   sinh viên thực hiện: Nguyễn Hoàng Đức Hiếu - 23103100116 - SV4
+   ============================================================== *@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.DatXe
+
+@{
+    ViewData["Title"] = $"Biên bản bàn giao xe #{Model.MaDatXe}";
+    var bg = Model.BanGiaoXe;
+    var qrBase64 = ViewBag.QRCodeBase64 as string;
+    var urlXacThuc = ViewBag.UrlXacThuc as string;
+}
+
+<div class="container py-4">
+    <!-- ACTION BAR (KHÔNG IN) -->
+    <div class="d-flex justify-content-between align-items-center mb-4 d-print-none flex-wrap gap-2">
+        <a asp-controller="DatXe" asp-action="Details" asp-route-id="@Model.MaDatXe" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> &larr; Quay lại chi tiết đơn
+        </a>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("QRCodeImage", "BanGiaoXe", new { id = Model.MaDatXe })" class="btn btn-outline-primary" download>
+                <i class="bi bi-qr-code"></i> Tải mã QR (.PNG)
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="bi bi-printer"></i> In biên bản bàn giao (PDF)
+            </button>
+        </div>
+    </div>
+
+    <!-- KHUNG BIÊN BẢN BÀN GIAO -->
+    <div class="card shadow-sm border-0 bien-ban-wrapper p-4 p-md-5 bg-white">
+        <!-- QUỐC HIỆU & TIÊU NGỮ -->
+        <div class="row align-items-center mb-4 pb-3 border-bottom">
+            <div class="col-8">
+                <div class="text-uppercase fw-bold text-muted small">CÔNG TY TNHH CHO THUÊ XE TỰ LÁI UNETI</div>
+                <div class="small text-muted">Địa chỉ: 218 Lĩnh Nam, Hoàng Mai, Hà Nội</div>
+                <div class="small text-muted">Hotline: 1900 6868 - Email: hotro@rentcar.vn</div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="fw-bold small text-uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+                <div class="small fst-italic">Độc lập - Tự do - Hạnh phúc</div>
+                <div class="small">----------o0o----------</div>
+            </div>
+        </div>
+
+        <!-- TIÊU ĐỀ BIÊN BẢN & MÃ QR -->
+        <div class="row align-items-center my-3">
+            <div class="col-md-9 text-center text-md-start">
+                <h3 class="fw-bold text-uppercase text-primary mb-1">BIÊN BẢN BÀN GIAO PHƯƠNG TIỆN</h3>
+                <div class="text-muted">Mã đơn đặt xe: <strong class="text-dark">#MDX-@Model.MaDatXe</strong></div>
+                <div class="text-muted small">Thời gian lập biên bản: @(bg?.ThoiGianBanGiao.ToString("dd/MM/yyyy HH:mm") ?? DateTime.Now.ToString("dd/MM/yyyy HH:mm"))</div>
+            </div>
+            <div class="col-md-3 text-center text-md-end mt-3 mt-md-0">
+                <div class="d-inline-block p-2 border rounded bg-light text-center">
+                    @if (!string.IsNullOrEmpty(qrBase64))
+                    {
+                        <img src="data:image/png;base64,@qrBase64" alt="QR Code Xác thực biên bản" style="width: 110px; height: 110px;" />
+                    }
+                    <div class="small text-muted mt-1" style="font-size: 11px;">
+                        <i class="bi bi-shield-check text-success"></i> Quét mã xác thực
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- I. THÔNG TIN CÁC BÊN -->
+        <div class="row g-4 my-2">
+            <div class="col-md-6">
+                <div class="p-3 border rounded h-100 bg-light-subtle">
+                    <h6 class="fw-bold text-uppercase text-secondary border-bottom pb-2">I. BÊN GIAO (ĐẠI DIỆN CÔNG TY)</h6>
+                    <table class="table table-sm table-borderless mb-0 small">
+                        <tr>
+                            <td class="text-muted" style="width: 120px;">Đại diện:</td>
+                            <td class="fw-bold">@(bg?.NguoiBanGiao ?? "Đại diện UNETI")</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Đơn vị:</td>
+                            <td>Công ty Cho Thuê Xe Tự Lái UNETI</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Địa chỉ nhận xe:</td>
+                            <td>@Model.DiaDiemNhan</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="p-3 border rounded h-100 bg-light-subtle">
+                    <h6 class="fw-bold text-uppercase text-secondary border-bottom pb-2">II. BÊN NHẬN (KHÁCH HÀNG)</h6>
+                    <table class="table table-sm table-borderless mb-0 small">
+                        <tr>
+                            <td class="text-muted" style="width: 120px;">Họ và tên:</td>
+                            <td class="fw-bold">@Model.KhachHang?.HoTen</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Số điện thoại:</td>
+                            <td>@Model.KhachHang?.SoDienThoai</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">GPLX / CCCD:</td>
+                            <td>@(Model.KhachHang?.SoGiayPhepLaiXe ?? "Đã xác minh hồ sơ")</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Địa chỉ:</td>
+                            <td>@(Model.KhachHang?.DiaChi ?? "Chưa cập nhật")</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- III. THÔNG TIN PHƯƠNG TIỆN -->
+        <div class="mt-4">
+            <h6 class="fw-bold text-uppercase text-secondary border-bottom pb-2">III. THÔNG TIN PHƯƠNG TIỆN BÀN GIAO</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tên xe</th>
+                            <th>Biển số</th>
+                            <th>Hãng xe / Loại xe</th>
+                            <th>Năm SX</th>
+                            <th>Màu sắc</th>
+                            <th>Số chỗ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold text-primary">@Model.Xe?.TenXe</td>
+                            <td><span class="badge bg-dark fs-6 font-monospace">@Model.Xe?.BienSo</span></td>
+                            <td>@Model.Xe?.HangXe?.TenHangXe / @Model.Xe?.LoaiXe?.TenLoaiXe</td>
+                            <td>@Model.Xe?.NamSanXuat</td>
+                            <td>@(Model.Xe?.MauSac ?? "Tiêu chuẩn")</td>
+                            <td>@Model.Xe?.SoCho chỗ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- IV. TÌNH TRẠNG KHI BÀN GIAO -->
+        <div class="mt-4">
+            <h6 class="fw-bold text-uppercase text-secondary border-bottom pb-2">IV. CHỈ SỐ VẬN HÀNH & TÌNH TRẠNG KỸ THUẬT KHI BÀN GIAO</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="border rounded p-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Số KM tại thời điểm bàn giao:</span>
+                            <span class="fs-5 fw-bold text-success">@((bg?.SoKmBanGiao ?? 0).ToString("N0")) km</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Mức nhiên liệu thực tế:</span>
+                            <span class="fs-5 fw-bold text-info">@(bg?.MucNhienLieuBanGiao ?? 100)%</span>
+                        </div>
+                        <div class="progress mt-2" style="height: 10px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: @(bg?.MucNhienLieuBanGiao ?? 100)%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="border rounded p-3 bg-light h-100">
+                        <div class="text-muted small fw-bold mb-1">Mô tả tình trạng phương tiện khi bàn giao:</div>
+                        <div class="small text-dark fst-italic">
+                            @(string.IsNullOrWhiteSpace(bg?.TinhTrangBanGiao) ? "Xe sạch sẽ, thân vỏ và nội thất nguyên vẹn, máy móc hoạt động bình thường, đầy đủ lốp dự phòng và phụ kiện kèm theo." : bg.TinhTrangBanGiao)
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(bg?.GhiChu))
+                        {
+                            <div class="mt-2 text-muted small"><strong>Ghi chú bổ sung:</strong> @bg.GhiChu</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- V. DANH MỤC GIẤY TỜ & PHỤ KIỆN BÀN GIAO KÈM THEO -->
+        <div class="mt-4">
+            <h6 class="fw-bold text-uppercase text-secondary border-bottom pb-2">V. GIẤY TỜ VÀ PHỤ KIỆN BÀN GIAO ĐI KÈM</h6>
+            <div class="row small g-2">
+                <div class="col-6 col-md-3"><i class="bi bi-check-circle-fill text-success"></i> 01 Bản sao Đăng ký xe</div>
+                <div class="col-6 col-md-3"><i class="bi bi-check-circle-fill text-success"></i> 01 Giấy Chứng nhận Đăng kiểm</div>
+                <div class="col-6 col-md-3"><i class="bi bi-check-circle-fill text-success"></i> 01 Bảo hiểm TNDS bắt buộc</div>
+                <div class="col-6 col-md-3"><i class="bi bi-check-circle-fill text-success"></i> 01 Chìa khóa thông minh</div>
+                <div class="col-6 col-md-3"><i class="bi bi-check-circle-fill text-success"></i> 01 Lốp dự phòng & Kích xe</div>
+                <div class="col-6 col-md-3"><i class="bi bi-check-circle-fill text-success"></i> 01 Camera hành trình</div>
+                <div class="col-6 col-md-3"><i class="bi bi-check-circle-fill text-success"></i> Bộ thảm lót sàn cao cấp</div>
+                <div class="col-6 col-md-3"><i class="bi bi-check-circle-fill text-success"></i> Cáp sạc & Thiết bị cứu hộ</div>
+            </div>
+        </div>
+
+        <!-- CAM KẾT & CHỮ KÝ -->
+        <div class="mt-5 pt-3 border-top">
+            <p class="small text-muted fst-italic text-center">
+                Hai bên đã cùng nhau kiểm tra thực tế tình trạng xe, đối chiếu giấy tờ và đồng ý ký biên bản bàn giao này.
+                Biên bản được lập thành 02 bản điện tử và lưu trữ đối soát trực tiếp trên hệ thống qua Mã QR Code xác thực.
+            </p>
+            <div class="row text-center mt-4">
+                <div class="col-6">
+                    <div class="fw-bold text-uppercase">ĐẠI DIỆN BÊN NHẬN</div>
+                    <div class="small text-muted">(Khách hàng ký và ghi rõ họ tên)</div>
+                    <div style="height: 70px;"></div>
+                    <div class="fw-bold">@Model.KhachHang?.HoTen</div>
+                </div>
+                <div class="col-6">
+                    <div class="fw-bold text-uppercase">ĐẠI DIỆN BÊN GIAO</div>
+                    <div class="small text-muted">(Nhân viên kiểm tra và bàn giao)</div>
+                    <div style="height: 70px;">
+                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2 text-uppercase fs-6">
+                            <i class="bi bi-patch-check-fill"></i> ĐÃ BÀN GIAO
+                        </span>
+                    </div>
+                    <div class="fw-bold">@(bg?.NguoiBanGiao ?? "Đại diện UNETI")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        body {
+            background: #fff !important;
+            color: #000 !important;
+            font-size: 13px !important;
+        }
+        .app-navbar, .app-footer, .d-print-none {
+            display: none !important;
+        }
+        .bien-ban-wrapper {
+            box-shadow: none !important;
+            padding: 0 !important;
+            border: none !important;
+        }
+        .table {
+            border-color: #000 !important;
+        }
+    }
+</style>
+@* ==============================================================
+   Kết thúc Code của SV4
+   ============================================================== *@

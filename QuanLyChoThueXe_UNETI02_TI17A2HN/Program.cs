@@ -75,6 +75,17 @@ builder.Services.AddScoped<IExportService, ExportService>();
 // Đăng ký QR Code Service
 builder.Services.AddScoped<IQRCodeService, QRCodeService>();
 
+// ==============================================================
+// Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+// file: Program.cs
+// nội dung: STT 10 - Đăng ký IEmailService phục vụ gửi email xác nhận và từ chối duyệt đơn
+// sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+// ==============================================================
+builder.Services.AddScoped<IEmailService, EmailService>();
+// ==============================================================
+// Kết thúc Code của SV4
+// ==============================================================
+
 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var app = builder.Build();

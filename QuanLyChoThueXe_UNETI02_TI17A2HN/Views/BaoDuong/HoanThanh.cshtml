@@ -1,0 +1,106 @@
+@* ==============================================================
+   Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+   file: Views/BaoDuong/HoanThanh.cshtml
+   nội dung: STT 11 - Form nghiệm thu hoàn tất bảo dưỡng, tự động chuyển trạng thái xe về "Sẵn sàng"
+   sinh viên thực hiện: Nguyễn Hoàng Đức Hiếu - 23103100116 - SV4
+   ============================================================== *@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.LichSuBaoDuong
+
+@{
+    ViewData["Title"] = $"Nghiệm thu bảo dưỡng #{Model.MaBaoDuong}";
+}
+
+<div class="container py-4" style="max-width: 800px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">
+                <i class="bi bi-check2-circle text-success"></i> Nghiệm thu hoàn tất bảo dưỡng
+            </h3>
+            <p class="text-muted small mb-0">Xác nhận hoàn thành các hạng mục sửa chữa và mở khóa xe đưa vào kinh doanh tiếp.</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            &larr; Quay lại danh sách
+        </a>
+    </div>
+
+    <!-- THÔNG TIN XE ĐANG BẢO DƯỠNG -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4 bg-light-subtle">
+        <div class="card-body p-4">
+            <h6 class="fw-bold text-uppercase text-secondary mb-3 border-bottom pb-2">Thông tin phương tiện & Phiếu bảo dưỡng</h6>
+            <div class="row g-3 small">
+                <div class="col-md-6">
+                    <div>Phương tiện: <strong class="text-primary fs-6">@Model.Xe?.TenXe</strong></div>
+                    <div>Biển số: <span class="badge bg-dark font-monospace">@Model.Xe?.BienSo</span></div>
+                    <div>Phân loại: <strong>@Model.Xe?.LoaiXe?.TenLoaiXe</strong> | Hãng: <strong>@Model.Xe?.HangXe?.TenHangXe</strong></div>
+                </div>
+                <div class="col-md-6">
+                    <div>Mã phiếu: <strong>#BD-@Model.MaBaoDuong</strong></div>
+                    <div>Phân loại bảo dưỡng: <span class="badge bg-warning text-dark">@Model.LoaiBaoDuong</span></div>
+                    <div>Ngày bắt đầu: <strong>@Model.NgayBatDau.ToString("dd/MM/yyyy HH:mm")</strong></div>
+                    <div>Số KM khi vào xưởng: <strong>@Model.SoKmKhiBaoDuong.ToString("N0") km</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORM NGHIỆM THU -->
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-4 p-md-5">
+            <div class="alert alert-success border-0 d-flex align-items-center mb-4">
+                <i class="bi bi-info-circle-fill fs-4 me-3 text-success"></i>
+                <div class="small">
+                    <strong>Cơ chế tự động:</strong> Khi bấm <strong>"Xác nhận hoàn tất & Mở khóa xe"</strong>, hệ thống sẽ tự động cập nhật tình trạng xe 
+                    <strong>@Model.Xe?.BienSo</strong> từ <span class="badge bg-warning text-dark">Bảo dưỡng</span> về <span class="badge bg-success">Sẵn sàng</span>, cho phép khách hàng tìm và thuê xe ngay lập tức.
+                </div>
+            </div>
+
+            <form asp-action="HoanThanh" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.MaBaoDuong" />
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Ngày hoàn thành thực tế <span class="text-danger">*</span></label>
+                        <input name="ngayHoanThanh" type="datetime-local" class="form-control"
+                               value="@(Model.NgayHoanThanh.HasValue ? Model.NgayHoanThanh.Value.ToString("yyyy-MM-ddTHH:mm") : DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Tổng chi phí thực tế (VNĐ) <span class="text-danger">*</span></label>
+                        <input name="chiPhi" type="number" class="form-control"
+                               value="@Model.ChiPhi.ToString("F0")" min="0" step="1000" required />
+                        <div class="form-text small">Chi phí sửa chữa thực tế theo hóa đơn của xưởng.</div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Gara / Đơn vị thực hiện</label>
+                        <input name="garaBaoDuong" class="form-control" value="@Model.GaraBaoDuong"
+                               placeholder="Tên gara hoặc trạm bảo hành ủy quyền" />
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Nội dung nghiệm thu & Phụ tùng thay thế <span class="text-danger">*</span></label>
+                        <textarea name="noiDungBaoDuong" rows="4" class="form-control" required
+                                  placeholder="Ghi rõ chi tiết: Đã thay dầu máy Castrol 4L, lọc nhớt chính hãng, cân chỉnh góc đặt bánh xe, kiểm tra hệ thống phanh an toàn...">@Model.NoiDungBaoDuong</textarea>
+                        <div class="form-text small">Lưu lại phục vụ đối soát và theo dõi lý lịch phương tiện.</div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Ghi chú bổ sung</label>
+                        <textarea name="ghiChu" rows="2" class="form-control" placeholder="Ghi chú thêm về chế độ bảo hành phụ tùng...">@Model.GhiChu</textarea>
+                    </div>
+
+                    <div class="col-12 mt-4 text-end">
+                        <a asp-action="Index" class="btn btn-light me-2">Hủy</a>
+                        <button type="submit" class="btn btn-success px-4 py-2 fw-bold text-white">
+                            <i class="bi bi-check2-circle"></i> Xác nhận hoàn tất & Mở khóa xe về "Sẵn sàng"
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@* ==============================================================
+   Kết thúc Code của SV4
+   ============================================================== *@

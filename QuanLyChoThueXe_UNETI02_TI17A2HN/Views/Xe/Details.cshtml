@@ -505,6 +505,87 @@
                 </div>
             }
         </div>
+
+        <!-- ============================================================== -->
+        <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
+        <!-- file: Views/Xe/Details.cshtml -->
+        <!-- nội dung: STT 11 - Hiển thị Bảng Lịch sử bảo dưỡng & Sửa chữa phương tiện -->
+        <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
+        <!-- ============================================================== -->
+        @if (laQuanTri)
+        {
+            var lichSuBD = ViewBag.LichSuBaoDuong as List<QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.LichSuBaoDuong>;
+            <div class="card-box mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2 class="card-title mb-0">Lịch sử bảo dưỡng &amp; Sửa chữa kỹ thuật</h2>
+                        <div class="card-subtitle">Theo dõi các lần bảo dưỡng định kỳ và khắc phục sự cố sau thuê</div>
+                    </div>
+                    <a asp-controller="BaoDuong" asp-action="TaoMoi" asp-route-maXe="@Model.MaXe" class="btn btn-sm btn-outline-primary">
+                        + Lập phiếu bảo dưỡng
+                    </a>
+                </div>
+
+                @if (lichSuBD != null && lichSuBD.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Mã phiếu</th>
+                                    <th>Phân loại</th>
+                                    <th>Thời gian</th>
+                                    <th>Số KM</th>
+                                    <th>Gara / Xưởng</th>
+                                    <th>Nội dung hạng mục</th>
+                                    <th class="text-end">Chi phí</th>
+                                    <th class="text-center">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var bd in lichSuBD)
+                                {
+                                    <tr>
+                                        <td class="fw-bold">#BD-@bd.MaBaoDuong</td>
+                                        <td><span class="badge-soft" style="background:#fef3c7;color:#92400e">@bd.LoaiBaoDuong</span></td>
+                                        <td>
+                                            <div class="small fw-semibold">@bd.NgayBatDau.ToString("dd/MM/yyyy")</div>
+                                            @if (bd.NgayHoanThanh.HasValue)
+                                            {
+                                                <div class="small text-muted">Xong: @bd.NgayHoanThanh.Value.ToString("dd/MM/yyyy")</div>
+                                            }
+                                        </td>
+                                        <td>@bd.SoKmKhiBaoDuong.ToString("N0") km</td>
+                                        <td>@(bd.GaraBaoDuong ?? "-")</td>
+                                        <td><span class="small" title="@bd.NoiDungBaoDuong">@bd.NoiDungBaoDuong</span></td>
+                                        <td class="text-end fw-bold text-danger">@bd.ChiPhi.ToString("N0")đ</td>
+                                        <td class="text-center">
+                                            @if (bd.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiBaoDuong.DangBaoDuong)
+                                            {
+                                                <span class="badge-soft" style="background:#fee2e2;color:#991b1b">Đang làm</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge-soft" style="background:#dcfce7;color:#166534">Hoàn thành</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">
+                        <div class="small">Chưa có bản ghi bảo dưỡng nào cho phương tiện này.</div>
+                    </div>
+                }
+            </div>
+        }
+        <!-- ============================================================== -->
+        <!-- Kết thúc Code của SV4 -->
+        <!-- ============================================================== -->
     </div>
 </div>
 

@@ -1,0 +1,110 @@
+@* ==============================================================
+   Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+   file: Views/BaoDuong/TaoMoi.cshtml
+   nội dung: STT 11 - Form lập phiếu đưa xe vào bảo dưỡng / sửa chữa kỹ thuật
+   sinh viên thực hiện: Nguyễn Hoàng Đức Hiếu - 23103100116 - SV4
+   ============================================================== *@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.LichSuBaoDuong
+
+@{
+    ViewData["Title"] = "Lập phiếu bảo dưỡng xe";
+}
+
+<div class="container py-4" style="max-width: 800px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">
+                <i class="bi bi-tools text-primary"></i> Lập phiếu bảo dưỡng phương tiện
+            </h3>
+            <p class="text-muted small mb-0">Đưa phương tiện vào xưởng bảo dưỡng định kỳ hoặc sửa chữa khắc phục sự cố.</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            &larr; Quay lại danh sách
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-4 p-md-5">
+            <div class="alert alert-warning border-0 d-flex align-items-center mb-4">
+                <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-warning"></i>
+                <div class="small">
+                    <strong>Lưu ý:</strong> Sau khi lập phiếu thành công, phương tiện sẽ tự động chuyển sang trạng thái 
+                    <span class="badge bg-warning text-dark">Bảo dưỡng</span> và tự động bị khóa, không xuất hiện trong kết quả tìm kiếm xe trống của khách hàng.
+                </div>
+            </div>
+
+            <form asp-action="TaoMoi" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label asp-for="MaXe" class="form-label fw-bold"></label> <span class="text-danger">*</span>
+                        <select asp-for="MaXe" asp-items="ViewBag.DanhSachXe" class="form-select">
+                            <option value="">-- Chọn phương tiện cần bảo dưỡng --</option>
+                        </select>
+                        <span asp-validation-for="MaXe" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="LoaiBaoDuong" class="form-label fw-bold"></label> <span class="text-danger">*</span>
+                        <select asp-for="LoaiBaoDuong" asp-items="ViewBag.DanhSachLoaiBaoDuong" class="form-select"></select>
+                        <span asp-validation-for="LoaiBaoDuong" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="NgayBatDau" class="form-label fw-bold"></label> <span class="text-danger">*</span>
+                        <input asp-for="NgayBatDau" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="NgayBatDau" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SoKmKhiBaoDuong" class="form-label fw-bold"></label>
+                        <input asp-for="SoKmKhiBaoDuong" class="form-control" placeholder="Để trống hệ thống tự lấy km hiện tại của xe" />
+                        <span asp-validation-for="SoKmKhiBaoDuong" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ChiPhi" class="form-label fw-bold">Chi phí dự kiến (VNĐ)</label>
+                        <input asp-for="ChiPhi" class="form-control" placeholder="Nhập chi phí dự kiến nếu có" />
+                        <span asp-validation-for="ChiPhi" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="GaraBaoDuong" class="form-label fw-bold"></label>
+                        <input asp-for="GaraBaoDuong" class="form-control" placeholder="Ví dụ: Toyota Lĩnh Nam, Gara Hà Nội..." />
+                        <span asp-validation-for="GaraBaoDuong" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="NguoiPhuTrach" class="form-label fw-bold"></label>
+                        <input asp-for="NguoiPhuTrach" class="form-control" />
+                        <span asp-validation-for="NguoiPhuTrach" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="NoiDungBaoDuong" class="form-label fw-bold"></label> <span class="text-danger">*</span>
+                        <textarea asp-for="NoiDungBaoDuong" rows="3" class="form-control"
+                                  placeholder="Mô tả cụ thể các hạng mục cần làm: thay dầu động cơ, thay lọc gió, kiểm tra phanh, sơn lại vết xước..."></textarea>
+                        <span asp-validation-for="NoiDungBaoDuong" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="GhiChu" class="form-label fw-bold"></label>
+                        <textarea asp-for="GhiChu" rows="2" class="form-control" placeholder="Ghi chú thêm về lịch hẹn, phụ tùng đặt riêng..."></textarea>
+                    </div>
+
+                    <div class="col-12 mt-4 text-end">
+                        <a asp-action="Index" class="btn btn-light me-2">Hủy</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-bold">
+                            <i class="bi bi-save"></i> Xác nhận & Đưa xe vào bảo dưỡng
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@* ==============================================================
+   Kết thúc Code của SV4
+   ============================================================== *@

@@ -262,6 +262,20 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             ViewBag.GiaTrungBinhLoai = giaTrungBinhLoai;
             ViewBag.GiaTrungBinhHang = giaTrungBinhHang;
 
+            // ==============================================================
+            // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+            // file: Controllers/XeController.cs
+            // nội dung: STT 11 - Nạp lịch sử bảo dưỡng của xe để hiển thị đối soát trong trang chi tiết xe
+            // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+            // ==============================================================
+            ViewBag.LichSuBaoDuong = await _context.LichSuBaoDuongs
+                .Where(b => b.MaXe == id)
+                .OrderByDescending(b => b.NgayBatDau)
+                .ToListAsync();
+            // ==============================================================
+            // Kết thúc Code của SV4
+            // ==============================================================
+
             return View(xe);
         }
 

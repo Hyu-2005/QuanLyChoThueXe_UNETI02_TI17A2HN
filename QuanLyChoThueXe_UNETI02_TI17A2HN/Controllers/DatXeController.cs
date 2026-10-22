@@ -23,15 +23,18 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         private readonly AppDbContext _context;
         private readonly IXeTrongService _xeTrongService;
         private readonly ITrungLichService _trungLichService;
+        private readonly IEmailService _emailService;
 
         public DatXeController(
             AppDbContext context,
             IXeTrongService xeTrongService,
-            ITrungLichService trungLichService)
+            ITrungLichService trungLichService,
+            IEmailService emailService)
         {
             _context = context;
             _xeTrongService = xeTrongService;
             _trungLichService = trungLichService;
+            _emailService = emailService;
         }
 
         // =====================================================
@@ -559,7 +562,10 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Duyet(int id)
         {
-            var datXe = await _context.DatXes.Include(d => d.Xe).FirstOrDefaultAsync(d => d.MaDatXe == id);
+            var datXe = await _context.DatXes
+                .Include(d => d.Xe)
+                .Include(d => d.KhachHang)
+                .FirstOrDefaultAsync(d => d.MaDatXe == id);
             if (datXe == null)
             {
                 TempData["Error"] = "Khong tim thay don dat xe";
@@ -594,7 +600,28 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             datXe.TrangThai = TrangThaiDatXe.DaDuyet;
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Da duyet don #{datXe.MaDatXe} thanh cong.";
+            // ==============================================================
+            // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+            // file: Controllers/DatXeController.cs
+            // nội dung: STT 10 - Tự động gửi Email xác nhận duyệt đơn đặt xe tới khách hàng
+            // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+            // ==============================================================
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _emailService.GuiEmailXacNhanDatXeAsync(datXe);
+                }
+                catch
+                {
+                    // Fail-safe: khong de loi email anh huong den tien trinh duyet don
+                }
+            });
+            // ==============================================================
+            // Kết thúc Code của SV4
+            // ==============================================================
+
+            TempData["Success"] = $"Đã duyệt đơn #{datXe.MaDatXe} thành công và gửi email thông báo cho khách hàng.";
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -602,7 +629,10 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> TuChoi(int id, string lyDoTuChoi)
         {
-            var datXe = await _context.DatXes.FindAsync(id);
+            var datXe = await _context.DatXes
+                .Include(d => d.KhachHang)
+                .Include(d => d.Xe)
+                .FirstOrDefaultAsync(d => d.MaDatXe == id);
             if (datXe == null)
             {
                 TempData["Error"] = "Khong tim thay don dat xe";
@@ -625,9 +655,91 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             datXe.LyDoTuChoi = lyDoTuChoi;
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Đã từ chối đơn #{datXe.MaDatXe}.";
+            // ==============================================================
+            // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+            // file: Controllers/DatXeController.cs
+            // nội dung: STT 10 - Tự động gửi Email thông báo từ chối đơn đặt xe kèm lý do tới khách hàng
+            // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+            // ==============================================================
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _emailService.GuiEmailTuChoiDatXeAsync(datXe, lyDoTuChoi);
+                }
+                catch
+                {
+                    // Fail-safe: khong de loi email anh huong den tien trinh
+                }
+            });
+            // ==============================================================
+            // Kết thúc Code của SV4
+            // ==============================================================
+
+            TempData["Success"] = $"Đã từ chối đơn #{datXe.MaDatXe} và gửi email thông báo lý do tới khách hàng.";
             return RedirectToAction(nameof(Details), new { id });
         }
+
+        // ==============================================================
+        // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+        // file: Controllers/DatXeController.cs
+        // nội dung: STT 10 - Bổ sung chức năng gửi lại email xác nhận và gửi email kiểm thử kết nối Gmail cá nhân
+        // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+        // ==============================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GuiLaiEmailXacNhan(int id)
+        {
+            var datXe = await _context.DatXes
+                .Include(d => d.Xe)
+                .Include(d => d.KhachHang)
+                .FirstOrDefaultAsync(d => d.MaDatXe == id);
+
+            if (datXe == null)
+            {
+                TempData["Error"] = "Không tìm thấy đơn đặt xe";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                await _emailService.GuiEmailXacNhanDatXeAsync(datXe);
+                TempData["Success"] = $"Đã kích hoạt gửi email xác nhận cho đơn #{id} tới hòm thư cá nhân/khách hàng!";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi khi gửi email: " + ex.Message;
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GuiEmailTest(int id)
+        {
+            try
+            {
+                bool thanhCong = await _emailService.GuiEmailTestAsync();
+                if (thanhCong)
+                {
+                    TempData["Success"] = "🎉 Đã gửi email kiểm thử kết nối thành công tới Gmail cá nhân! Hãy kiểm tra Hộp thư đến (hoặc Thư rác/Spam).";
+                }
+                else
+                {
+                    TempData["Warning"] = "Hệ thống đã xử lý qua luồng mô phỏng an toàn (Log console). Để nhận email thật về Gmail cá nhân, bạn hãy dán Mật khẩu ứng dụng Gmail (16 chữ) vào mục 'Password' trong appsettings.json.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi kiểm tra gửi mail: " + ex.Message;
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        // ==============================================================
+        // Kết thúc Code của SV4
+        // ==============================================================
 
         
 

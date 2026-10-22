@@ -207,7 +207,7 @@
                 <!-- ============================================================== -->
                 <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
                 <!-- file: Views/DatXe/Details.cshtml -->
-                <!-- nội dung: Cập nhật đường dẫn nút bấm trỏ về Controller mới (BanGiaoXe, TraXe) và bổ sung thêm nút "Tiến hành Thanh toán". -->
+                <!-- nội dung: Cập nhật đường dẫn nút bấm trỏ về Controller mới (BanGiaoXe, TraXe), bổ sung nút "Tiến hành Thanh toán" và nút xem "Biên bản & Mã QR Bàn giao". -->
                 <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
                 <!-- ============================================================== -->
                 @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet)
@@ -223,6 +223,15 @@
                 @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.ChoThanhToan)
                 {
                     <a asp-controller="ThanhToan" asp-action="ThanhToan" asp-route-id="@Model.MaDatXe" class="btn btn-success px-4 py-2 fw-semibold text-white" style="border-radius:8px">Tiến hành Thanh toán</a>
+                }
+
+                @if (Model.BanGiaoXe != null || Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue 
+                    || Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.ChoThanhToan 
+                    || Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.HoanThanh)
+                {
+                    <a asp-controller="BanGiaoXe" asp-action="BienBanDienTu" asp-route-id="@Model.MaDatXe" class="btn btn-outline-info px-3 py-2 fw-semibold" style="border-radius:8px">
+                        Biên bản & Mã QR Bàn giao
+                    </a>
                 }
                 <!-- ============================================================== -->
                 <!-- Kết thúc Code của SV4 -->
@@ -326,6 +335,54 @@
                 </div>
             </div>
         </div>
+
+        <!-- ============================================================== -->
+        <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
+        <!-- file: Views/DatXe/Details.cshtml -->
+        <!-- nội dung: STT 10 - Bảng điều khiển Gửi Email thông báo tự động & kiểm thử gửi về Gmail cá nhân -->
+        <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
+        <!-- ============================================================== -->
+        @if (!laKhachHang)
+        {
+            <div class="card border-0 shadow-sm mb-4" style="border-radius:12px; background:linear-gradient(to right, #f8fafc, #eff6ff); border-left: 5px solid #0284c7 !important;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge bg-primary px-2 py-1">STT 10 - SV4</span>
+                                <h6 class="mb-0 fw-bold text-dark" style="font-size:16px;">
+                                    📧 Chức năng gửi Email thông báo tự động & Nghiệm thu cá nhân
+                                </h6>
+                            </div>
+                            <p class="text-muted small mb-0">
+                                Khi duyệt hoặc từ chối đơn, hệ thống sẽ tự động gửi email thông báo chi tiết.
+                                Đang chuyển tiếp về Gmail cá nhân: <strong class="text-primary">duchieu07122005@gmail.com</strong>
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <form asp-action="GuiEmailTest" asp-route-id="@Model.MaDatXe" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-primary fw-semibold" title="Kiểm tra kết nối gửi thư tới duchieu07122005@gmail.com">
+                                    ✉️ Gửi Email test kết nối
+                                </button>
+                            </form>
+                            @if (Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet)
+                            {
+                                <form asp-action="GuiLaiEmailXacNhan" asp-route-id="@Model.MaDatXe" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-primary text-white fw-semibold" title="Gửi lại thông báo duyệt xe của đơn này về Gmail cá nhân">
+                                        📨 Gửi lại Email xác nhận đơn này
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <!-- ============================================================== -->
+        <!-- Kết thúc Code của SV4 -->
+        <!-- ============================================================== -->
 
         <!-- GHI CHÚ -->
         @if (!string.IsNullOrEmpty(Model.GhiChu) || !string.IsNullOrEmpty(Model.LyDoTuChoi))

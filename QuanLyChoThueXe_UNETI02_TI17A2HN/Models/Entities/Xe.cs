@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -71,5 +71,16 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities
 
         public ICollection<BangGiaThue> BangGiaThues { get; set; } = new List<BangGiaThue>();
         public ICollection<DatXe> DatXes { get; set; } = new List<DatXe>();
+
+        // ==============================================================
+        // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+        // file: Models/Entities/Xe.cs
+        // nội dung: STT 11 - Quan hệ theo dõi lịch sử bảo dưỡng của xe
+        // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+        // ==============================================================
+        public ICollection<LichSuBaoDuong> LichSuBaoDuongs { get; set; } = new List<LichSuBaoDuong>();
+        // ==============================================================
+        // Kết thúc Code của SV4
+        // ==============================================================
     }
 }

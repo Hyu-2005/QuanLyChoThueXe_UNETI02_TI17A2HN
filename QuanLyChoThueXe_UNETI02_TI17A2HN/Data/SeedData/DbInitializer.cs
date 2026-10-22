@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // File: Data/SeedData/DbInitializer.cs
 // Noi dung: Tao du lieu mau cho he thong QuanLyChoThueXe
 // Sinh vien thuc hien: [Ca nhom]
@@ -615,6 +615,57 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
 
             await context.ThanhToans.AddRangeAsync(thanhToans);
             await context.SaveChangesAsync();
+
+            // ==============================================================
+            // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+            // file: Data/SeedData/DbInitializer.cs
+            // nội dung: STT 11 - Seed dữ liệu mẫu cho bảng LichSuBaoDuong theo dõi bảo dưỡng xe
+            // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+            // ==============================================================
+            if (!await context.LichSuBaoDuongs.AnyAsync())
+            {
+                var xeBaoDuong = await context.Xes.FirstOrDefaultAsync(x => x.TinhTrang == TinhTrangXe.BaoDuong)
+                              ?? await context.Xes.FirstOrDefaultAsync();
+
+                if (xeBaoDuong != null)
+                {
+                    var sampleBaoDuong = new List<LichSuBaoDuong>
+                    {
+                        new()
+                        {
+                            MaXe = xeBaoDuong.MaXe,
+                            NgayBatDau = DateTime.Now.AddDays(-2),
+                            LoaiBaoDuong = LoaiBaoDuong.SuCoSauThue,
+                            SoKmKhiBaoDuong = xeBaoDuong.SoKmHienTai,
+                            ChiPhi = 1500000,
+                            GaraBaoDuong = "Gara Ô Tô UNETI Lĩnh Nam",
+                            NoiDungBaoDuong = "Sơn tút lại cản trước bị trầy xước sau chuyến thuê, cân chỉnh thước lái và kiểm tra toàn bộ hệ thống đèn pha.",
+                            NguoiPhuTrach = "Nguyễn Hoàng Đức Hiếu",
+                            TrangThai = TrangThaiBaoDuong.DangBaoDuong,
+                            GhiChu = "Đang chờ xưởng sơn sấy xong, dự kiến nghiệm thu trong ngày mai."
+                        },
+                        new()
+                        {
+                            MaXe = xeBaoDuong.MaXe,
+                            NgayBatDau = DateTime.Now.AddMonths(-2),
+                            NgayHoanThanh = DateTime.Now.AddMonths(-2).AddDays(1),
+                            LoaiBaoDuong = LoaiBaoDuong.ThayDauLocNhot,
+                            SoKmKhiBaoDuong = Math.Max(0, xeBaoDuong.SoKmHienTai - 5000),
+                            ChiPhi = 850000,
+                            GaraBaoDuong = "Trung tâm Dịch vụ Toyota Giải Phóng",
+                            NoiDungBaoDuong = "Thay 4 lít dầu Castrol Magnatec 5W-30, thay cốc lọc nhớt chính hãng, vệ sinh lọc gió động cơ và điều hòa.",
+                            NguoiPhuTrach = "Nguyễn Hoàng Đức Hiếu",
+                            TrangThai = TrangThaiBaoDuong.DaHoanThanh,
+                            GhiChu = "Đã nghiệm thu và bàn giao lại cho đội xe kinh doanh."
+                        }
+                    };
+                    await context.LichSuBaoDuongs.AddRangeAsync(sampleBaoDuong);
+                    await context.SaveChangesAsync();
+                }
+            }
+            // ==============================================================
+            // Kết thúc Code của SV4
+            // ==============================================================
         }
     }
 }

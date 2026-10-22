@@ -90,6 +90,32 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 if (phaiBaoDuong)
                 {
                     datXe.Xe.TinhTrang = TinhTrangXe.BaoDuong;
+
+                    // ==============================================================
+                    // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
+                    // file: Controllers/TraXeController.cs
+                    // nội dung: STT 11 - Tự động tạo phiếu theo dõi bảo dưỡng xe khi phát sinh sự cố/hư hại sau trả xe
+                    // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
+                    // ==============================================================
+                    var phieuBaoDuong = new LichSuBaoDuong
+                    {
+                        MaXe = datXe.MaXe,
+                        NgayBatDau = DateTime.Now,
+                        LoaiBaoDuong = model.PhiHuHong > 0 ? LoaiBaoDuong.SuCoSauThue : LoaiBaoDuong.TongThe,
+                        SoKmKhiBaoDuong = model.SoKmTra,
+                        ChiPhi = model.PhiHuHong,
+                        GaraBaoDuong = "Gara liên kết UNETI",
+                        NoiDungBaoDuong = !string.IsNullOrWhiteSpace(model.TinhTrangTra) 
+                            ? $"Ghi nhận sau trả xe: {model.TinhTrangTra}" 
+                            : $"Kiểm tra kỹ thuật và khắc phục hư hại từ đơn thuê #{datXe.MaDatXe}",
+                        NguoiPhuTrach = HttpContext.Session.GetString("HoTen") ?? "Nhân viên nhận xe",
+                        TrangThai = TrangThaiBaoDuong.DangBaoDuong,
+                        GhiChu = $"Hệ thống tự động lập phiếu bảo dưỡng từ đơn #{datXe.MaDatXe}. Phụ phí hư hỏng đã thu: {model.PhiHuHong:N0}đ"
+                    };
+                    _context.LichSuBaoDuongs.Add(phieuBaoDuong);
+                    // ==============================================================
+                    // Kết thúc Code của SV4
+                    // ==============================================================
                 }
                 else
                 {
