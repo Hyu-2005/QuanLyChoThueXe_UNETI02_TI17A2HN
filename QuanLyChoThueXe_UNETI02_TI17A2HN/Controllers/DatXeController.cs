@@ -87,9 +87,54 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return View(vm);
         }
 
+        // =====================================================
+        // KIEM TRA GIAY TO: phai co CCCD + GPLX da duoc nhan vien xac minh moi duoc dat xe
+        // Tra ve null neu hop le, nguoc lai tra ve thong bao loi
+        // =====================================================
+        private async Task<string?> KiemTraGiayToAsync(int maKhachHang)
+        {
+            var giayTos = await _context.GiayToKhachHangs
+                .AsNoTracking()
+                .Where(g => g.MaKhachHang == maKhachHang)
+                .ToListAsync();
+
+            var loi = new List<string>();
+
+            foreach (var loai in LoaiGiayTo.TatCa)
+            {
+                var gt = giayTos.FirstOrDefault(g => g.LoaiGiayTo == loai);
+                var ten = LoaiGiayTo.GetDisplayName(loai);
+
+                if (gt == null)
+                    loi.Add($"chưa tải lên {ten}");
+                else if (gt.TrangThai == TrangThaiGiayTo.ChoKiemTra)
+                    loi.Add($"{ten} đang chờ nhân viên kiểm tra");
+                else if (gt.TrangThai == TrangThaiGiayTo.TuChoi)
+                    loi.Add($"{ten} bị từ chối, vui lòng tải lại");
+                else if (loai == LoaiGiayTo.GPLX && gt.NgayHetHan.HasValue && gt.NgayHetHan.Value.Date < DateTime.Today)
+                    loi.Add($"{ten} đã hết hạn");
+            }
+
+            return loi.Count == 0
+                ? null
+                : "Bạn cần có đủ CCCD và GPLX đã được xác minh mới được đặt xe: " + string.Join("; ", loi) + ".";
+        }
+
         [HttpGet]
         public async Task<IActionResult> DatXe(int maXe, DateTime? thoiGianNhan = null, DateTime? thoiGianTra = null)
         {
+            // 0. Kiem tra giay to (CCCD + GPLX da xac minh)
+            var maKhGet = HttpContext.Session.GetMaKhachHang();
+            if (maKhGet.HasValue)
+            {
+                var loiGiayTo = await KiemTraGiayToAsync(maKhGet.Value);
+                if (loiGiayTo != null)
+                {
+                    TempData["Error"] = loiGiayTo;
+                    return RedirectToAction("CuaToi", "GiayTo");
+                }
+            }
+
             // 1. Kiem tra xe ton tai
             var xe = await _context.Xes
                 .Include(x => x.LoaiXe)
@@ -193,6 +238,14 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             {
                 TempData["Error"] = "Tai khoan khach hang da bi khoa hoac khong ton tai";
                 return RedirectToAction(nameof(TimXeTrong));
+            }
+
+            // Bat buoc co du CCCD + GPLX da duoc xac minh
+            var loiGiayToPost = await KiemTraGiayToAsync(maKhachHang.Value);
+            if (loiGiayToPost != null)
+            {
+                TempData["Error"] = loiGiayToPost;
+                return RedirectToAction("CuaToi", "GiayTo");
             }
 
             var xe = await _context.Xes
@@ -741,7 +794,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         // Kết thúc Code của SV4
         // ==============================================================
 
-        
+
 
         private List<SelectListItem> LayDanhSachTrangThai()
         {
