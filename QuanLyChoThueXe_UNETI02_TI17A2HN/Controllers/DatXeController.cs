@@ -90,6 +90,27 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         [HttpGet]
         public async Task<IActionResult> DatXe(int maXe, DateTime? thoiGianNhan = null, DateTime? thoiGianTra = null)
         {
+            // ==============================================================
+            // Bắt Đầu Code của SV3: Vũ Tiến Đạt
+            // file: Controllers/DatXeController.cs
+            // nội dung: Chặn mở trang đặt xe khi khách chưa có CCCD/GPLX được xác minh (kèm lý do cụ thể).
+            // sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
+            // ==============================================================
+            var maKhachHangHienTai = HttpContext.Session.GetMaKhachHang();
+            if (maKhachHangHienTai.HasValue)
+            {
+                var loiGiayTo = await GiayToHelper.KiemTraDieuKienThueXeAsync(
+                    _context, maKhachHangHienTai.Value, thoiGianNhan);
+                if (loiGiayTo != null)
+                {
+                    TempData["Error"] = loiGiayTo;
+                    return RedirectToAction("CuaToi", "GiayTo");
+                }
+            }
+
+            // ==============================================================
+            // Kết thúc Code của SV3
+            // ==============================================================
             // 1. Kiem tra xe ton tai
             var xe = await _context.Xes
                 .Include(x => x.LoaiXe)
@@ -194,6 +215,23 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 TempData["Error"] = "Tai khoan khach hang da bi khoa hoac khong ton tai";
                 return RedirectToAction(nameof(TimXeTrong));
             }
+
+            // ==============================================================
+            // Bắt Đầu Code của SV3: Vũ Tiến Đạt
+            // file: Controllers/DatXeController.cs
+            // nội dung: Vá lỗ hổng: máy chủ từ chối tạo đơn nếu khách chưa có CCCD và GPLX được xác minh (còn hạn đến ngày nhận xe), kể cả khi gửi form trực tiếp.
+            // sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
+            // ==============================================================
+            var loiGiayToKhachHang = await GiayToHelper.KiemTraDieuKienThueXeAsync(
+                _context, maKhachHang.Value, vm.ThoiGianNhanDuKien);
+            if (loiGiayToKhachHang != null)
+            {
+                TempData["Error"] = loiGiayToKhachHang;
+                return RedirectToAction("CuaToi", "GiayTo");
+            }
+            // ==============================================================
+            // Kết thúc Code của SV3
+            // ==============================================================
 
             var xe = await _context.Xes
                 .Include(x => x.LoaiXe)
