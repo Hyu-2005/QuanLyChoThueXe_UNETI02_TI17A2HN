@@ -96,6 +96,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
+        // Tu dong ap dung cac migration con thieu (vd: ThemLichSuBaoDuong) truoc khi seed
+        await context.Database.MigrateAsync();
         await DbInitializer.SeedAsync(context);
     }
     catch (Exception ex)
