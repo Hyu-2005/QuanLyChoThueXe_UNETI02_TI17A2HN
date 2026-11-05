@@ -1,0 +1,147 @@
+/* ================================================================
+   VIRELLO SKIN - phủ giao diện VIRELLO lên các trang CŨ của nhóm
+   File: wwwroot/css/virello-skin.css
+   Họ và tên: Vũ Tiến Đạt - MSSV: 23103100119 - SV3
+   Cách hoạt động: các trang cũ đều dùng chung tên lớp (page-shell, data-card,
+   filter-card, form-card, info-card, status-pill, btn-clean, pager...).
+   File này (chỉ có tác dụng khi <body> có lớp vr-dark) ghi đè màu sáng của
+   từng lớp đó thành màu tối của VIRELLO, không cần sửa từng trang.
+   Mỗi quy tắc đều bắt đầu bằng "body.vr-dark" để có độ ưu tiên cao hơn <style> trong trang.
+   ================================================================ */
+
+/* ---------- Nền & chữ chung ---------- */
+body.vr-dark [class*="-shell"] { background: #000 !important; color: #e2e8f0; }
+body.vr-dark .app-content { color: #e2e8f0; }
+body.vr-dark h1, body.vr-dark h2, body.vr-dark h3, body.vr-dark h4, body.vr-dark h5, body.vr-dark h6 { color: #fff; }
+body.vr-dark .title, body.vr-dark .name, body.vr-dark .xe-name, body.vr-dark .val, body.vr-dark .money,
+body.vr-dark .form-label, body.vr-dark .info-row .val, body.vr-dark .card-head .title,
+body.vr-dark .price-tag, body.vr-dark strong { color: #fff; }
+body.vr-dark .sub, body.vr-dark .lbl, body.vr-dark .form-text, body.vr-dark .hint, body.vr-dark .xe-meta,
+body.vr-dark .price-sub, body.vr-dark .back, body.vr-dark .unit, body.vr-dark small,
+body.vr-dark .text-muted, body.vr-dark .info-row .lbl { color: var(--vr-slate400) !important; }
+body.vr-dark .back:hover, body.vr-dark a:hover { color: var(--vr-red); }
+body.vr-dark .req { color: var(--vr-red); }
+
+/* ---------- Banner đầu trang (hero) ---------- */
+body.vr-dark [class*="-hero"]:not(.vr-hero):not(.vr-hero-bg):not(.vr-hero-content):not(.vr-hero-slice):not(.vr-hero-title):not(.vr-hero-text):not(.vr-hero-actions) {
+    background: linear-gradient(135deg, #1c1c1c 0%, #0a0a0a 100%) !important;
+    border: 1px solid var(--vr-line) !important; border-left: 4px solid var(--vr-red) !important;
+    border-radius: 0 !important; color: #fff !important;
+}
+body.vr-dark [class*="-hero"] h1, body.vr-dark .form-head h1, body.vr-dark .detail-head h1 {
+    font-family: var(--vr-font-display); text-transform: uppercase; letter-spacing: .02em; color: #fff;
+}
+body.vr-dark .price-highlight {
+    background: linear-gradient(135deg, #1c1c1c 0%, #0a0a0a 100%) !important;
+    border: 1px solid var(--vr-line); border-left: 4px solid var(--vr-red); border-radius: 0 !important;
+}
+
+/* ---------- Thẻ / khung ---------- */
+body.vr-dark [class*="-card"], body.vr-dark .hero-img, body.vr-dark .modal-content {
+    background: var(--vr-card) !important; border-color: var(--vr-line) !important;
+    border-radius: 0 !important; box-shadow: none !important; color: #e2e8f0;
+}
+body.vr-dark .data-card .card-head, body.vr-dark .filter-card .head, body.vr-dark .form-card .sect,
+body.vr-dark .info-row, body.vr-dark .form-head, body.vr-dark .detail-head { border-color: var(--vr-line) !important; }
+body.vr-dark .desc-box, body.vr-dark .upload-box { background: #0a0a0a !important; border-color: rgba(255, 255, 255, .15) !important; color: var(--vr-slate300); }
+body.vr-dark .upload-box:hover { border-color: var(--vr-red) !important; background: rgba(229, 9, 20, .06) !important; }
+body.vr-dark .upload-box .preview { background: #000 !important; border-color: var(--vr-line) !important; }
+body.vr-dark .tips-box { background: rgba(229, 9, 20, .08) !important; border-color: rgba(229, 9, 20, .35) !important; color: var(--vr-slate300) !important; border-radius: 0 !important; }
+body.vr-dark .tips-box strong { color: #fff !important; }
+body.vr-dark .form-actions, body.vr-dark .pager { background: #0a0a0a !important; border-color: var(--vr-line) !important; color: var(--vr-slate400); }
+body.vr-dark .count { background: rgba(255, 255, 255, .08) !important; color: var(--vr-slate300) !important; }
+body.vr-dark .filter-badge { background: rgba(229, 9, 20, .15) !important; color: #fca5a5 !important; border-radius: 0 !important; }
+body.vr-dark .filter-toggle { color: var(--vr-red) !important; }
+body.vr-dark .filter-toggle:hover { background: rgba(229, 9, 20, .1) !important; }
+body.vr-dark .plate-chip, body.vr-dark .id-chip { background: #1c1c1c !important; border-color: var(--vr-line) !important; color: #fff !important; }
+body.vr-dark .xe-thumb { background: #000 !important; border-color: var(--vr-line) !important; border-radius: 0 !important; }
+body.vr-dark .empty-state { color: var(--vr-slate500); }
+body.vr-dark .empty-state .big { color: #27272a; }
+
+/* ---------- Bảng ---------- */
+body.vr-dark table { color: #e2e8f0; --bs-table-bg: transparent; --bs-table-color: #e2e8f0; --bs-table-border-color: rgba(255, 255, 255, .06); }
+body.vr-dark thead th { background: #1c1c1c !important; color: var(--vr-slate300) !important; border-color: var(--vr-line) !important; font-family: var(--vr-font-display); letter-spacing: .08em; }
+body.vr-dark tbody td, body.vr-dark tbody th { border-color: rgba(255, 255, 255, .06) !important; background: transparent; }
+body.vr-dark tbody tr:hover, body.vr-dark .data-card tbody tr:hover { background: rgba(255, 255, 255, .03) !important; }
+
+/* ---------- Form ---------- */
+body.vr-dark .form-control, body.vr-dark .form-select, body.vr-dark .input-group-text, body.vr-dark textarea {
+    background-color: #000 !important; border-color: rgba(255, 255, 255, .2) !important; color: #fff !important;
+    border-radius: 0 !important; color-scheme: dark;
+}
+body.vr-dark .input-group-text { background-color: #1c1c1c !important; color: var(--vr-slate400) !important; }
+body.vr-dark .form-control:focus, body.vr-dark .form-select:focus { border-color: var(--vr-red) !important; box-shadow: none !important; }
+body.vr-dark .form-control::placeholder { color: var(--vr-slate500); }
+body.vr-dark .form-check-input:checked { background-color: var(--vr-red); border-color: var(--vr-red); }
+body.vr-dark .form-select option { background: #121212; color: #fff; }
+
+/* ---------- Nút ---------- */
+body.vr-dark .btn-clean {
+    background: transparent !important; border: 1px solid rgba(255, 255, 255, .25) !important; color: #fff !important;
+    border-radius: 0 !important; font-family: var(--vr-font-display); letter-spacing: .05em; text-transform: uppercase;
+}
+body.vr-dark .btn-clean:hover { border-color: #fff !important; background: rgba(255, 255, 255, .06) !important; color: #fff !important; transform: none; }
+body.vr-dark .btn-clean.warn { color: #fcd34d !important; border-color: rgba(252, 211, 77, .4) !important; }
+body.vr-dark .btn-clean.danger { color: #fca5a5 !important; border-color: rgba(239, 68, 68, .5) !important; }
+body.vr-dark .btn-clean.danger:hover { background: rgba(239, 68, 68, .12) !important; }
+body.vr-dark .btn-clean.primary, body.vr-dark .btn-primary, body.vr-dark .btn-book-header,
+body.vr-dark button.primary, body.vr-dark a.primary {
+    background: var(--vr-red) !important; border-color: var(--vr-red) !important; color: #fff !important;
+    border-radius: 0 !important; box-shadow: none !important;
+}
+body.vr-dark .btn-clean.primary:hover, body.vr-dark .btn-primary:hover, body.vr-dark .btn-book-header:hover {
+    background: var(--vr-red-hover) !important; border-color: var(--vr-red-hover) !important; color: #fff !important; transform: none;
+}
+body.vr-dark .btn { border-radius: 0; }
+body.vr-dark .sect-title .num { background: var(--vr-red) !important; }
+
+/* ---------- Phân trang ---------- */
+body.vr-dark .page-link { background: var(--vr-card) !important; border-color: var(--vr-line) !important; color: var(--vr-slate300) !important; border-radius: 0 !important; }
+body.vr-dark .page-link:hover { background: rgba(255, 255, 255, .08) !important; color: #fff !important; }
+body.vr-dark .page-item.active .page-link { background: var(--vr-red) !important; border-color: var(--vr-red) !important; color: #fff !important; }
+body.vr-dark .page-item.disabled .page-link { opacity: .4; }
+
+/* ---------- Dropdown / modal / alert của Bootstrap ---------- */
+body.vr-dark .modal-content { color: #fff; }
+body.vr-dark .dropdown-menu:not(.vr-dd-menu) { background: var(--vr-card); border-color: var(--vr-line); border-radius: 0; }
+body.vr-dark .dropdown-item { color: var(--vr-slate300); }
+body.vr-dark .dropdown-item:hover { background: var(--vr-red); color: #fff; }
+body.vr-dark hr { border-color: var(--vr-line); opacity: 1; }
+
+/* ================================================================
+   BỔ SUNG: các lớp riêng của từng module (nền xám/trắng trung tính -> tối)
+   Màu pastel có ý nghĩa (xanh lá, vàng, đỏ...) được giữ nguyên.
+   ================================================================ */
+body.vr-dark .xe-plate, body.vr-dark .plate, body.vr-dark .tk-plate, body.vr-dark .tk-rank,
+body.vr-dark .tk-table-badge, body.vr-dark .db-top-rank, body.vr-dark .gplx-chip.none {
+    background: #1c1c1c !important; border-color: var(--vr-line) !important; color: #fff !important; border-radius: 0 !important;
+}
+body.vr-dark .xe-preview, body.vr-dark .price-summary, body.vr-dark .price-block, body.vr-dark .price-breakdown,
+body.vr-dark .price-tile, body.vr-dark .scope-block, body.vr-dark .invoice-box, body.vr-dark .qr-info,
+body.vr-dark .empty-result, body.vr-dark .filter-panel, body.vr-dark .price-table, body.vr-dark .xe-preview .img-wrap,
+body.vr-dark .tk-filter, body.vr-dark .db-stat, body.vr-dark .db-top-img, body.vr-dark .gt-thumb,
+body.vr-dark .payment-option, body.vr-dark .tk-btn-ghost, body.vr-dark .db-action-white, body.vr-dark .btn-cancel,
+body.vr-dark [style*="background:#f9fafb"], body.vr-dark [style*="background: #f8fafc"], body.vr-dark [style*="background:#f8fafc"] {
+    background: var(--vr-card) !important; border-color: var(--vr-line) !important; color: #e2e8f0 !important; border-radius: 0 !important;
+}
+body.vr-dark .payment-option:hover, body.vr-dark .payment-option:has(input[type="radio"]:checked) {
+    background: rgba(229, 9, 20, .08) !important; border-color: var(--vr-red) !important;
+}
+body.vr-dark .db-activity-item:hover, body.vr-dark .db-top-item:hover, body.vr-dark .tk-table tbody tr:hover {
+    background: rgba(255, 255, 255, .04) !important;
+}
+body.vr-dark .tk-btn-ghost:hover, body.vr-dark .btn-cancel:hover { background: rgba(255, 255, 255, .06) !important; color: #fff !important; }
+/* Mã QR phải giữ nền trắng để điện thoại quét được */
+body.vr-dark .qr-frame { background: #fff !important; padding: 12px; }
+
+/* ---------- Chữ đậm/nhạt theo tên lớp (các trang có màu chữ cứng #0f172a, #334155...) ---------- */
+body.vr-dark .app-content [class*="title"]:not(.vr-label), body.vr-dark .app-content [class*="value"],
+body.vr-dark .app-content [class*="-name"], body.vr-dark .app-content [class*="-num"],
+body.vr-dark .app-content [class*="total"], body.vr-dark .app-content [class*="amount"],
+body.vr-dark .app-content [class*="-price"], body.vr-dark .app-content [class*="-val"] { color: #fff; }
+body.vr-dark .app-content [class*="label"], body.vr-dark .app-content [class*="-lbl"],
+body.vr-dark .app-content [class*="desc"], body.vr-dark .app-content [class*="meta"],
+body.vr-dark .app-content [class*="hint"], body.vr-dark .app-content [class*="muted"],
+body.vr-dark .app-content [class*="-sub"], body.vr-dark .app-content [class*="caption"] { color: var(--vr-slate400); }
+/* Giữ chữ trắng trong banner và nút màu */
+body.vr-dark [class*="-hero"] *, body.vr-dark .btn-clean.primary *, body.vr-dark .btn-primary * { color: inherit; }

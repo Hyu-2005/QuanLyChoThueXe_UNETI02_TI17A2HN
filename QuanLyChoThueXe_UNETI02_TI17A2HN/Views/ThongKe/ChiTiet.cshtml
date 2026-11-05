@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     ChiTiet.cshtml - Thống kê chi tiết
     Sinh viên thực hiện: Dương Lâm Huy - 23103100120
     Nội dung: Thống kê chi tiết xe, loại xe, hãng xe, doanh thu, khách hàng
@@ -551,7 +552,7 @@
         gap: 24px;
         padding: 8px 0 24px;
         margin-bottom: 24px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         flex-wrap: wrap;
     }
     .tk-back {
@@ -559,26 +560,26 @@
         align-items: center;
         gap: 6px;
         font-size: 13px;
-        color: #64748b;
+        color: #94a3b8;
         text-decoration: none;
         font-weight: 500;
         margin-bottom: 8px;
         transition: color .15s;
     }
-    .tk-back:hover { color: #2563eb; }
+    .tk-back:hover { color: #E50914; }
     .tk-title {
         font-size: 28px;
         font-weight: 800;
-        color: #0f172a;
+        color: #ffffff;
         letter-spacing: -0.8px;
         margin: 0 0 6px 0;
     }
     .tk-subtitle {
         font-size: 14px;
-        color: #64748b;
+        color: #94a3b8;
         margin: 0;
     }
-    .tk-subtitle strong { color: #1d4ed8; font-weight: 700; }
+    .tk-subtitle strong { color: #E50914; font-weight: 700; }
 
     .tk-header-actions { display: flex; gap: 10px; }
 
@@ -588,7 +589,7 @@
         align-items: center;
         gap: 8px;
         padding: 10px 20px;
-        border-radius: 10px;
+        border-radius: 0;
         font-size: 14px;
         font-weight: 700;
         text-decoration: none;
@@ -608,28 +609,28 @@
         box-shadow: 0 8px 22px rgba(220,38,38,.35);
     }
     .tk-btn-blue {
-        background: #2563eb;
+        background: #E50914;
         color: #fff;
     }
-    .tk-btn-blue:hover { background: #1d4ed8; color: #fff; }
+    .tk-btn-blue:hover { background: #b80710; color: #fff; }
     .tk-btn-ghost {
-        background: #fff;
-        border-color: #d1d5db;
-        color: #374151;
+        background: #121212;
+        border-color: rgba(255,255,255,.2);
+        color: #cbd5e1;
     }
     .tk-btn-ghost:hover {
-        background: #f9fafb;
-        border-color: #9ca3af;
-        color: #111827;
+        background: #1c1c1c;
+        border-color: rgba(255,255,255,.3);
+        color: #ffffff;
     }
 
     /* ============================================================
        FILTER
        ============================================================ */
     .tk-filter {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 16px 20px;
         margin-bottom: 24px;
     }
@@ -650,21 +651,21 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #64748b;
+        color: #94a3b8;
     }
     .tk-filter-input {
         height: 42px;
         padding: 0 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,.2);
+        border-radius: 0;
         font-size: 14px;
-        color: #0f172a;
+        color: #ffffff;
         outline: none;
         transition: all .15s;
     }
     .tk-filter-input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+        border-color: #E50914;
+        box-shadow: 0 0 0 3px rgba(229,9,20,.12);
     }
     .tk-filter-actions {
         margin-left: auto;
@@ -682,9 +683,9 @@
         margin-bottom: 24px;
     }
     .tk-sum-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 20px 22px;
         position: relative;
         overflow: hidden;
@@ -702,9 +703,9 @@
     }
     .tk-sum-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 12px 28px rgba(15,23,42,.08);
+        box-shadow: 0 12px 28px rgba(0,0,0,.45);
     }
-    .tk-sum-blue::before { background: linear-gradient(180deg, #1e3a8a, #3b82f6); }
+    .tk-sum-blue::before { background: linear-gradient(180deg, #b80710, #E50914); }
     .tk-sum-green::before { background: linear-gradient(180deg, #059669, #10b981); }
     .tk-sum-amber::before { background: linear-gradient(180deg, #b45309, #f59e0b); }
     .tk-sum-red::before { background: linear-gradient(180deg, #b91c1c, #ef4444); }
@@ -719,29 +720,29 @@
     .tk-sum-icon {
         width: 34px;
         height: 34px;
-        border-radius: 10px;
+        border-radius: 0;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
     }
-    .tk-sum-blue .tk-sum-icon { background: #dbeafe; color: #2563eb; }
-    .tk-sum-green .tk-sum-icon { background: #dcfce7; color: #16a34a; }
-    .tk-sum-amber .tk-sum-icon { background: #fef3c7; color: #d97706; }
-    .tk-sum-red .tk-sum-icon { background: #fee2e2; color: #dc2626; }
-    .tk-sum-purple .tk-sum-icon { background: #ede9fe; color: #7c3aed; }
+    .tk-sum-blue .tk-sum-icon { background: rgba(229,9,20,.18); color: #E50914; }
+    .tk-sum-green .tk-sum-icon { background: rgba(34,197,94,.15); color: #4ade80; }
+    .tk-sum-amber .tk-sum-icon { background: rgba(245,158,11,.15); color: #fbbf24; }
+    .tk-sum-red .tk-sum-icon { background: rgba(239,68,68,.15); color: #f87171; }
+    .tk-sum-purple .tk-sum-icon { background: rgba(139,92,246,.15); color: #a78bfa; }
 
     .tk-sum-label {
         font-size: 10.5px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.8px;
-        color: #64748b;
+        color: #94a3b8;
     }
     .tk-sum-value {
         font-size: 26px;
         font-weight: 800;
-        color: #0f172a;
+        color: #ffffff;
         letter-spacing: -0.8px;
         line-height: 1.1;
         font-variant-numeric: tabular-nums;
@@ -750,18 +751,18 @@
     .tk-sum-value .unit {
         font-size: 14px;
         font-weight: 600;
-        color: #94a3b8;
+        color: #71717a;
         margin-left: 4px;
     }
-    .tk-sum-blue .tk-sum-value { color: #1d4ed8; }
-    .tk-sum-green .tk-sum-value { color: #059669; }
-    .tk-sum-amber .tk-sum-value { color: #b45309; }
-    .tk-sum-red .tk-sum-value { color: #b91c1c; }
-    .tk-sum-purple .tk-sum-value { color: #6d28d9; }
+    .tk-sum-blue .tk-sum-value { color: #E50914; }
+    .tk-sum-green .tk-sum-value { color: #34d399; }
+    .tk-sum-amber .tk-sum-value { color: #fbbf24; }
+    .tk-sum-red .tk-sum-value { color: #fca5a5; }
+    .tk-sum-purple .tk-sum-value { color: #c4b5fd; }
 
     .tk-sum-note {
         font-size: 11.5px;
-        color: #94a3b8;
+        color: #71717a;
         line-height: 1.4;
     }
 
@@ -781,21 +782,21 @@
         margin-bottom: 24px;
     }
     .tk-chart-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         overflow: hidden;
         transition: all .2s;
     }
     .tk-chart-card:hover {
-        box-shadow: 0 12px 28px rgba(15,23,42,.06);
+        box-shadow: 0 12px 28px rgba(0,0,0,.45);
     }
     .tk-chart-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 16px 20px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .tk-chart-title-wrap {
         display: flex;
@@ -805,22 +806,22 @@
     .tk-chart-icon {
         width: 32px;
         height: 32px;
-        border-radius: 9px;
+        border-radius: 0;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
     }
-    .tk-icon-blue { background: #dbeafe; color: #2563eb; }
-    .tk-icon-green { background: #dcfce7; color: #16a34a; }
-    .tk-icon-amber { background: #fef3c7; color: #d97706; }
-    .tk-icon-red { background: #fee2e2; color: #dc2626; }
-    .tk-icon-purple { background: #ede9fe; color: #7c3aed; }
+    .tk-icon-blue { background: rgba(229,9,20,.18); color: #E50914; }
+    .tk-icon-green { background: rgba(34,197,94,.15); color: #4ade80; }
+    .tk-icon-amber { background: rgba(245,158,11,.15); color: #fbbf24; }
+    .tk-icon-red { background: rgba(239,68,68,.15); color: #f87171; }
+    .tk-icon-purple { background: rgba(139,92,246,.15); color: #a78bfa; }
 
     .tk-chart-title {
         font-size: 14px;
         font-weight: 700;
-        color: #0f172a;
+        color: #ffffff;
         margin: 0;
     }
     .tk-chart-body {
@@ -839,21 +840,21 @@
         margin-bottom: 24px;
     }
     .tk-table-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         overflow: hidden;
         transition: all .2s;
     }
     .tk-table-card:hover {
-        box-shadow: 0 12px 28px rgba(15,23,42,.06);
+        box-shadow: 0 12px 28px rgba(0,0,0,.45);
     }
     .tk-table-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 16px 20px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .tk-table-title-wrap {
         display: flex;
@@ -863,7 +864,7 @@
     .tk-table-icon {
         width: 32px;
         height: 32px;
-        border-radius: 9px;
+        border-radius: 0;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -872,14 +873,14 @@
     .tk-table-title {
         font-size: 14px;
         font-weight: 700;
-        color: #0f172a;
+        color: #ffffff;
         margin: 0;
     }
     .tk-table-badge {
         font-size: 11px;
         font-weight: 700;
-        background: #f1f5f9;
-        color: #64748b;
+        background: #1c1c1c;
+        color: #94a3b8;
         padding: 4px 10px;
         border-radius: 999px;
         margin-left: 6px;
@@ -891,26 +892,26 @@
         font-size: 13.5px;
     }
     .tk-table thead th {
-        background: #f9fafb;
+        background: #1c1c1c;
         font-size: 10.5px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #475569;
+        color: #cbd5e1;
         padding: 12px 16px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         text-align: left;
         white-space: nowrap;
     }
     .tk-table tbody td {
         padding: 12px 16px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
         vertical-align: middle;
     }
     .tk-table tbody tr:last-child td { border-bottom: none; }
-    .tk-table tbody tr:hover { background: #fafbfc; }
+    .tk-table tbody tr:hover { background: #161616; }
     .tk-table .text-end { text-align: right; }
-    .tk-table .text-muted { color: #94a3b8; }
+    .tk-table .text-muted { color: #71717a; }
 
     .tk-rank {
         display: inline-flex;
@@ -919,8 +920,8 @@
         width: 26px;
         height: 26px;
         border-radius: 50%;
-        background: #f1f5f9;
-        color: #64748b;
+        background: #1c1c1c;
+        color: #94a3b8;
         font-size: 12px;
         font-weight: 800;
     }
@@ -930,18 +931,18 @@
 
     .tk-plate {
         display: inline-block;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
+        background: #1c1c1c;
+        border: 1px solid rgba(255,255,255,.1);
         font-size: 12px;
         font-weight: 700;
         padding: 3px 8px;
-        border-radius: 6px;
+        border-radius: 0;
         font-variant-numeric: tabular-nums;
     }
     .tk-money {
         font-variant-numeric: tabular-nums;
         font-weight: 700;
-        color: #1d4ed8;
+        color: #E50914;
     }
 
     /* Empty state */
@@ -950,7 +951,7 @@
         align-items: center;
         justify-content: center;
         padding: 60px 20px;
-        color: #94a3b8;
+        color: #71717a;
         font-size: 13.5px;
         font-weight: 500;
     }

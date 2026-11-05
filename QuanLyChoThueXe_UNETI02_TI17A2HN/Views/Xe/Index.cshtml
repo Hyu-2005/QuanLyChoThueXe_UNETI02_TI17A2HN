@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     Index.cshtml - danh sach xe (tim kiem + loc + sap xep + phan trang)
     sinh vien thuc hien: Dao Gia Hung - 23103100065
     module 2 - quan ly xe, bang gia thue
@@ -35,14 +36,14 @@
 }
 
 <style>
-    .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .page-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
     .page-wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
 
     /* HERO */
     .xe-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #1c1c1c 0%, #0a0a0a 100%);
         color: #fff;
-        border-radius: 14px;
+        border-radius: 0;
         padding: 32px 30px;
         margin-bottom: 24px;
         position: relative;
@@ -77,7 +78,7 @@
         background: rgba(255,255,255,.12);
         backdrop-filter: blur(8px);
         border: 1px solid rgba(255,255,255,.14);
-        border-radius: 10px;
+        border-radius: 0;
         padding: 14px 16px;
     }
     .stat-row .stat .lbl {
@@ -100,9 +101,9 @@
 
     /* FILTER */
     .filter-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         margin-bottom: 20px;
         overflow: hidden;
     }
@@ -111,14 +112,14 @@
         justify-content: space-between;
         align-items: center;
         padding: 16px 22px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .filter-card .head h6 {
         font-size: 12px;
         font-weight: 700;
         letter-spacing: 1px;
         text-transform: uppercase;
-        color: #475569;
+        color: #cbd5e1;
         margin: 0;
     }
     .filter-toggle {
@@ -126,49 +127,49 @@
         border: none;
         font-size: 13px;
         font-weight: 600;
-        color: #1d4ed8;
+        color: #E50914;
         cursor: pointer;
         padding: 4px 8px;
-        border-radius: 6px;
+        border-radius: 0;
     }
-    .filter-toggle:hover { background: #eff6ff; }
+    .filter-toggle:hover { background: rgba(229,9,20,.10); }
     .filter-card .body { padding: 18px 22px; }
     .filter-card .form-label {
         font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: .5px;
-        color: #64748b;
+        color: #94a3b8;
         margin-bottom: 6px;
     }
     .filter-card .form-control,
     .filter-card .form-select {
-        border-radius: 8px;
-        border-color: #d1d5db;
+        border-radius: 0;
+        border-color: rgba(255,255,255,.2);
         font-size: 14px;
         height: 40px;
     }
     .filter-card .form-control:focus,
     .filter-card .form-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+        border-color: #E50914;
+        box-shadow: 0 0 0 3px rgba(229,9,20,.12);
     }
     .filter-badge {
         display: inline-block;
-        background: #eff6ff;
-        color: #1d4ed8;
+        background: rgba(59,130,246,.15);
+        color: #93c5fd;
         font-size: 11px;
         font-weight: 700;
         padding: 3px 8px;
-        border-radius: 6px;
+        border-radius: 0;
         margin-left: 6px;
     }
 
     /* TABLE */
     .data-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         overflow: hidden;
     }
     .data-card .card-head {
@@ -176,62 +177,62 @@
         justify-content: space-between;
         align-items: center;
         padding: 18px 22px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .data-card .card-head .title {
         font-size: 14px;
         font-weight: 700;
-        color: #0f172a;
+        color: #ffffff;
         margin: 0;
     }
     .data-card .card-head .count {
         font-size: 12px;
-        color: #64748b;
-        background: #f1f5f9;
+        color: #94a3b8;
+        background: #1c1c1c;
         padding: 4px 12px;
         border-radius: 999px;
         font-weight: 600;
     }
     .data-card table { margin: 0; font-size: 14px; }
     .data-card thead th {
-        background: #f9fafb;
+        background: #1c1c1c;
         font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: .5px;
-        color: #475569;
+        color: #cbd5e1;
         padding: 14px 16px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         white-space: nowrap;
     }
     .data-card tbody td {
         padding: 16px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
         vertical-align: middle;
     }
     .data-card tbody tr:last-child td { border-bottom: none; }
-    .data-card tbody tr:hover { background: #fafbfc; }
+    .data-card tbody tr:hover { background: #161616; }
 
     .xe-thumb {
         width: 90px; height: 68px;
         object-fit: cover;
-        border-radius: 10px;
-        border: 1px solid #e5e7eb;
-        background: #f8fafc;
+        border-radius: 0;
+        border: 1px solid rgba(255,255,255,.1);
+        background: #0a0a0a;
         transition: transform .15s;
     }
     .data-card tbody tr:hover .xe-thumb { transform: scale(1.04); }
 
-    .xe-name { font-weight: 700; color: #0f172a; margin-bottom: 4px; font-size: 14px; }
+    .xe-name { font-weight: 700; color: #ffffff; margin-bottom: 4px; font-size: 14px; }
     .plate-chip {
         display: inline-block;
         padding: 4px 10px;
-        border-radius: 6px;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
+        border-radius: 0;
+        background: #1c1c1c;
+        border: 1px solid rgba(255,255,255,.1);
         font-weight: 700;
         font-size: 12px;
-        color: #0f172a;
+        color: #ffffff;
         letter-spacing: .3px;
         font-variant-numeric: tabular-nums;
     }
@@ -239,17 +240,17 @@
     .obj-badge {
         display: inline-block;
         padding: 5px 12px;
-        border-radius: 8px;
+        border-radius: 0;
         font-size: 12px;
         font-weight: 600;
         line-height: 1.2;
     }
-    .obj-badge.loai { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-    .xe-meta { font-size: 12px; color: #64748b; margin-top: 4px; }
+    .obj-badge.loai { background: rgba(59,130,246,.15); color: #93c5fd; border: 1px solid rgba(59,130,246,.35); }
+    .xe-meta { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
-    .price-tag { font-weight: 700; color: #1e40af; font-size: 15px; font-variant-numeric: tabular-nums; }
-    .price-tag small { font-weight: 500; color: #6b7280; font-size: 11px; }
-    .price-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .price-tag { font-weight: 700; color: #E50914; font-size: 15px; font-variant-numeric: tabular-nums; }
+    .price-tag small { font-weight: 500; color: #94a3b8; font-size: 11px; }
+    .price-sub { font-size: 11px; color: #71717a; margin-top: 2px; }
 
     .status-pill {
         display: inline-block;
@@ -260,11 +261,11 @@
         letter-spacing: .2px;
         white-space: nowrap;
     }
-    .status-pill.ready   { background: #dcfce7; color: #166534; }
-    .status-pill.hold    { background: #cffafe; color: #155e75; }
-    .status-pill.renting { background: #fef3c7; color: #92400e; }
-    .status-pill.maint   { background: #fee2e2; color: #991b1b; }
-    .status-pill.off     { background: #f1f5f9; color: #64748b; }
+    .status-pill.ready   { background: rgba(34,197,94,.15); color: #86efac; }
+    .status-pill.hold    { background: rgba(6,182,212,.15); color: #67e8f9; }
+    .status-pill.renting { background: rgba(245,158,11,.15); color: #fcd34d; }
+    .status-pill.maint   { background: rgba(239,68,68,.15); color: #fca5a5; }
+    .status-pill.off     { background: #1c1c1c; color: #94a3b8; }
 
     .action-cell {
         display: flex;
@@ -280,42 +281,42 @@
         padding: 7px 14px;
         font-size: 13px;
         font-weight: 600;
-        border-radius: 8px;
-        border: 1px solid #d1d5db;
-        background: #fff;
-        color: #374151;
+        border-radius: 0;
+        border: 1px solid rgba(255,255,255,.2);
+        background: #121212;
+        color: #cbd5e1;
         text-decoration: none;
         transition: all .15s;
         line-height: 1;
         white-space: nowrap;
         min-height: 34px;
     }
-    .btn-clean:hover { border-color: #9ca3af; background: #f9fafb; color: #111827; }
-    .btn-clean.warn { color: #b45309; border-color: #fcd34d; }
-    .btn-clean.warn:hover { background: #fffbeb; }
-    .btn-clean.danger { color: #b91c1c; border-color: #fca5a5; }
-    .btn-clean.danger:hover { background: #fef2f2; }
+    .btn-clean:hover { border-color: rgba(255,255,255,.3); background: #1c1c1c; color: #ffffff; }
+    .btn-clean.warn { color: #fbbf24; border-color: rgba(245,158,11,.4); }
+    .btn-clean.warn:hover { background: rgba(245,158,11,.10); }
+    .btn-clean.danger { color: #fca5a5; border-color: rgba(239,68,68,.4); }
+    .btn-clean.danger:hover { background: rgba(239,68,68,.10); }
     .btn-clean.primary {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #b80710 0%, #E50914 100%);
         color: #fff;
         border-color: transparent;
-        box-shadow: 0 4px 12px rgba(59,130,246,.25);
+        box-shadow: 0 4px 12px rgba(229,9,20,.25);
     }
     .btn-clean.primary:hover {
         color: #fff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(59,130,246,.35);
+        box-shadow: 0 6px 18px rgba(229,9,20,.35);
     }
 
     .empty-state {
         padding: 80px 24px;
         text-align: center;
-        color: #94a3b8;
+        color: #71717a;
     }
     .empty-state .big {
         font-size: 42px;
         font-weight: 700;
-        color: #e5e7eb;
+        color: #3f3f46;
         letter-spacing: 4px;
     }
     .empty-state .msg { font-size: 15px; margin-top: 8px; }
@@ -325,24 +326,24 @@
         justify-content: space-between;
         align-items: center;
         padding: 16px 22px;
-        background: #f9fafb;
-        border-top: 1px solid #e5e7eb;
+        background: #1c1c1c;
+        border-top: 1px solid rgba(255,255,255,.1);
         font-size: 13px;
-        color: #64748b;
+        color: #94a3b8;
     }
     .pager .pagination { margin: 0; }
     .pager .page-link {
-        border-radius: 8px;
+        border-radius: 0;
         margin: 0 2px;
-        border-color: #e5e7eb;
-        color: #334155;
+        border-color: rgba(255,255,255,.1);
+        color: #cbd5e1;
         font-size: 13px;
         font-weight: 600;
         padding: 6px 12px;
     }
     .pager .page-item.active .page-link {
-        background: #1d4ed8;
-        border-color: #1d4ed8;
+        background: #b80710;
+        border-color: #E50914;
     }
 
     @@media (max-width: 768px) {
@@ -359,7 +360,7 @@
             {
                 <div class="hero-actions">
                     <a asp-action="Create" class="btn btn-light fw-semibold px-4 py-2"
-                       style="border-radius:8px">
+                       style="border-radius:0">
                         + Thêm xe mới
                     </a>
                 </div>

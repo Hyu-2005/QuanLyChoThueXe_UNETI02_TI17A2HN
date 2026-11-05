@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     LichSu.cshtml - lich su thue cua khach hang
     sinh vien thuc hien: Duong Lam Huy - 23103100120
     module 5 - tinh tien, thanh toan, lich su va thong ke
@@ -11,24 +12,24 @@
 }
 
 <style>
-    .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .page-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
     .page-wrap { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
 
     .page-head {
         margin-bottom: 24px;
         padding-bottom: 20px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,.1);
     }
     .page-head .back {
-        font-size: 13px; color: #64748b; text-decoration: none;
+        font-size: 13px; color: #94a3b8; text-decoration: none;
         display: inline-block; margin-bottom: 8px;
     }
-    .page-head .back:hover { color: #1d4ed8; }
+    .page-head .back:hover { color: #E50914; }
     .page-head h1 {
-        font-size: 26px; font-weight: 800; color: #0f172a;
+        font-size: 26px; font-weight: 800; color: #ffffff;
         letter-spacing: -0.4px; margin: 0 0 4px 0;
     }
-    .page-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+    .page-head .sub { font-size: 14px; color: #94a3b8; margin: 0; }
 
     .stat-strip {
         display: grid;
@@ -37,83 +38,83 @@
         margin-bottom: 24px;
     }
     .stat-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 18px 20px;
-        border-left: 4px solid #3b82f6;
+        border-left: 4px solid #E50914;
     }
     .stat-card.green { border-left-color: #10b981; }
     .stat-card.red { border-left-color: #ef4444; }
-    .stat-card.blue { border-left-color: #3b82f6; }
+    .stat-card.blue { border-left-color: #E50914; }
     .stat-card.amber { border-left-color: #f59e0b; }
     .stat-card .lbl {
         font-size: 11px; font-weight: 700;
         text-transform: uppercase; letter-spacing: .5px;
-        color: #64748b; margin-bottom: 6px;
+        color: #94a3b8; margin-bottom: 6px;
     }
     .stat-card .num {
         font-size: 22px; font-weight: 800;
-        color: #0f172a; line-height: 1;
+        color: #ffffff; line-height: 1;
     }
 
     .kh-info-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 20px 24px;
         margin-bottom: 24px;
     }
     .kh-info-card h6 {
         font-size: 12px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 1.2px;
-        color: #64748b; margin: 0 0 14px 0;
+        color: #94a3b8; margin: 0 0 14px 0;
     }
     .kh-info-row {
         display: flex; gap: 24px;
         font-size: 14px;
     }
     .kh-info-row .item .lbl {
-        font-size: 11px; color: #94a3b8;
+        font-size: 11px; color: #71717a;
         text-transform: uppercase; letter-spacing: .3px;
     }
     .kh-info-row .item .val {
-        font-weight: 700; color: #0f172a;
+        font-weight: 700; color: #ffffff;
         margin-top: 2px;
     }
 
     .data-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         overflow: hidden;
     }
     .data-card .card-head {
         display: flex; justify-content: space-between; align-items: center;
         padding: 18px 22px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .data-card .card-head .title {
-        font-size: 14px; font-weight: 700; color: #0f172a; margin: 0;
+        font-size: 14px; font-weight: 700; color: #ffffff; margin: 0;
     }
     .data-card .card-head .count {
-        font-size: 12px; color: #64748b;
-        background: #f1f5f9;
+        font-size: 12px; color: #94a3b8;
+        background: #1c1c1c;
         padding: 4px 12px; border-radius: 999px;
         font-weight: 600;
     }
     .data-card table { margin: 0; font-size: 14px; }
     .data-card thead th {
-        background: #f9fafb;
+        background: #1c1c1c;
         font-size: 11px; font-weight: 700;
         text-transform: uppercase; letter-spacing: .5px;
-        color: #475569; padding: 14px 16px;
-        border-bottom: 1px solid #e5e7eb;
+        color: #cbd5e1; padding: 14px 16px;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         white-space: nowrap;
     }
     .data-card tbody td {
         padding: 16px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
         vertical-align: middle;
     }
     .data-card tbody tr:last-child td { border-bottom: none; }
@@ -121,26 +122,26 @@
     .xe-cell { display: flex; align-items: center; gap: 10px; }
     .xe-thumb {
         width: 56px; height: 44px;
-        object-fit: cover; border-radius: 8px;
-        border: 1px solid #e5e7eb;
+        object-fit: cover; border-radius: 0;
+        border: 1px solid rgba(255,255,255,.1);
         flex-shrink: 0;
     }
     .xe-name {
-        font-weight: 700; color: #0f172a;
+        font-weight: 700; color: #ffffff;
         font-size: 13px; margin-bottom: 2px;
     }
     .xe-plate {
         display: inline-block;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
+        background: #1c1c1c;
+        border: 1px solid rgba(255,255,255,.1);
         font-size: 11px; font-weight: 700;
         padding: 2px 8px;
-        border-radius: 5px;
+        border-radius: 0;
         font-variant-numeric: tabular-nums;
     }
 
-    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #0f172a; }
-    .money.primary { color: #1d4ed8; font-weight: 700; }
+    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #ffffff; }
+    .money.primary { color: #E50914; font-weight: 700; }
 
     .status-pill {
         display: inline-block;
@@ -151,14 +152,14 @@
         text-transform: uppercase;
         white-space: nowrap;
     }
-    .status-pill.cho-duyet { background: #fef3c7; color: #92400e; }
-    .status-pill.da-duyet { background: #dbeafe; color: #1e40af; }
-    .status-pill.da-ban-giao { background: #cffafe; color: #155e75; }
-    .status-pill.dang-thue { background: #e0e7ff; color: #3730a3; }
-    .status-pill.cho-thanh-toan { background: #fde68a; color: #78350f; }
-    .status-pill.hoan-thanh { background: #dcfce7; color: #166534; }
-    .status-pill.tu-choi { background: #fee2e2; color: #991b1b; }
-    .status-pill.da-huy { background: #f1f5f9; color: #64748b; }
+    .status-pill.cho-duyet { background: rgba(245,158,11,.15); color: #fcd34d; }
+    .status-pill.da-duyet { background: rgba(59,130,246,.20); color: #93c5fd; }
+    .status-pill.da-ban-giao { background: rgba(6,182,212,.15); color: #67e8f9; }
+    .status-pill.dang-thue { background: rgba(99,102,241,.18); color: #a5b4fc; }
+    .status-pill.cho-thanh-toan { background: rgba(245,158,11,.28); color: #fcd34d; }
+    .status-pill.hoan-thanh { background: rgba(34,197,94,.15); color: #86efac; }
+    .status-pill.tu-choi { background: rgba(239,68,68,.15); color: #fca5a5; }
+    .status-pill.da-huy { background: #1c1c1c; color: #94a3b8; }
 
     .action-cell {
         display: flex; justify-content: flex-end; gap: 6px;
@@ -168,22 +169,22 @@
         align-items: center; justify-content: center;
         padding: 7px 14px;
         font-size: 13px; font-weight: 600;
-        border-radius: 8px;
-        border: 1px solid #d1d5db;
-        background: #fff; color: #374151;
+        border-radius: 0;
+        border: 1px solid rgba(255,255,255,.2);
+        background: #121212; color: #cbd5e1;
         text-decoration: none;
         transition: all .15s;
         line-height: 1; white-space: nowrap;
         min-height: 34px;
     }
-    .btn-clean:hover { border-color: #9ca3af; background: #f9fafb; color: #111827; }
+    .btn-clean:hover { border-color: rgba(255,255,255,.3); background: #1c1c1c; color: #ffffff; }
 
     .empty-state {
-        padding: 72px 24px; text-align: center; color: #94a3b8;
+        padding: 72px 24px; text-align: center; color: #71717a;
     }
     .empty-state .big {
         font-size: 42px; font-weight: 700;
-        color: #e5e7eb; letter-spacing: 4px;
+        color: #3f3f46; letter-spacing: 4px;
     }
     .empty-state .msg { font-size: 15px; margin-top: 8px; }
 </style>

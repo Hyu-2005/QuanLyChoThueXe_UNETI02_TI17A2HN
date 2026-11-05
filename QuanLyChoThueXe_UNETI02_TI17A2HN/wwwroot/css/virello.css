@@ -1,0 +1,473 @@
+/* ================================================================
+   VIRELLO DESIGN SYSTEM
+   File: wwwroot/css/virello.css
+   Họ và tên: Vũ Tiến Đạt - MSSV: 23103100119 - SV3
+   Nội dung: Giao diện theo mẫu VIRELLO Premium Luxury Car Rental
+             (font Oswald + Inter, nền đen, đỏ #E50914, kính mờ,
+              hiệu ứng reveal khi cuộn, parallax, pulse-glow...)
+   ================================================================ */
+
+:root {
+    --vr-red: #E50914;
+    --vr-red-hover: #b80710;
+    --vr-dark: #0a0a0a;
+    --vr-card: #121212;
+    --vr-gray: #1c1c1c;
+    --vr-text: #f1f5f9;
+    --vr-slate300: #cbd5e1;
+    --vr-slate400: #94a3b8;
+    --vr-slate500: #64748b;
+    --vr-line: rgba(255, 255, 255, .1);
+    --vr-font-display: 'Oswald', sans-serif;
+    --vr-font-sans: 'Inter', sans-serif;
+    --vr-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #050505; }
+::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--vr-red); }
+
+/* ---------- Body ---------- */
+body.vr-body {
+    margin: 0;
+    font-family: var(--vr-font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+body.vr-dark { background: #000; color: var(--vr-text); }
+body.vr-light { background: #f5f7fa; color: #0f172a; }
+body.chrome-hidden { background: #fff; }
+.vr-main { flex: 1; }
+body.chrome-hidden .vr-main { padding: 0; margin: 0; min-height: 100vh; }
+
+/* ---------- Header (glass) ---------- */
+.vr-header {
+    position: sticky; top: 0; z-index: 40; width: 100%;
+    border-bottom: 1px solid var(--vr-line);
+    background: rgba(10, 10, 10, .75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: all .3s;
+}
+.vr-header-inner {
+    max-width: 80rem; margin: 0 auto; padding: 0 24px; height: 80px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.vr-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.vr-logo svg { width: 40px; height: 40px; color: var(--vr-red); fill: currentColor; transition: transform .3s; }
+.vr-logo:hover svg { transform: scale(1.1); }
+.vr-logo-inner { fill: #fff; opacity: .8; }
+.vr-logo-text {
+    font-family: var(--vr-font-display); font-weight: 700; font-size: 30px; line-height: 36px;
+    letter-spacing: .1em; color: #fff; text-transform: uppercase;
+}
+
+/* ---------- Menu desktop ---------- */
+.vr-nav {
+    display: none; align-items: center; gap: 28px;
+    font-size: 12px; font-weight: 600; letter-spacing: .05em; color: var(--vr-slate300);
+}
+@media (min-width: 768px) { .vr-nav { display: flex; } }
+.vr-nav > a, .vr-nav .vr-dd-btn {
+    color: inherit; text-decoration: none; text-transform: uppercase; background: none; border: 0;
+    padding: 0; font: inherit; letter-spacing: inherit; cursor: pointer; transition: color .15s;
+    white-space: nowrap;
+}
+.vr-nav > a:hover, .vr-nav .vr-dd-btn:hover, .vr-nav > a.active, .vr-dd.active > .vr-dd-btn { color: var(--vr-red); }
+.vr-dd { position: relative; padding: 8px 0; }
+.vr-dd-btn i { font-size: 10px; margin-left: 4px; }
+.vr-dd-menu {
+    position: absolute; top: 100%; left: 0; min-width: 240px;
+    background: var(--vr-card); border: 1px solid var(--vr-line); border-radius: 8px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .6); padding: 8px 0;
+    opacity: 0; visibility: hidden; transition: all .2s;
+}
+.vr-dd-menu.right { left: auto; right: 0; }
+.vr-dd:hover .vr-dd-menu, .vr-dd:focus-within .vr-dd-menu { opacity: 1; visibility: visible; }
+.vr-dd-menu a, .vr-dd-menu button.vr-dd-link {
+    display: block; width: 100%; text-align: left; padding: 8px 16px; font-size: 13px;
+    font-weight: 600; letter-spacing: .02em; color: var(--vr-slate300); text-decoration: none;
+    background: none; border: 0; cursor: pointer; transition: all .15s;
+}
+.vr-dd-menu a:hover, .vr-dd-menu button.vr-dd-link:hover { background: var(--vr-red); color: #fff; }
+.vr-dd-menu a.active { background: rgba(229, 9, 20, .15); color: #fff; }
+.vr-dd-head {
+    padding: 8px 16px 4px; font-family: var(--vr-font-display); font-size: 10px;
+    letter-spacing: .15em; color: var(--vr-slate500); text-transform: uppercase;
+}
+.vr-dd-sep { height: 1px; background: var(--vr-line); margin: 6px 0; }
+
+/* ---------- Nút ---------- */
+.vr-actions { display: flex; align-items: center; gap: 16px; }
+.vr-btn-outline {
+    display: none; padding: 10px 24px; border: 1px solid rgba(255, 255, 255, .3); color: #fff;
+    font-family: var(--vr-font-display); font-size: 14px; letter-spacing: .05em; text-transform: uppercase;
+    background: transparent; text-decoration: none; border-radius: 0;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1); transition: all .3s; cursor: pointer;
+}
+@media (min-width: 640px) { .vr-btn-outline { display: inline-block; } }
+.vr-btn-outline:hover { border-color: var(--vr-red); background: var(--vr-red); color: #fff; }
+.vr-btn-outline.always { display: inline-block; }
+
+.vr-btn-red {
+    display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 32px;
+    background: var(--vr-red); color: #fff; border: 0; text-decoration: none; cursor: pointer;
+    font-family: var(--vr-font-display); font-size: 16px; letter-spacing: .05em; text-transform: uppercase;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, .3); transition: all .3s;
+}
+.vr-btn-red:hover { background: var(--vr-red-hover); color: #fff; }
+.vr-btn-red.full { width: 100%; }
+.vr-btn-ghost {
+    display: inline-flex; align-items: center; justify-content: center; padding: 16px 32px;
+    border: 1px solid rgba(255, 255, 255, .2); color: #fff; text-decoration: none;
+    font-family: var(--vr-font-display); font-size: 16px; letter-spacing: .05em; text-transform: uppercase;
+    transition: all .3s;
+}
+.vr-btn-ghost:hover { border-color: #fff; color: #fff; }
+.vr-pulse { animation: vrPulseGlow 2.5s ease-in-out infinite; }
+@keyframes vrPulseGlow {
+    0%, 100% { box-shadow: 0 0 15px rgba(229, 9, 20, .4); }
+    50% { box-shadow: 0 0 30px rgba(229, 9, 20, .8); }
+}
+@keyframes vrFloatSlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.vr-float { animation: vrFloatSlow 4s ease-in-out infinite; }
+
+/* ---------- Người dùng ---------- */
+.vr-user { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 4px 0; }
+.vr-avatar {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--vr-red); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--vr-font-display); font-weight: 700; font-size: 15px;
+}
+.vr-user-text { line-height: 1.2; text-align: left; }
+.vr-user-name { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0; text-transform: none; }
+.vr-user-role { font-family: var(--vr-font-display); font-size: 10px; letter-spacing: .15em; color: var(--vr-slate400); text-transform: uppercase; }
+
+/* ---------- Menu mobile ---------- */
+.vr-burger { display: inline-flex; font-size: 24px; color: var(--vr-slate300); background: none; border: 0; cursor: pointer; }
+.vr-burger:hover { color: #fff; }
+@media (min-width: 768px) { .vr-burger { display: none; } }
+.vr-mobile { display: none; background: var(--vr-card); border-bottom: 1px solid var(--vr-line); padding: 16px 24px; }
+.vr-mobile.open { display: block; }
+@media (min-width: 768px) { .vr-mobile { display: none !important; } }
+.vr-mobile a, .vr-mobile button.vr-m-link {
+    display: block; width: 100%; text-align: left; background: none; border: 0; padding: 8px 0;
+    font-size: 14px; font-weight: 600; color: var(--vr-slate300); text-decoration: none;
+}
+.vr-mobile a:hover, .vr-mobile a.active { color: var(--vr-red); }
+.vr-mobile .vr-m-head {
+    font-family: var(--vr-font-display); font-size: 11px; letter-spacing: .15em; color: var(--vr-slate500);
+    text-transform: uppercase; margin-top: 10px;
+}
+
+/* ---------- Reveal khi cuộn ---------- */
+.vr-reveal { opacity: 0; transform: translateY(30px); transition: all .8s var(--vr-ease); }
+.vr-reveal.active { opacity: 1; transform: translateY(0); }
+
+/* ---------- Hero ---------- */
+.vr-hero {
+    position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    overflow: hidden; padding: 48px 0 96px; background: #000;
+}
+.vr-hero-bg { position: absolute; inset: 0; z-index: 0; }
+.vr-hero-bg img {
+    width: 100%; height: 100%; object-fit: cover; object-position: center;
+    transform: scale(1.05); transition: transform 1s;
+}
+.vr-hero-bg::before, .vr-hero-bg::after { content: ""; position: absolute; inset: 0; }
+.vr-hero-bg::before { background: linear-gradient(to top, #000, rgba(0, 0, 0, .6), transparent); }
+.vr-hero-bg::after { background: linear-gradient(to right, rgba(0, 0, 0, .9), transparent, rgba(0, 0, 0, .8)); }
+.vr-hero-slice {
+    position: absolute; top: -10rem; left: -10rem; width: 24rem; height: 800px;
+    background: rgba(229, 9, 20, .1); transform: rotate(12deg); filter: blur(64px); pointer-events: none;
+}
+.vr-hero-content { position: relative; z-index: 10; max-width: 72rem; margin: 0 auto; padding: 0 24px; text-align: center; }
+.vr-hero-title {
+    font-family: var(--vr-font-display); font-weight: 700; text-transform: uppercase; color: #fff;
+    font-size: clamp(3rem, 8vw, 7.5rem); line-height: .95; letter-spacing: -0.02em; margin: 0;
+    filter: drop-shadow(0 25px 25px rgba(0, 0, 0, .5));
+}
+.vr-grad-text {
+    background: linear-gradient(to right, #fff, #e2e8f0, #94a3b8);
+    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+}
+.vr-slogan {
+    margin: 24px 0; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+    color: var(--vr-slate300); font-family: var(--vr-font-display); letter-spacing: .1em; font-size: 14px;
+}
+@media (min-width: 768px) { .vr-slogan { font-size: 20px; } }
+.vr-slogan b { color: var(--vr-red); }
+.vr-hero-text {
+    max-width: 48rem; margin: 0 auto 40px; color: var(--vr-slate400); font-size: 14px; line-height: 1.625;
+    text-transform: uppercase; letter-spacing: .025em; font-weight: 300;
+}
+@media (min-width: 768px) { .vr-hero-text { font-size: 16px; } }
+.vr-hero-actions { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+@media (min-width: 640px) { .vr-hero-actions { flex-direction: row; } }
+.vr-hero-actions > * { width: 100%; }
+@media (min-width: 640px) { .vr-hero-actions > * { width: auto; } }
+
+/* ---------- Section chung ---------- */
+.vr-section { padding: 96px 0; position: relative; }
+.vr-section.dark { background: var(--vr-dark); border-top: 1px solid var(--vr-line); }
+.vr-section.black { background: #000; }
+.vr-wrap { max-width: 80rem; margin: 0 auto; padding: 0 24px; }
+.vr-head { text-align: center; max-width: 48rem; margin: 0 auto 64px; }
+.vr-label {
+    display: inline-block; color: var(--vr-red); font-family: var(--vr-font-display); letter-spacing: .1em;
+    font-size: 14px; text-transform: uppercase; font-weight: 700;
+}
+.vr-h2 {
+    font-family: var(--vr-font-display); font-weight: 700; text-transform: uppercase; color: #fff;
+    font-size: 36px; line-height: 1.1; margin: 8px 0 0;
+}
+@media (min-width: 768px) { .vr-h2 { font-size: 60px; } }
+.vr-h2.md { font-size: 36px; line-height: 1.2; }
+@media (min-width: 768px) { .vr-h2.md { font-size: 48px; } }
+.vr-sub { color: var(--vr-slate400); font-size: 14px; margin-top: 16px; }
+
+/* ---------- Bộ lọc xe ---------- */
+.vr-filters { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; margin-top: 32px; }
+.vr-filter-btn {
+    padding: 8px 24px; background: var(--vr-card); border: 1px solid var(--vr-line); color: var(--vr-slate300);
+    font-family: var(--vr-font-display); font-size: 12px; letter-spacing: .05em; text-transform: uppercase;
+    cursor: pointer; transition: all .15s;
+}
+.vr-filter-btn:hover { background: rgba(255, 255, 255, .1); }
+.vr-filter-btn.active { background: var(--vr-red); border-color: var(--vr-red); color: #fff; }
+
+/* ---------- Thẻ xe ---------- */
+.vr-grid { display: grid; grid-template-columns: 1fr; gap: 32px; }
+@media (min-width: 768px) { .vr-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .vr-grid { grid-template-columns: repeat(3, 1fr); } }
+.vr-card {
+    background: var(--vr-card); border: 1px solid var(--vr-line); overflow: hidden; transition: all .3s;
+}
+.vr-card:hover { border-color: var(--vr-red); }
+.vr-card-img {
+    position: relative; height: 240px; overflow: hidden;
+    background: linear-gradient(160deg, #1c1c1c, #0a0a0a); display: flex; align-items: center; justify-content: center;
+    color: #3f3f46; font-size: 64px;
+}
+.vr-card-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+.vr-card:hover .vr-card-img img { transform: scale(1.1); }
+.vr-badge {
+    position: absolute; top: 16px; left: 16px; background: var(--vr-red); color: #fff; font-family: var(--vr-font-display);
+    font-size: 10px; font-weight: 700; padding: 4px 10px; text-transform: uppercase; letter-spacing: .05em;
+}
+.vr-price {
+    position: absolute; bottom: 16px; right: 16px; background: rgba(0, 0, 0, .8); backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); padding: 4px 12px; color: #fff; font-family: var(--vr-font-display); font-size: 14px;
+}
+.vr-price b { color: var(--vr-red); font-weight: 700; font-size: 18px; }
+.vr-card-body { padding: 24px; }
+.vr-card-title {
+    font-family: var(--vr-font-display); font-size: 24px; font-weight: 700; text-transform: uppercase; color: #fff;
+    margin: 0; transition: color .3s; line-height: 1.2;
+}
+.vr-card:hover .vr-card-title { color: var(--vr-red); }
+.vr-card-desc { font-size: 12px; color: var(--vr-slate400); margin: 4px 0 0; }
+.vr-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 16px 0; margin: 16px 0;
+    border-top: 1px solid var(--vr-line); border-bottom: 1px solid var(--vr-line);
+    text-align: center; font-size: 12px; color: var(--vr-slate300);
+}
+.vr-stats i { display: block; color: var(--vr-red); margin-bottom: 4px; }
+.vr-card-btn {
+    display: block; width: 100%; padding: 12px; text-align: center; text-decoration: none; background: transparent;
+    border: 1px solid rgba(255, 255, 255, .2); color: #fff; font-family: var(--vr-font-display); font-size: 12px;
+    text-transform: uppercase; letter-spacing: .05em; transition: all .3s;
+}
+.vr-card:hover .vr-card-btn, .vr-card-btn:hover { background: var(--vr-red); border-color: var(--vr-red); color: #fff; }
+.vr-empty { text-align: center; color: var(--vr-slate400); padding: 48px 0; grid-column: 1 / -1; }
+
+/* ---------- Giới thiệu ---------- */
+.vr-about { display: grid; grid-template-columns: 1fr; gap: 64px; align-items: center; }
+@media (min-width: 1024px) { .vr-about { grid-template-columns: 1fr 1fr; } }
+.vr-frame { position: relative; }
+.vr-frame-img { position: relative; z-index: 10; border: 2px solid var(--vr-red); }
+.vr-frame-img img { display: block; width: 100%; height: auto; filter: brightness(.9); }
+.vr-frame-glow {
+    position: absolute; bottom: -24px; right: -24px; width: 12rem; height: 12rem;
+    background: rgba(229, 9, 20, .2); filter: blur(40px); pointer-events: none;
+}
+.vr-p { color: var(--vr-slate400); font-size: 14px; line-height: 1.625; margin-top: 24px; }
+.vr-feat { display: flex; align-items: flex-start; gap: 16px; margin-top: 24px; }
+.vr-feat-ico {
+    width: 48px; height: 48px; flex-shrink: 0; background: var(--vr-card); border: 1px solid rgba(229, 9, 20, .4);
+    display: flex; align-items: center; justify-content: center; color: var(--vr-red); font-size: 20px;
+}
+.vr-feat h4 { font-family: var(--vr-font-display); font-size: 18px; font-weight: 700; color: #fff; text-transform: uppercase; margin: 0; }
+.vr-feat p { font-size: 12px; color: var(--vr-slate400); margin: 4px 0 0; }
+
+/* ---------- Ô chức năng (dashboard) ---------- */
+.vr-tiles { display: grid; grid-template-columns: 1fr; gap: 24px; }
+@media (min-width: 640px) { .vr-tiles { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .vr-tiles { grid-template-columns: repeat(4, 1fr); } }
+.vr-tiles.three { }
+@media (min-width: 1024px) { .vr-tiles.three { grid-template-columns: repeat(3, 1fr); } }
+.vr-tile {
+    display: block; background: var(--vr-card); border: 1px solid var(--vr-line); padding: 28px; text-decoration: none;
+    transition: all .3s; color: inherit;
+}
+.vr-tile:hover { border-color: var(--vr-red); transform: translateY(-4px); color: inherit; }
+.vr-tile .vr-feat-ico { margin-bottom: 20px; }
+.vr-tile h3 { font-family: var(--vr-font-display); font-size: 22px; font-weight: 700; color: #fff; text-transform: uppercase; margin: 0 0 8px; }
+.vr-tile p { font-size: 13px; color: var(--vr-slate400); margin: 0 0 16px; }
+.vr-tile-go { font-family: var(--vr-font-display); font-size: 12px; letter-spacing: .1em; color: var(--vr-red); text-transform: uppercase; }
+
+/* ---------- Modal ---------- */
+.vr-modal {
+    position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center; padding: 16px;
+    background: rgba(0, 0, 0, .8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.vr-modal.open { display: flex; }
+.vr-modal-box {
+    position: relative; width: 100%; max-width: 32rem; background: var(--vr-card); border: 1px solid rgba(255, 255, 255, .2);
+    padding: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .6);
+}
+.vr-modal-close { position: absolute; top: 16px; right: 16px; background: none; border: 0; color: var(--vr-slate400); font-size: 20px; cursor: pointer; }
+.vr-modal-close:hover { color: #fff; }
+.vr-modal-title { font-family: var(--vr-font-display); font-size: 30px; font-weight: 700; text-transform: uppercase; color: #fff; margin: 4px 0 24px; }
+.vr-field { margin-bottom: 16px; }
+.vr-field label {
+    display: block; font-family: var(--vr-font-display); font-size: 12px; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--vr-slate400); margin-bottom: 4px;
+}
+.vr-input {
+    width: 100%; background: #000; border: 1px solid rgba(255, 255, 255, .2); padding: 8px 14px; font-size: 14px;
+    color: #fff; color-scheme: dark; border-radius: 0;
+}
+.vr-input:focus { border-color: var(--vr-red); outline: none; }
+.vr-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ---------- Footer ---------- */
+.vr-footer { background: var(--vr-card); border-top: 1px solid var(--vr-line); padding: 64px 0 48px; color: var(--vr-slate400); }
+.vr-footer-grid { max-width: 80rem; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 1fr; gap: 40px; }
+@media (min-width: 768px) { .vr-footer-grid { grid-template-columns: repeat(4, 1fr); } }
+.vr-footer h5 {
+    font-family: var(--vr-font-display); font-weight: 700; color: #fff; text-transform: uppercase;
+    letter-spacing: .05em; margin: 0 0 16px; font-size: 16px;
+}
+.vr-footer ul { list-style: none; margin: 0; padding: 0; font-size: 12px; }
+.vr-footer li { margin-bottom: 8px; }
+.vr-footer a { color: var(--vr-slate400); text-decoration: none; transition: color .15s; }
+.vr-footer a:hover { color: var(--vr-red); }
+.vr-footer li i { color: var(--vr-red); margin-right: 8px; }
+.vr-footer-brand { font-family: var(--vr-font-display); font-weight: 700; font-size: 30px; letter-spacing: .1em; color: #fff; text-transform: uppercase; }
+.vr-footer-note { font-size: 12px; margin-top: 16px; line-height: 1.625; text-transform: uppercase; letter-spacing: .05em; }
+.vr-footer-bottom {
+    max-width: 80rem; margin: 48px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--vr-line);
+    text-align: center; font-family: var(--vr-font-display); font-size: 12px; letter-spacing: .1em; color: var(--vr-slate500);
+}
+
+/* ---------- Trang cũ (nền sáng): giữ nguyên bố cục ---------- */
+.app-content { padding: 0; }
+.app-content .container-fluid { padding: 24px 28px 0; }
+body.vr-light .app-content { padding-bottom: 48px; }
+@media (max-width: 991.98px) { .app-content .container-fluid { padding: 16px 16px 0; } }
+
+/* ---------- Thông báo (alert) ---------- */
+.alert {
+    border-radius: 12px; border: none; font-size: 14px; font-weight: 500; padding: 14px 18px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .05); display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+}
+.alert strong:first-child { font-weight: 700; }
+.alert-success { background: #f0fdf4; color: #166534; border-left: 4px solid #10b981; }
+.alert-danger { background: #fef2f2; color: #991b1b; border-left: 4px solid #ef4444; }
+.alert-warning { background: #fffbeb; color: #92400e; border-left: 4px solid #f59e0b; }
+.alert-info { background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; }
+.vr-alerts { max-width: 80rem; margin: 16px auto 0; padding: 0 24px; position: relative; z-index: 30; }
+body.vr-dark .alert { border-radius: 0; }
+body.vr-dark .alert-success { background: #0c1f14; color: #86efac; }
+body.vr-dark .alert-danger { background: #2a0d0f; color: #fca5a5; border-left-color: var(--vr-red); }
+
+/* ---------- Bổ sung: hộp người dùng ---------- */
+.vr-user-text { display: none; }
+@media (min-width: 1024px) { .vr-user-text { display: block; } }
+.vr-actions .vr-dd { padding: 0; }
+.vr-dd:focus { outline: none; }
+.vr-user:focus-visible { outline: 2px solid var(--vr-red); outline-offset: 4px; }
+
+/* ---------- Trang Giới thiệu / form trong trang tối ---------- */
+.vr-dark .form-control, .vr-dark .form-select { background: #000; border-color: rgba(255, 255, 255, .2); color: #fff; border-radius: 0; }
+.vr-dark .form-control:focus, .vr-dark .form-select:focus { border-color: var(--vr-red); box-shadow: none; }
+.vr-dark a { color: inherit; }
+
+/* ================================================================
+   TRANG ĐĂNG NHẬP / ĐĂNG KÝ (2 cột)
+   ================================================================ */
+.vr-auth { display: grid; grid-template-columns: 1fr; min-height: 100vh; background: #000; }
+@media (min-width: 1024px) { .vr-auth { grid-template-columns: 1.1fr 1fr; } }
+.vr-auth-left { position: relative; display: none; overflow: hidden; padding: 48px 64px; color: #fff; }
+@media (min-width: 1024px) { .vr-auth-left { display: flex; flex-direction: column; justify-content: space-between; } }
+.vr-auth-left .bg { position: absolute; inset: 0; }
+.vr-auth-left .bg img { width: 100%; height: 100%; object-fit: cover; }
+.vr-auth-left .bg::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, #000, rgba(0, 0, 0, .55), rgba(0, 0, 0, .35)); }
+.vr-auth-left .bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to right, rgba(0, 0, 0, .85), transparent); }
+.vr-auth-left > *:not(.bg) { position: relative; z-index: 2; }
+.vr-auth-left-title {
+    font-family: var(--vr-font-display); font-weight: 700; text-transform: uppercase; font-size: 56px;
+    line-height: 1; letter-spacing: -0.01em; margin: 0 0 16px;
+}
+.vr-auth-left p { color: var(--vr-slate300); max-width: 28rem; font-size: 15px; line-height: 1.6; margin: 0; }
+.vr-auth-bullets { display: flex; gap: 32px; flex-wrap: wrap; }
+.vr-auth-bullets div { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--vr-slate300); }
+.vr-auth-bullets i { color: var(--vr-red); font-size: 18px; }
+
+.vr-auth-right {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 32px 20px; background: var(--vr-dark); position: relative;
+}
+.vr-auth-card { width: 100%; max-width: 30rem; }
+.vr-auth-card.wide { max-width: 38rem; }
+.vr-auth-title { font-family: var(--vr-font-display); font-size: 40px; font-weight: 700; text-transform: uppercase; color: #fff; margin: 4px 0 8px; line-height: 1.1; }
+.vr-auth-sub { color: var(--vr-slate400); font-size: 14px; margin: 0 0 28px; }
+.vr-auth-card .vr-input { height: 48px; }
+.vr-auth-card .vr-field label { font-size: 12px; }
+.vr-auth-error { display: block; color: #fca5a5; font-size: 12px; margin-top: 4px; }
+.vr-auth-msg { padding: 12px 16px; font-size: 13px; margin-bottom: 20px; border-left: 4px solid; }
+.vr-auth-msg.ok { background: #0c1f14; color: #86efac; border-color: #22c55e; }
+.vr-auth-msg.err { background: #2a0d0f; color: #fca5a5; border-color: var(--vr-red); }
+.input-validation-error { border-color: var(--vr-red) !important; }
+.vr-pass { position: relative; }
+.vr-pass .vr-input { padding-right: 44px; }
+.vr-pass button { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: 0; color: var(--vr-slate400); padding: 6px 8px; cursor: pointer; }
+.vr-pass button:hover { color: #fff; }
+.vr-row { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 24px; gap: 12px; flex-wrap: wrap; }
+.vr-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--vr-slate300); cursor: pointer; }
+.vr-check input { accent-color: var(--vr-red); width: 16px; height: 16px; }
+.vr-link { color: var(--vr-slate400); font-size: 13px; text-decoration: none; transition: color .15s; }
+.vr-link:hover { color: var(--vr-red); }
+.vr-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; color: var(--vr-slate500); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
+.vr-divider::before, .vr-divider::after { content: ""; flex: 1; height: 1px; background: var(--vr-line); }
+.vr-google {
+    display: flex; align-items: center; justify-content: center; gap: 10px; height: 48px; width: 100%;
+    border: 1px solid rgba(255, 255, 255, .2); color: #fff; text-decoration: none; background: transparent;
+    font-family: var(--vr-font-display); letter-spacing: .05em; text-transform: uppercase; font-size: 14px; transition: all .3s;
+}
+.vr-google:hover { border-color: #fff; color: #fff; background: rgba(255, 255, 255, .05); }
+.vr-auth-foot { text-align: center; font-size: 13px; color: var(--vr-slate400); margin-top: 24px; }
+.vr-auth-foot a { color: var(--vr-red); font-weight: 600; text-decoration: none; }
+.vr-auth-foot a:hover { color: #fff; }
+.vr-auth-top { position: absolute; top: 24px; left: 24px; }
+.vr-auth-top a { color: var(--vr-slate400); font-size: 13px; text-decoration: none; }
+.vr-auth-top a:hover { color: var(--vr-red); }
+.vr-auth-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 640px) { .vr-auth-grid { grid-template-columns: 1fr 1fr; } .vr-auth-grid .full { grid-column: 1 / -1; } }
+.vr-auth-grid .vr-field { margin-bottom: 0; }
+
+body.vr-dark.chrome-hidden { background: #000; }

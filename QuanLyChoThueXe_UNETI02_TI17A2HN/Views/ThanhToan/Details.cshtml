@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     Details.cshtml - chi tiet hoa don thanh toan
     Sinh viên thực hiện: Duong Lam Huy - 23103100120
     Nội dung: Chi tiết hóa đơn + nút In hóa đơn PDF
@@ -10,29 +11,29 @@
 }
 
 <style>
-    .detail-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .detail-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
     .detail-wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
 
     .detail-head {
         display: flex; justify-content: space-between; align-items: flex-end;
         margin-bottom: 28px; padding-bottom: 20px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         flex-wrap: wrap; gap: 16px;
     }
     .detail-head .back {
-        font-size: 13px; color: #64748b; text-decoration: none;
+        font-size: 13px; color: #94a3b8; text-decoration: none;
         display: inline-block; margin-bottom: 8px;
     }
-    .detail-head .back:hover { color: #1d4ed8; }
+    .detail-head .back:hover { color: #E50914; }
     .detail-head h1 {
-        font-size: 26px; font-weight: 800; color: #0f172a;
+        font-size: 26px; font-weight: 800; color: #ffffff;
         letter-spacing: -0.4px; margin: 0 0 8px 0;
     }
     .id-chip {
         display: inline-block;
-        background: #e0e7ff; color: #3730a3;
+        background: rgba(99,102,241,.18); color: #a5b4fc;
         font-weight: 700; font-size: 13px;
-        padding: 4px 12px; border-radius: 8px;
+        padding: 4px 12px; border-radius: 0;
         margin-right: 8px;
     }
     .status-pill {
@@ -42,7 +43,7 @@
         font-size: 12px; font-weight: 700;
         letter-spacing: .3px;
         text-transform: uppercase;
-        background: #dcfce7; color: #166534;
+        background: rgba(34,197,94,.15); color: #86efac;
     }
 
     /* ===== NÚT IN PDF ===== */
@@ -51,7 +52,7 @@
         padding: 11px 22px;
         background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
         color: #fff;
-        border: none; border-radius: 10px;
+        border: none; border-radius: 0;
         font-size: 13px; font-weight: 700;
         text-decoration: none;
         box-shadow: 0 4px 12px rgba(220,38,38,.25);
@@ -66,9 +67,9 @@
     .btn-print-pdf .icon { font-size: 16px; }
 
     .info-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 26px 30px;
         margin-bottom: 20px;
     }
@@ -76,25 +77,25 @@
         font-size: 12px; font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1.2px;
-        color: #64748b; margin: 0 0 18px 0;
+        color: #94a3b8; margin: 0 0 18px 0;
     }
     .info-row {
         display: flex; justify-content: space-between;
         padding: 11px 0;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
         font-size: 14px;
     }
     .info-row:last-child { border-bottom: none; }
-    .info-row .lbl { color: #64748b; }
+    .info-row .lbl { color: #94a3b8; }
     .info-row .val {
-        font-weight: 600; color: #0f172a;
+        font-weight: 600; color: #ffffff;
         text-align: right; font-variant-numeric: tabular-nums;
     }
 
     .price-card {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
+        background: #0a0a0a;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 24px 30px;
         margin-bottom: 20px;
     }
@@ -102,31 +103,31 @@
         font-size: 12px; font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1.2px;
-        color: #64748b; margin: 0 0 18px 0;
+        color: #94a3b8; margin: 0 0 18px 0;
     }
     .price-row {
         display: flex; justify-content: space-between;
         padding: 10px 0;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         font-size: 14px;
     }
     .price-row:last-child { border-bottom: none; }
-    .price-row .lbl { color: #64748b; }
+    .price-row .lbl { color: #94a3b8; }
     .price-row .val {
-        color: #0f172a; font-weight: 600;
+        color: #ffffff; font-weight: 600;
         font-variant-numeric: tabular-nums;
     }
-    .price-row.minus .val { color: #059669; }
+    .price-row.minus .val { color: #34d399; }
     .price-row.total {
         margin-top: 8px; padding-top: 14px;
-        border-top: 2px solid #cbd5e1;
+        border-top: 2px solid rgba(255,255,255,.2);
         border-bottom: none;
     }
     .price-row.total .lbl {
-        color: #0f172a; font-weight: 800; font-size: 15px;
+        color: #ffffff; font-weight: 800; font-size: 15px;
     }
     .price-row.total .val {
-        color: #b45309; font-weight: 800; font-size: 20px;
+        color: #fbbf24; font-weight: 800; font-size: 20px;
     }
 </style>
 

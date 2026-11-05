@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     Edit.cshtml - form sua xe
     sinh vien thuc hien: Dao Gia Hung - 23103100065
     module 2 - quan ly xe, bang gia thue
@@ -9,7 +10,7 @@
 }
 
 <style>
-    .form-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .form-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
     .form-wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 
     .form-head {
@@ -18,26 +19,26 @@
         justify-content: space-between;
         align-items: flex-end;
         padding-bottom: 20px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,.1);
     }
     .form-head .back {
-        font-size: 13px; color: #64748b; text-decoration: none;
+        font-size: 13px; color: #94a3b8; text-decoration: none;
         display: inline-block; margin-bottom: 8px;
     }
-    .form-head .back:hover { color: #1d4ed8; }
+    .form-head .back:hover { color: #E50914; }
     .form-head h1 {
-        font-size: 26px; font-weight: 800; color: #0f172a;
+        font-size: 26px; font-weight: 800; color: #ffffff;
         letter-spacing: -0.4px; margin: 0 0 4px 0;
     }
-    .form-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+    .form-head .sub { font-size: 14px; color: #94a3b8; margin: 0; }
     .plate-chip {
         display: inline-block;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
+        background: #1c1c1c;
+        border: 1px solid rgba(255,255,255,.1);
         padding: 4px 12px;
-        border-radius: 8px;
+        border-radius: 0;
         font-weight: 700;
-        color: #0f172a;
+        color: #ffffff;
         font-size: 13px;
         margin-left: 8px;
         vertical-align: middle;
@@ -45,80 +46,80 @@
     }
 
     .form-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(15,23,42,.04);
+        box-shadow: 0 1px 3px rgba(0,0,0,.45);
     }
-    .form-card .sect { padding: 28px 32px; border-bottom: 1px solid #f1f5f9; }
+    .form-card .sect { padding: 28px 32px; border-bottom: 1px solid rgba(255,255,255,.06); }
     .form-card .sect:last-of-type { border-bottom: none; }
     .form-card .sect-title {
         display: flex; align-items: center; gap: 12px;
         font-size: 12px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 1.2px;
-        color: #64748b; margin: 0 0 22px 0;
+        color: #94a3b8; margin: 0 0 22px 0;
     }
     .form-card .sect-title .num {
         width: 26px; height: 26px; border-radius: 50%;
-        background: #1d4ed8; color: #fff;
+        background: #b80710; color: #fff;
         display: inline-flex; align-items: center; justify-content: center;
         font-size: 12px; font-weight: 700; flex-shrink: 0;
     }
     .form-card .sect-title .hint {
         margin-left: auto; font-size: 11px; font-weight: 500;
-        text-transform: none; letter-spacing: 0; color: #94a3b8;
+        text-transform: none; letter-spacing: 0; color: #71717a;
     }
 
-    .form-label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
-    .form-label .req { color: #dc2626; margin-left: 2px; }
+    .form-label { font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px; }
+    .form-label .req { color: #f87171; margin-left: 2px; }
     .form-control, .form-select {
-        border-radius: 8px; border-color: #d1d5db;
+        border-radius: 0; border-color: rgba(255,255,255,.2);
         font-size: 14px; padding: 9px 12px; height: 42px;
     }
     .form-control:focus, .form-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+        border-color: #E50914;
+        box-shadow: 0 0 0 3px rgba(229,9,20,.12);
     }
     .input-group-text {
-        background: #f8fafc; border-color: #d1d5db;
-        color: #64748b; font-weight: 600; font-size: 13px;
+        background: #0a0a0a; border-color: rgba(255,255,255,.2);
+        color: #94a3b8; font-weight: 600; font-size: 13px;
     }
-    .form-text { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+    .form-text { font-size: 12px; color: #71717a; margin-top: 4px; }
 
     .upload-box {
-        background: #f8fafc;
-        border: 2px dashed #cbd5e1;
-        border-radius: 12px;
+        background: #0a0a0a;
+        border: 2px dashed rgba(255,255,255,.2);
+        border-radius: 0;
         padding: 24px 20px;
         text-align: center;
         transition: all .15s;
     }
-    .upload-box:hover { border-color: #3b82f6; background: #eff6ff; }
+    .upload-box:hover { border-color: #E50914; background: rgba(229,9,20,.10); }
     .upload-box .preview {
         width: 100%; height: 240px;
-        object-fit: cover; border-radius: 10px;
-        border: 1px solid #e2e8f0;
-        margin-bottom: 16px; background: #fff;
+        object-fit: cover; border-radius: 0;
+        border: 1px solid rgba(255,255,255,.1);
+        margin-bottom: 16px; background: #121212;
     }
-    .upload-box .hint { font-size: 12px; color: #64748b; margin-top: 8px; }
+    .upload-box .hint { font-size: 12px; color: #94a3b8; margin-top: 8px; }
     .tips-box {
-        background: #eff6ff;
-        border-left: 4px solid #3b82f6;
+        background: rgba(229,9,20,.10);
+        border-left: 4px solid #E50914;
         padding: 16px 20px;
-        border-radius: 10px;
+        border-radius: 0;
         font-size: 13px;
-        color: #1e40af;
+        color: #E50914;
         line-height: 1.8;
     }
-    .tips-box strong { color: #1e3a8a; }
+    .tips-box strong { color: #E50914; }
 
     .form-actions {
-        padding: 20px 32px; background: #f9fafb;
-        border-top: 1px solid #e5e7eb;
+        padding: 20px 32px; background: #1c1c1c;
+        border-top: 1px solid rgba(255,255,255,.1);
         display: flex; justify-content: flex-end; gap: 10px;
     }
-    .form-actions .btn { padding: 10px 26px; font-weight: 600; border-radius: 8px; }
+    .form-actions .btn { padding: 10px 26px; font-weight: 600; border-radius: 0; }
 </style>
 
 <div class="form-shell">

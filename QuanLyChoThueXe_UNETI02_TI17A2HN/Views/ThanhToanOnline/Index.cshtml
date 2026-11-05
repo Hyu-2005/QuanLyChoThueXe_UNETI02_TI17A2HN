@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     Index.cshtml - Chọn cổng thanh toán trực tuyến (giả lập)
     Sinh viên thực hiện: Dương Lâm Huy - 23103100120 - SV5
     Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
@@ -11,20 +12,20 @@
 
 <style>
     .online-shell {
-        background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+        background: linear-gradient(135deg, rgba(229,9,20,.10) 0%, rgba(139,92,246,.10) 100%);
         min-height: 100vh;
         padding: 40px 0;
     }
     .online-wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
 
     .online-card {
-        background: #fff;
-        border-radius: 18px;
+        background: #121212;
+        border-radius: 0;
         overflow: hidden;
-        box-shadow: 0 20px 60px rgba(15,23,42,.12);
+        box-shadow: 0 20px 60px rgba(0,0,0,.45);
     }
     .online-head {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #b80710 0%, #E50914 100%);
         color: #fff;
         padding: 32px 36px;
     }
@@ -37,41 +38,41 @@
     .online-body { padding: 32px 36px; }
 
     .invoice-box {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
+        background: #0a0a0a;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 22px 26px;
         margin-bottom: 28px;
     }
     .invoice-box .lbl {
         font-size: 11px; font-weight: 700;
         text-transform: uppercase; letter-spacing: .8px;
-        color: #64748b; margin-bottom: 14px;
+        color: #94a3b8; margin-bottom: 14px;
     }
     .invoice-row {
         display: flex; justify-content: space-between;
         padding: 8px 0; font-size: 14px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .invoice-row:last-child { border-bottom: none; }
-    .invoice-row .k { color: #64748b; }
-    .invoice-row .v { font-weight: 700; color: #0f172a; }
+    .invoice-row .k { color: #94a3b8; }
+    .invoice-row .v { font-weight: 700; color: #ffffff; }
     .invoice-row.total {
-        border-top: 2px solid #cbd5e1;
+        border-top: 2px solid rgba(255,255,255,.2);
         margin-top: 8px; padding-top: 14px;
     }
     .invoice-row.total .k {
-        font-size: 15px; font-weight: 700; color: #0f172a;
+        font-size: 15px; font-weight: 700; color: #ffffff;
     }
     .invoice-row.total .v {
-        font-size: 26px; font-weight: 800; color: #b45309;
+        font-size: 26px; font-weight: 800; color: #fbbf24;
         letter-spacing: -0.8px;
     }
 
     .section-label {
         font-size: 12px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 1.2px;
-        color: #64748b; margin: 0 0 16px 0;
+        color: #94a3b8; margin: 0 0 16px 0;
     }
 
     .payment-grid {
@@ -82,52 +83,52 @@
     }
     .payment-option {
         position: relative;
-        border: 2px solid #e5e7eb;
-        border-radius: 14px;
+        border: 2px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 20px 22px;
         cursor: pointer;
         transition: all .18s;
-        background: #fff;
+        background: #121212;
         display: flex;
         align-items: center;
         gap: 14px;
     }
     .payment-option:hover {
-        border-color: #93c5fd;
-        background: #f0f9ff;
+        border-color: rgba(229,9,20,.4);
+        background: rgba(229,9,20,.08);
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(59,130,246,.1);
+        box-shadow: 0 8px 20px rgba(229,9,20,.1);
     }
     .payment-option input[type="radio"] { display: none; }
     .payment-option .icon {
         width: 46px; height: 46px;
-        border-radius: 10px;
+        border-radius: 0;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         font-size: 22px;
         flex-shrink: 0;
-        background: #eff6ff;
+        background: rgba(229,9,20,.10);
     }
     .payment-option .info { flex: 1; }
     .payment-option .info .name {
         font-size: 15px; font-weight: 700;
-        color: #0f172a; margin-bottom: 2px;
+        color: #ffffff; margin-bottom: 2px;
     }
     .payment-option .info .desc {
-        font-size: 12px; color: #64748b;
+        font-size: 12px; color: #94a3b8;
     }
     .payment-option:has(input[type="radio"]:checked) {
-        border-color: #3b82f6;
-        background: #eff6ff;
-        box-shadow: 0 8px 20px rgba(59,130,246,.15);
+        border-color: #E50914;
+        background: rgba(229,9,20,.10);
+        box-shadow: 0 8px 20px rgba(229,9,20,.15);
     }
     .payment-option:has(input[type="radio"]:checked)::after {
         content: "✓";
         position: absolute;
         top: 10px; right: 12px;
         width: 24px; height: 24px;
-        background: #3b82f6; color: #fff;
+        background: #E50914; color: #fff;
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
@@ -137,12 +138,12 @@
     }
 
     .notice {
-        background: #fffbeb;
+        background: rgba(245,158,11,.10);
         border-left: 4px solid #f59e0b;
         padding: 14px 18px;
-        border-radius: 10px;
+        border-radius: 0;
         font-size: 13px;
-        color: #92400e;
+        color: #fcd34d;
         margin-bottom: 24px;
         line-height: 1.6;
     }
@@ -150,11 +151,11 @@
     .online-actions {
         display: flex; justify-content: flex-end; gap: 12px;
         padding-top: 24px;
-        border-top: 1px solid #f1f5f9;
+        border-top: 1px solid rgba(255,255,255,.06);
     }
     .online-actions .btn {
         padding: 12px 28px; font-weight: 700;
-        border-radius: 10px; font-size: 14px;
+        border-radius: 0; font-size: 14px;
     }
     .btn-continue {
         background: linear-gradient(135deg, #059669 0%, #10b981 100%);

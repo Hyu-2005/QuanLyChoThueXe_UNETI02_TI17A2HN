@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     Details.cshtml - xem chi tiet bang gia thue
     sinh vien thuc hien: Dao Gia Hung - 23103100065
     module 2 - quan ly xe, bang gia thue
@@ -14,38 +15,38 @@
 }
 
 <style>
-    .detail-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .detail-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
     .detail-wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
     .detail-head {
         display: flex; justify-content: space-between; align-items: flex-end;
         margin-bottom: 28px; padding-bottom: 20px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,.1);
     }
     .detail-head .back {
-        font-size: 13px; color: #64748b; text-decoration: none;
+        font-size: 13px; color: #94a3b8; text-decoration: none;
         display: inline-block; margin-bottom: 8px;
     }
-    .detail-head .back:hover { color: #1d4ed8; }
+    .detail-head .back:hover { color: #E50914; }
     .detail-head h1 {
-        font-size: 26px; font-weight: 700; color: #0f172a;
+        font-size: 26px; font-weight: 700; color: #ffffff;
         letter-spacing: -0.4px; margin: 0 0 4px 0;
     }
     .detail-head .id-chip {
         display: inline-block;
-        background: #e0e7ff;
-        color: #3730a3;
+        background: rgba(99,102,241,.18);
+        color: #a5b4fc;
         font-weight: 700;
         font-size: 14px;
         padding: 4px 12px;
-        border-radius: 8px;
+        border-radius: 0;
         margin-left: 8px;
         vertical-align: middle;
     }
-    .detail-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+    .detail-head .sub { font-size: 14px; color: #94a3b8; margin: 0; }
 
     .status-banner {
-        border-radius: 12px;
+        border-radius: 0;
         padding: 24px 28px;
         margin-bottom: 24px;
         display: flex;
@@ -53,10 +54,10 @@
         align-items: center;
         border: 1px solid;
     }
-    .status-banner.active   { background: #f0fdf4; border-color: #bbf7d0; }
-    .status-banner.off      { background: #f8fafc; border-color: #e2e8f0; }
-    .status-banner.pending  { background: #fffbeb; border-color: #fde68a; }
-    .status-banner.expired  { background: #fef2f2; border-color: #fecaca; }
+    .status-banner.active   { background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.35); }
+    .status-banner.off      { background: #0a0a0a; border-color: rgba(255,255,255,.1); }
+    .status-banner.pending  { background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.35); }
+    .status-banner.expired  { background: rgba(239,68,68,.10); border-color: rgba(239,68,68,.35); }
 
     .status-banner .lbl {
         font-size: 11px; font-weight: 700;
@@ -65,86 +66,86 @@
     }
     .status-banner .val { font-size: 22px; font-weight: 700; margin: 0; }
     .status-banner .note { font-size: 13px; opacity: .8; }
-    .status-banner.active   .lbl, .status-banner.active   .val { color: #166534; }
-    .status-banner.off      .lbl, .status-banner.off      .val { color: #334155; }
-    .status-banner.pending  .lbl, .status-banner.pending  .val { color: #92400e; }
-    .status-banner.expired  .lbl, .status-banner.expired  .val { color: #991b1b; }
+    .status-banner.active   .lbl, .status-banner.active   .val { color: #86efac; }
+    .status-banner.off      .lbl, .status-banner.off      .val { color: #cbd5e1; }
+    .status-banner.pending  .lbl, .status-banner.pending  .val { color: #fcd34d; }
+    .status-banner.expired  .lbl, .status-banner.expired  .val { color: #fca5a5; }
 
     .info-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 24px 28px;
         height: 100%;
     }
     .info-card .title {
         font-size: 12px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 1px;
-        color: #64748b; margin: 0 0 18px 0;
+        color: #94a3b8; margin: 0 0 18px 0;
     }
     .info-row {
         display: flex; justify-content: space-between;
-        padding: 12px 0; border-bottom: 1px solid #f1f5f9;
+        padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.06);
         font-size: 14px;
     }
     .info-row:last-child { border-bottom: none; }
-    .info-row .lbl { color: #64748b; }
+    .info-row .lbl { color: #94a3b8; }
     .info-row .val {
-        font-weight: 600; color: #0f172a;
+        font-weight: 600; color: #ffffff;
         text-align: right; font-variant-numeric: tabular-nums;
     }
 
     .price-tile {
-        border-radius: 12px;
+        border-radius: 0;
         padding: 26px 22px;
         text-align: center;
         border: 1px solid;
         height: 100%;
     }
-    .price-tile.blue  { background: #eff6ff; border-color: #bfdbfe; }
-    .price-tile.cyan  { background: #ecfeff; border-color: #a5f3fc; }
-    .price-tile.amber { background: #fffbeb; border-color: #fde68a; }
+    .price-tile.blue  { background: rgba(59,130,246,.15); border-color: rgba(59,130,246,.35); }
+    .price-tile.cyan  { background: rgba(6,182,212,.10); border-color: rgba(6,182,212,.35); }
+    .price-tile.amber { background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.35); }
 
     .price-tile .lbl {
         font-size: 11px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 1px;
         margin-bottom: 12px; opacity: .75;
     }
-    .price-tile.blue  .lbl { color: #1e40af; }
-    .price-tile.cyan  .lbl { color: #155e75; }
-    .price-tile.amber .lbl { color: #92400e; }
+    .price-tile.blue  .lbl { color: #93c5fd; }
+    .price-tile.cyan  .lbl { color: #67e8f9; }
+    .price-tile.amber .lbl { color: #fcd34d; }
 
     .price-tile .val {
         font-size: 30px; font-weight: 700;
         letter-spacing: -0.6px; line-height: 1;
         font-variant-numeric: tabular-nums;
     }
-    .price-tile.blue  .val { color: #1d4ed8; }
-    .price-tile.cyan  .val { color: #0e7490; }
-    .price-tile.amber .val { color: #b45309; }
+    .price-tile.blue  .val { color: #93c5fd; }
+    .price-tile.cyan  .val { color: #67e8f9; }
+    .price-tile.amber .val { color: #fbbf24; }
 
     .price-tile .unit {
         font-size: 12px; font-weight: 600;
         margin-top: 8px; opacity: .75;
     }
-    .price-tile.blue  .unit { color: #1e40af; }
-    .price-tile.cyan  .unit { color: #155e75; }
-    .price-tile.amber .unit { color: #92400e; }
+    .price-tile.blue  .unit { color: #93c5fd; }
+    .price-tile.cyan  .unit { color: #67e8f9; }
+    .price-tile.amber .unit { color: #fcd34d; }
 
     .scope-block {
         display: flex; align-items: center; gap: 12px;
         padding: 16px 20px;
-        background: #f8fafc;
-        border-radius: 10px;
-        border: 1px solid #e2e8f0;
+        background: #0a0a0a;
+        border-radius: 0;
+        border: 1px solid rgba(255,255,255,.1);
     }
     .scope-block .ic {
         font-size: 12px; font-weight: 700;
-        padding: 6px 12px; border-radius: 8px;
+        padding: 6px 12px; border-radius: 0;
         text-transform: uppercase; letter-spacing: .5px;
     }
-    .scope-block.loai .ic { background: #dbeafe; color: #1e40af; }
-    .scope-block.xe   .ic { background: #d1fae5; color: #065f46; }
+    .scope-block.loai .ic { background: rgba(229,9,20,.18); color: #E50914; }
+    .scope-block.xe   .ic { background: rgba(34,197,94,.18); color: #6ee7b7; }
 </style>
 
 <div class="detail-shell">
@@ -160,7 +161,7 @@
                 <p class="sub">Thông tin chi tiết về đơn giá, hiệu lực và trạng thái áp dụng</p>
             </div>
             <a asp-action="Edit" asp-route-id="@Model.MaBangGia"
-               class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:8px">
+               class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:0">
                 Sửa bảng giá
             </a>
         </div>

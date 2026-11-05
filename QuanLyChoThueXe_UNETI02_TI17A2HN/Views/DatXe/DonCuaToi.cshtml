@@ -1,4 +1,5 @@
-﻿@* 
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@* 
    File: Views/DatXe/DonCuaToi.cshtml
    Noi dung: Danh sach don dat xe cua khach hang dang nhap
    Sinh vien thuc hien: Vu Tien Dat - 23103100119 - SV3
@@ -16,13 +17,13 @@
 }
 
 <style>
-    .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .page-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
     .page-wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
 
     .hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #1c1c1c 0%, #0a0a0a 100%);
         color: #fff;
-        border-radius: 14px;
+        border-radius: 0;
         padding: 32px 30px;
         margin-bottom: 24px;
     }
@@ -33,7 +34,7 @@
         background: rgba(255,255,255,.12);
         backdrop-filter: blur(8px);
         border: 1px solid rgba(255,255,255,.14);
-        border-radius: 10px;
+        border-radius: 0;
         padding: 14px 16px;
     }
     .stat-row .stat .lbl {
@@ -43,87 +44,87 @@
     .stat-row .stat .num { font-size: 22px; font-weight: 800; line-height: 1; }
 
     .filter-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 18px 22px;
         margin-bottom: 20px;
     }
     .filter-card .form-label {
         font-size: 11px; font-weight: 700;
         text-transform: uppercase; letter-spacing: .5px;
-        color: #64748b; margin-bottom: 6px;
+        color: #94a3b8; margin-bottom: 6px;
     }
     .filter-card .form-control,
     .filter-card .form-select {
-        border-radius: 8px; border-color: #d1d5db;
+        border-radius: 0; border-color: rgba(255,255,255,.2);
         font-size: 14px; height: 40px;
     }
     .filter-card .form-control:focus,
     .filter-card .form-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+        border-color: #E50914;
+        box-shadow: 0 0 0 3px rgba(229,9,20,.12);
     }
 
     .data-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         overflow: hidden;
     }
     .data-card .card-head {
         display: flex; justify-content: space-between; align-items: center;
         padding: 18px 22px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .data-card .card-head .title {
-        font-size: 14px; font-weight: 700; color: #0f172a; margin: 0;
+        font-size: 14px; font-weight: 700; color: #ffffff; margin: 0;
     }
     .data-card .card-head .count {
-        font-size: 12px; color: #64748b;
-        background: #f1f5f9;
+        font-size: 12px; color: #94a3b8;
+        background: #1c1c1c;
         padding: 4px 12px; border-radius: 999px;
         font-weight: 600;
     }
     .data-card table { margin: 0; font-size: 14px; }
     .data-card thead th {
-        background: #f9fafb;
+        background: #1c1c1c;
         font-size: 11px; font-weight: 700;
         text-transform: uppercase; letter-spacing: .5px;
-        color: #475569; padding: 14px 16px;
-        border-bottom: 1px solid #e5e7eb;
+        color: #cbd5e1; padding: 14px 16px;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         white-space: nowrap;
     }
     .data-card tbody td {
         padding: 16px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
         vertical-align: middle;
     }
     .data-card tbody tr:last-child td { border-bottom: none; }
-    .data-card tbody tr:hover { background: #fafbfc; }
+    .data-card tbody tr:hover { background: #161616; }
 
     .xe-cell { display: flex; align-items: center; gap: 12px; }
     .xe-thumb {
         width: 60px; height: 46px;
-        object-fit: cover; border-radius: 8px;
-        border: 1px solid #e5e7eb;
+        object-fit: cover; border-radius: 0;
+        border: 1px solid rgba(255,255,255,.1);
         flex-shrink: 0;
     }
-    .xe-name { font-weight: 700; color: #0f172a; font-size: 14px; }
+    .xe-name { font-weight: 700; color: #ffffff; font-size: 14px; }
     .xe-plate {
         display: inline-block;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
+        background: #1c1c1c;
+        border: 1px solid rgba(255,255,255,.1);
         font-size: 11px; font-weight: 700;
         padding: 2px 8px;
-        border-radius: 5px;
+        border-radius: 0;
         margin-top: 2px;
         font-variant-numeric: tabular-nums;
     }
 
     .time-cell { font-size: 13px; }
-    .time-cell .lbl { color: #64748b; font-size: 11px; display: block; }
-    .time-cell .val { font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; }
+    .time-cell .lbl { color: #94a3b8; font-size: 11px; display: block; }
+    .time-cell .val { font-weight: 600; color: #ffffff; font-variant-numeric: tabular-nums; }
 
     .status-pill {
         display: inline-block;
@@ -135,58 +136,58 @@
         text-transform: uppercase;
         white-space: nowrap;
     }
-    .status-pill.cho-duyet { background: #fef3c7; color: #92400e; }
-    .status-pill.da-duyet { background: #dbeafe; color: #1e40af; }
-    .status-pill.da-ban-giao { background: #cffafe; color: #155e75; }
-    .status-pill.dang-thue { background: #e0e7ff; color: #3730a3; }
-    .status-pill.cho-thanh-toan { background: #fde68a; color: #78350f; }
-    .status-pill.hoan-thanh { background: #dcfce7; color: #166534; }
-    .status-pill.tu-choi { background: #fee2e2; color: #991b1b; }
-    .status-pill.da-huy { background: #f1f5f9; color: #64748b; }
+    .status-pill.cho-duyet { background: rgba(245,158,11,.15); color: #fcd34d; }
+    .status-pill.da-duyet { background: rgba(59,130,246,.20); color: #93c5fd; }
+    .status-pill.da-ban-giao { background: rgba(6,182,212,.15); color: #67e8f9; }
+    .status-pill.dang-thue { background: rgba(99,102,241,.18); color: #a5b4fc; }
+    .status-pill.cho-thanh-toan { background: rgba(245,158,11,.28); color: #fcd34d; }
+    .status-pill.hoan-thanh { background: rgba(34,197,94,.15); color: #86efac; }
+    .status-pill.tu-choi { background: rgba(239,68,68,.15); color: #fca5a5; }
+    .status-pill.da-huy { background: #1c1c1c; color: #94a3b8; }
 
-    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #0f172a; }
-    .money.primary { color: #1d4ed8; font-weight: 700; font-size: 15px; }
-    .money .unit { font-size: 11px; font-weight: 500; color: #94a3b8; margin-left: 2px; }
+    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #ffffff; }
+    .money.primary { color: #E50914; font-weight: 700; font-size: 15px; }
+    .money .unit { font-size: 11px; font-weight: 500; color: #71717a; margin-left: 2px; }
 
     .action-cell { display: flex; justify-content: flex-end; gap: 6px; flex-wrap: nowrap; }
     .btn-clean {
         display: inline-flex; align-items: center; justify-content: center;
         padding: 7px 14px;
         font-size: 13px; font-weight: 600;
-        border-radius: 8px;
-        border: 1px solid #d1d5db;
-        background: #fff; color: #374151;
+        border-radius: 0;
+        border: 1px solid rgba(255,255,255,.2);
+        background: #121212; color: #cbd5e1;
         text-decoration: none;
         transition: all .15s;
         line-height: 1; white-space: nowrap;
         min-height: 34px;
     }
-    .btn-clean:hover { border-color: #9ca3af; background: #f9fafb; color: #111827; }
-    .btn-clean.danger { color: #b91c1c; border-color: #fca5a5; }
-    .btn-clean.danger:hover { background: #fef2f2; }
+    .btn-clean:hover { border-color: rgba(255,255,255,.3); background: #1c1c1c; color: #ffffff; }
+    .btn-clean.danger { color: #fca5a5; border-color: rgba(239,68,68,.4); }
+    .btn-clean.danger:hover { background: rgba(239,68,68,.10); }
 
     .empty-state {
-        padding: 72px 24px; text-align: center; color: #94a3b8;
+        padding: 72px 24px; text-align: center; color: #71717a;
     }
-    .empty-state .big { font-size: 42px; color: #e5e7eb; letter-spacing: 4px; }
+    .empty-state .big { font-size: 42px; color: #3f3f46; letter-spacing: 4px; }
     .empty-state .msg { font-size: 15px; margin-top: 8px; }
 
     .pager {
         display: flex; justify-content: space-between; align-items: center;
         padding: 16px 22px;
-        background: #f9fafb;
-        border-top: 1px solid #e5e7eb;
-        font-size: 13px; color: #64748b;
+        background: #1c1c1c;
+        border-top: 1px solid rgba(255,255,255,.1);
+        font-size: 13px; color: #94a3b8;
     }
     .pager .pagination { margin: 0; }
     .pager .page-link {
-        border-radius: 8px; margin: 0 2px;
-        border-color: #e5e7eb; color: #334155;
+        border-radius: 0; margin: 0 2px;
+        border-color: rgba(255,255,255,.1); color: #cbd5e1;
         font-size: 13px; font-weight: 600;
         padding: 6px 12px;
     }
     .pager .page-item.active .page-link {
-        background: #1d4ed8; border-color: #1d4ed8;
+        background: #b80710; border-color: #E50914;
     }
 </style>
 

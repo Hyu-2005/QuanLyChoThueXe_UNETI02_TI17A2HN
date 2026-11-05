@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     Index.cshtml - Danh sách hóa đơn thanh toán
     Họ và tên: Dương Lâm Huy
     Mã sinh viên: 23103100120
@@ -14,25 +15,25 @@
 }
 
 <style>
-    .page-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .page-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
     .page-wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
 
     .page-head {
         display: flex; justify-content: space-between; align-items: flex-end;
         margin-bottom: 24px; padding-bottom: 20px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         flex-wrap: wrap; gap: 16px;
     }
     .page-head h1 {
-        font-size: 26px; font-weight: 800; color: #0f172a;
+        font-size: 26px; font-weight: 800; color: #ffffff;
         letter-spacing: -0.4px; margin: 0 0 4px 0;
     }
-    .page-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+    .page-head .sub { font-size: 14px; color: #94a3b8; margin: 0; }
 
     .head-actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .head-actions .btn {
         padding: 10px 20px; font-weight: 700; font-size: 13px;
-        border-radius: 10px; display: inline-flex; align-items: center; gap: 6px;
+        border-radius: 0; display: inline-flex; align-items: center; gap: 6px;
     }
     .btn-export-excel {
         background: linear-gradient(135deg, #059669 0%, #10b981 100%);
@@ -46,117 +47,117 @@
     }
 
     .stat-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
         border-left: 4px solid #10b981;
-        border-radius: 12px;
+        border-radius: 0;
         padding: 20px 24px;
         margin-bottom: 20px;
     }
     .stat-card .lbl {
         font-size: 11px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 1px;
-        color: #64748b; margin-bottom: 8px;
+        color: #94a3b8; margin-bottom: 8px;
     }
     .stat-card .val {
         font-size: 28px; font-weight: 800;
-        color: #166534; letter-spacing: -0.6px;
+        color: #86efac; letter-spacing: -0.6px;
         font-variant-numeric: tabular-nums;
     }
 
     .filter-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 18px 22px;
         margin-bottom: 20px;
     }
     .filter-card .form-label {
         font-size: 11px; font-weight: 700;
         text-transform: uppercase; letter-spacing: .5px;
-        color: #64748b; margin-bottom: 6px;
+        color: #94a3b8; margin-bottom: 6px;
     }
     .filter-card .form-control,
     .filter-card .form-select {
-        border-radius: 8px; border-color: #d1d5db;
+        border-radius: 0; border-color: rgba(255,255,255,.2);
         font-size: 14px; height: 40px;
     }
     .filter-card .form-control:focus,
     .filter-card .form-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+        border-color: #E50914;
+        box-shadow: 0 0 0 3px rgba(229,9,20,.12);
     }
 
     .data-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         overflow: hidden;
     }
     .data-card .card-head {
         display: flex; justify-content: space-between; align-items: center;
         padding: 18px 22px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .data-card .card-head .title {
-        font-size: 14px; font-weight: 700; color: #0f172a; margin: 0;
+        font-size: 14px; font-weight: 700; color: #ffffff; margin: 0;
     }
     .data-card .card-head .count {
-        font-size: 12px; color: #64748b;
-        background: #f1f5f9;
+        font-size: 12px; color: #94a3b8;
+        background: #1c1c1c;
         padding: 4px 12px; border-radius: 999px;
         font-weight: 600;
     }
     .data-card table { margin: 0; font-size: 14px; }
     .data-card thead th {
-        background: #f9fafb;
+        background: #1c1c1c;
         font-size: 11px; font-weight: 700;
         text-transform: uppercase; letter-spacing: .5px;
-        color: #475569; padding: 14px 16px;
-        border-bottom: 1px solid #e5e7eb;
+        color: #cbd5e1; padding: 14px 16px;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         white-space: nowrap;
     }
     .data-card tbody td {
         padding: 16px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
         vertical-align: middle;
     }
     .data-card tbody tr:last-child td { border-bottom: none; }
-    .data-card tbody tr:hover { background: #fafbfc; }
+    .data-card tbody tr:hover { background: #161616; }
 
     .kh-cell .name {
-        font-weight: 700; color: #0f172a;
+        font-weight: 700; color: #ffffff;
         font-size: 14px; margin-bottom: 2px;
     }
     .kh-cell .phone {
-        font-size: 12px; color: #64748b;
+        font-size: 12px; color: #94a3b8;
         font-variant-numeric: tabular-nums;
     }
 
     .xe-cell { display: flex; align-items: center; gap: 10px; }
     .xe-thumb {
         width: 56px; height: 44px;
-        object-fit: cover; border-radius: 8px;
-        border: 1px solid #e5e7eb;
+        object-fit: cover; border-radius: 0;
+        border: 1px solid rgba(255,255,255,.1);
         flex-shrink: 0;
     }
     .xe-name {
-        font-weight: 700; color: #0f172a;
+        font-weight: 700; color: #ffffff;
         font-size: 13px; margin-bottom: 2px;
     }
     .xe-plate {
         display: inline-block;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
+        background: #1c1c1c;
+        border: 1px solid rgba(255,255,255,.1);
         font-size: 11px; font-weight: 700;
         padding: 2px 8px;
-        border-radius: 5px;
+        border-radius: 0;
         font-variant-numeric: tabular-nums;
     }
 
-    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #0f172a; }
-    .money.big { color: #1d4ed8; font-weight: 800; font-size: 15px; }
-    .money.unit { font-size: 11px; color: #94a3b8; font-weight: 500; margin-left: 2px; }
+    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #ffffff; }
+    .money.big { color: #E50914; font-weight: 800; font-size: 15px; }
+    .money.unit { font-size: 11px; color: #71717a; font-weight: 500; margin-left: 2px; }
 
     .status-pill {
         display: inline-block;
@@ -167,9 +168,9 @@
         text-transform: uppercase;
         white-space: nowrap;
     }
-    .status-pill.chua-tt { background: #fef3c7; color: #92400e; }
-    .status-pill.da-tt { background: #dcfce7; color: #166534; }
-    .status-pill.hoan-tien { background: #dbeafe; color: #1e40af; }
+    .status-pill.chua-tt { background: rgba(245,158,11,.15); color: #fcd34d; }
+    .status-pill.da-tt { background: rgba(34,197,94,.15); color: #86efac; }
+    .status-pill.hoan-tien { background: rgba(59,130,246,.20); color: #93c5fd; }
 
     .action-cell {
         display: flex; justify-content: flex-end;
@@ -181,15 +182,15 @@
         align-items: center; justify-content: center;
         padding: 7px 14px;
         font-size: 13px; font-weight: 600;
-        border-radius: 8px;
-        border: 1px solid #d1d5db;
-        background: #fff; color: #374151;
+        border-radius: 0;
+        border: 1px solid rgba(255,255,255,.2);
+        background: #121212; color: #cbd5e1;
         text-decoration: none;
         transition: all .15s;
         line-height: 1; white-space: nowrap;
         min-height: 34px;
     }
-    .btn-clean:hover { border-color: #9ca3af; background: #f9fafb; color: #111827; }
+    .btn-clean:hover { border-color: rgba(255,255,255,.3); background: #1c1c1c; color: #ffffff; }
 
     .btn-clean.primary {
         background: linear-gradient(135deg, #059669 0%, #10b981 100%);
@@ -204,37 +205,37 @@
     }
 
     .btn-clean.online {
-        color: #6d28d9; border-color: #c4b5fd; background: #faf5ff;
+        color: #c4b5fd; border-color: rgba(139,92,246,.4); background: rgba(139,92,246,.10);
     }
     .btn-clean.online:hover {
-        background: #f3e8ff; border-color: #a78bfa; color: #6d28d9;
+        background: rgba(139,92,246,.18); border-color: #a78bfa; color: #c4b5fd;
     }
 
     .empty-state {
-        padding: 72px 24px; text-align: center; color: #94a3b8;
+        padding: 72px 24px; text-align: center; color: #71717a;
     }
     .empty-state .big {
         font-size: 42px; font-weight: 700;
-        color: #e5e7eb; letter-spacing: 4px;
+        color: #3f3f46; letter-spacing: 4px;
     }
     .empty-state .msg { font-size: 15px; margin-top: 8px; }
 
     .pager {
         display: flex; justify-content: space-between; align-items: center;
         padding: 16px 22px;
-        background: #f9fafb;
-        border-top: 1px solid #e5e7eb;
-        font-size: 13px; color: #64748b;
+        background: #1c1c1c;
+        border-top: 1px solid rgba(255,255,255,.1);
+        font-size: 13px; color: #94a3b8;
     }
     .pager .pagination { margin: 0; }
     .pager .page-link {
-        border-radius: 8px; margin: 0 2px;
-        border-color: #e5e7eb; color: #334155;
+        border-radius: 0; margin: 0 2px;
+        border-color: rgba(255,255,255,.1); color: #cbd5e1;
         font-size: 13px; font-weight: 600;
         padding: 6px 12px;
     }
     .pager .page-item.active .page-link {
-        background: #1d4ed8; border-color: #1d4ed8;
+        background: #b80710; border-color: #E50914;
     }
 </style>
 

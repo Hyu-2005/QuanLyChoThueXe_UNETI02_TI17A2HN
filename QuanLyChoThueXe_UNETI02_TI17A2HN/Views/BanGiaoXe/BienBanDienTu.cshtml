@@ -8,6 +8,7 @@
 
 @{
     ViewData["Title"] = $"Biên bản bàn giao xe #{Model.MaDatXe}";
+    ViewData["Dark"] = false;   // [VIRELLO] giữ nền sáng cho biên bản in - Vũ Tiến Đạt (SV3)
     var bg = Model.BanGiaoXe;
     var qrBase64 = ViewBag.QRCodeBase64 as string;
     var urlXacThuc = ViewBag.UrlXacThuc as string;

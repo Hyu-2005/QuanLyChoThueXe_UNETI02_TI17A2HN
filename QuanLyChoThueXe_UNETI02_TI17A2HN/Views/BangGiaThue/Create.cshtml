@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     Create.cshtml - form them bang gia thue moi
     sinh vien thuc hien: Dao Gia Hung - 23103100065
     module 2 - quan ly xe, bang gia thue
@@ -10,7 +11,7 @@
 
 <style>
     .form-shell {
-        background: #f5f7fa;
+        background: #000000;
         min-height: 100vh;
         padding: 32px 0;
     }
@@ -19,31 +20,31 @@
     .form-head { margin-bottom: 28px; }
     .form-head .back {
         font-size: 13px;
-        color: #64748b;
+        color: #94a3b8;
         text-decoration: none;
         display: inline-block;
         margin-bottom: 8px;
     }
-    .form-head .back:hover { color: #1d4ed8; }
+    .form-head .back:hover { color: #E50914; }
     .form-head h1 {
         font-size: 26px;
         font-weight: 700;
-        color: #0f172a;
+        color: #ffffff;
         letter-spacing: -0.4px;
         margin: 0 0 4px 0;
     }
-    .form-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+    .form-head .sub { font-size: 14px; color: #94a3b8; margin: 0; }
 
     .form-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(15,23,42,.04);
+        box-shadow: 0 1px 3px rgba(0,0,0,.45);
     }
     .form-card .sect {
         padding: 28px 32px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .form-card .sect:last-of-type { border-bottom: none; }
     .form-card .sect-title {
@@ -54,13 +55,13 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: #64748b;
+        color: #94a3b8;
         margin: 0 0 20px 0;
     }
     .form-card .sect-title .num {
         width: 22px; height: 22px;
         border-radius: 50%;
-        background: #1d4ed8;
+        background: #b80710;
         color: #fff;
         display: inline-flex;
         align-items: center;
@@ -70,10 +71,10 @@
     }
 
     .scope-hint {
-        background: #fef9c3;
+        background: rgba(234,179,8,.15);
         border-left: 4px solid #eab308;
         padding: 14px 18px;
-        border-radius: 8px;
+        border-radius: 0;
         font-size: 13px;
         color: #713f12;
         margin-bottom: 20px;
@@ -83,37 +84,37 @@
     .form-label {
         font-size: 13px;
         font-weight: 600;
-        color: #334155;
+        color: #cbd5e1;
         margin-bottom: 6px;
     }
     .form-control, .form-select {
-        border-radius: 8px;
-        border-color: #d1d5db;
+        border-radius: 0;
+        border-color: rgba(255,255,255,.2);
         font-size: 14px;
         padding: 9px 12px;
         height: 42px;
     }
     .form-control:focus, .form-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+        border-color: #E50914;
+        box-shadow: 0 0 0 3px rgba(229,9,20,.12);
     }
     .input-group-text {
-        background: #f8fafc;
-        border-color: #d1d5db;
-        color: #64748b;
+        background: #0a0a0a;
+        border-color: rgba(255,255,255,.2);
+        color: #94a3b8;
         font-weight: 600;
         font-size: 13px;
     }
 
     .form-actions {
         padding: 20px 32px;
-        background: #f9fafb;
-        border-top: 1px solid #e5e7eb;
+        background: #1c1c1c;
+        border-top: 1px solid rgba(255,255,255,.1);
         display: flex;
         justify-content: flex-end;
         gap: 10px;
     }
-    .form-actions .btn { padding: 10px 24px; font-weight: 600; border-radius: 8px; }
+    .form-actions .btn { padding: 10px 24px; font-weight: 600; border-radius: 0; }
 </style>
 
 <div class="form-shell">

@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     ThanhToan.cshtml - Form thanh toán tại quầy
     Sinh viên thực hiện: Dương Lâm Huy - 23103100120
     Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
@@ -10,28 +11,28 @@
 }
 
 <style>
-    .form-shell { background: #f5f7fa; min-height: 100vh; padding: 32px 0; }
+    .form-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
     .form-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
     .form-head {
         margin-bottom: 28px; padding-bottom: 20px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,.1);
     }
     .form-head .back {
-        font-size: 13px; color: #64748b; text-decoration: none;
+        font-size: 13px; color: #94a3b8; text-decoration: none;
         display: inline-block; margin-bottom: 8px;
     }
-    .form-head .back:hover { color: #1d4ed8; }
+    .form-head .back:hover { color: #E50914; }
     .form-head h1 {
-        font-size: 26px; font-weight: 800; color: #0f172a;
+        font-size: 26px; font-weight: 800; color: #ffffff;
         letter-spacing: -0.4px; margin: 0 0 4px 0;
     }
-    .form-head .sub { font-size: 14px; color: #64748b; margin: 0; }
+    .form-head .sub { font-size: 14px; color: #94a3b8; margin: 0; }
 
     .info-summary {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #b80710 0%, #E50914 100%);
         color: #fff;
-        border-radius: 14px;
+        border-radius: 0;
         padding: 24px 28px;
         margin-bottom: 24px;
         display: flex;
@@ -53,109 +54,109 @@
     }
 
     .form-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(15,23,42,.04);
+        box-shadow: 0 1px 3px rgba(0,0,0,.45);
     }
     .form-card .sect {
         padding: 28px 32px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .form-card .sect:last-of-type { border-bottom: none; }
     .form-card .sect-title {
         display: flex; align-items: center; gap: 12px;
         font-size: 12px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 1.2px;
-        color: #64748b; margin: 0 0 22px 0;
+        color: #94a3b8; margin: 0 0 22px 0;
     }
     .form-card .sect-title .num {
         width: 26px; height: 26px; border-radius: 50%;
-        background: #1d4ed8; color: #fff;
+        background: #b80710; color: #fff;
         display: inline-flex; align-items: center; justify-content: center;
         font-size: 12px; font-weight: 700; flex-shrink: 0;
     }
     .form-card .sect-title .hint {
         margin-left: auto; font-size: 11px; font-weight: 500;
-        text-transform: none; letter-spacing: 0; color: #94a3b8;
+        text-transform: none; letter-spacing: 0; color: #71717a;
     }
 
-    .form-label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
-    .form-label .req { color: #dc2626; margin-left: 2px; }
+    .form-label { font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px; }
+    .form-label .req { color: #f87171; margin-left: 2px; }
     .form-control, .form-select {
-        border-radius: 8px; border-color: #d1d5db;
+        border-radius: 0; border-color: rgba(255,255,255,.2);
         font-size: 14px; padding: 9px 12px; height: 42px;
     }
     .form-control:focus, .form-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+        border-color: #E50914;
+        box-shadow: 0 0 0 3px rgba(229,9,20,.12);
     }
 
     .price-breakdown {
-        background: #f8fafc;
-        border-radius: 10px;
+        background: #0a0a0a;
+        border-radius: 0;
         padding: 20px 24px;
     }
     .price-row {
         display: flex; justify-content: space-between;
         padding: 10px 0;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         font-size: 14px;
     }
     .price-row:last-child { border-bottom: none; }
-    .price-row .lbl { color: #64748b; }
+    .price-row .lbl { color: #94a3b8; }
     .price-row .val {
-        color: #0f172a; font-weight: 600;
+        color: #ffffff; font-weight: 600;
         font-variant-numeric: tabular-nums;
     }
     .price-row.highlight .lbl {
-        color: #0f172a; font-weight: 700; font-size: 15px;
+        color: #ffffff; font-weight: 700; font-size: 15px;
     }
     .price-row.highlight .val {
-        color: #1d4ed8; font-weight: 800; font-size: 18px;
+        color: #E50914; font-weight: 800; font-size: 18px;
     }
-    .price-row.minus .val { color: #059669; }
+    .price-row.minus .val { color: #34d399; }
     .price-row.total {
         margin-top: 8px; padding-top: 14px;
-        border-top: 2px solid #cbd5e1;
+        border-top: 2px solid rgba(255,255,255,.2);
         border-bottom: none;
     }
     .price-row.total .lbl {
-        color: #0f172a; font-weight: 800; font-size: 15px;
+        color: #ffffff; font-weight: 800; font-size: 15px;
     }
     .price-row.total .val {
-        color: #b45309; font-weight: 800; font-size: 22px;
+        color: #fbbf24; font-weight: 800; font-size: 22px;
         letter-spacing: -0.5px;
     }
 
     .phi-detail-box {
-        background: #fffbeb;
-        border: 1px solid #fde68a;
-        border-radius: 10px;
+        background: rgba(245,158,11,.10);
+        border: 1px solid rgba(245,158,11,.35);
+        border-radius: 0;
         padding: 16px 20px;
         margin-top: 16px;
     }
     .phi-detail-box h6 {
         font-size: 12px; font-weight: 700;
         text-transform: uppercase; letter-spacing: .5px;
-        color: #92400e; margin: 0 0 10px 0;
+        color: #fcd34d; margin: 0 0 10px 0;
     }
     .phi-line {
         display: flex; justify-content: space-between;
         font-size: 13px; padding: 4px 0;
-        color: #78350f;
+        color: #fcd34d;
     }
     .phi-line .val { font-weight: 600; font-variant-numeric: tabular-nums; }
 
     .form-actions {
         padding: 20px 32px;
-        background: #f9fafb;
-        border-top: 1px solid #e5e7eb;
+        background: #1c1c1c;
+        border-top: 1px solid rgba(255,255,255,.1);
         display: flex; justify-content: space-between; align-items: center;
         flex-wrap: wrap; gap: 12px;
     }
-    .form-actions .btn { padding: 10px 26px; font-weight: 600; border-radius: 8px; }
+    .form-actions .btn { padding: 10px 26px; font-weight: 600; border-radius: 0; }
 
     .btn-primary-custom {
         background: linear-gradient(135deg, #059669 0%, #10b981 100%);
@@ -172,7 +173,7 @@
         background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
         color: #fff; border: none;
         box-shadow: 0 4px 12px rgba(139,92,246,.25);
-        padding: 10px 22px; border-radius: 10px;
+        padding: 10px 22px; border-radius: 0;
         font-weight: 700; font-size: 13px;
         text-decoration: none;
         display: inline-flex; align-items: center; gap: 6px;
@@ -291,7 +292,7 @@
                         </div>
                     }
 
-                    <div style="margin-top:16px;font-size:13px;color:#94a3b8">
+                    <div style="margin-top:16px;font-size:13px;color:#71717a">
                         Tiền thuê và tổng thanh toán được tính tự động, không thể nhập tay.
                     </div>
                 </div>

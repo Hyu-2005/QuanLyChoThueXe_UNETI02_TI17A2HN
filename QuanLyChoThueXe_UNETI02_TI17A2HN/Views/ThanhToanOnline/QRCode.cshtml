@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     QRCode.cshtml - Hiển thị mã QR thanh toán và xác nhận
     Sinh viên thực hiện: Dương Lâm Huy - 23103100120 - SV5
     Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
@@ -11,17 +12,17 @@
 
 <style>
     .qr-shell {
-        background: linear-gradient(135deg, #ecfdf5 0%, #eff6ff 100%);
+        background: linear-gradient(135deg, rgba(34,197,94,.10) 0%, rgba(229,9,20,.10) 100%);
         min-height: 100vh;
         padding: 40px 0;
     }
     .qr-wrap { max-width: 640px; margin: 0 auto; padding: 0 24px; }
 
     .qr-card {
-        background: #fff;
-        border-radius: 18px;
+        background: #121212;
+        border-radius: 0;
         overflow: hidden;
-        box-shadow: 0 20px 60px rgba(15,23,42,.12);
+        box-shadow: 0 20px 60px rgba(0,0,0,.45);
         text-align: center;
     }
     .qr-head {
@@ -38,11 +39,11 @@
     .qr-body { padding: 32px 36px; }
 
     .timer-box {
-        background: #fef3c7;
-        border-radius: 10px;
+        background: rgba(245,158,11,.15);
+        border-radius: 0;
         padding: 12px 18px;
         font-size: 13px;
-        color: #92400e;
+        color: #fcd34d;
         margin-bottom: 24px;
         display: flex;
         justify-content: center;
@@ -59,8 +60,8 @@
         display: inline-block;
         padding: 16px;
         background: #fff;
-        border: 3px dashed #3b82f6;
-        border-radius: 16px;
+        border: 3px dashed #E50914;
+        border-radius: 0;
         margin-bottom: 20px;
     }
     .qr-frame img {
@@ -69,8 +70,8 @@
     }
 
     .qr-info {
-        background: #f8fafc;
-        border-radius: 12px;
+        background: #0a0a0a;
+        border-radius: 0;
         padding: 18px 22px;
         text-align: left;
         margin-bottom: 22px;
@@ -79,19 +80,19 @@
     .qr-info .row-item {
         display: flex; justify-content: space-between;
         padding: 8px 0;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .qr-info .row-item:last-child { border-bottom: none; }
-    .qr-info .row-item .k { color: #64748b; }
+    .qr-info .row-item .k { color: #94a3b8; }
     .qr-info .row-item .v {
-        font-weight: 700; color: #0f172a;
+        font-weight: 700; color: #ffffff;
         font-variant-numeric: tabular-nums;
     }
     .qr-info .row-item.amount .k {
-        font-weight: 700; color: #0f172a;
+        font-weight: 700; color: #ffffff;
     }
     .qr-info .row-item.amount .v {
-        color: #b45309; font-size: 22px; font-weight: 800;
+        color: #fbbf24; font-size: 22px; font-weight: 800;
     }
 
     .qr-actions {
@@ -101,7 +102,7 @@
     .qr-actions .btn {
         padding: 12px 24px;
         font-weight: 700;
-        border-radius: 10px;
+        border-radius: 0;
         font-size: 14px;
     }
     .btn-confirm {
@@ -115,14 +116,14 @@
         box-shadow: 0 6px 18px rgba(16,185,129,.35);
     }
     .btn-cancel {
-        color: #b91c1c; border: 1px solid #fca5a5; background: #fff;
+        color: #fca5a5; border: 1px solid rgba(239,68,68,.4); background: #121212;
     }
-    .btn-cancel:hover { background: #fef2f2; }
+    .btn-cancel:hover { background: rgba(239,68,68,.10); }
 
     .note-text {
         margin-top: 18px;
         font-size: 12px;
-        color: #94a3b8;
+        color: #71717a;
         line-height: 1.6;
     }
 </style>

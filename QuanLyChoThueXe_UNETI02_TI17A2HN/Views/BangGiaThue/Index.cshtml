@@ -1,4 +1,5 @@
-﻿@*
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
     Index.cshtml - danh sach bang gia thue (tim kiem + loc + sap xep + phan trang)
     sinh vien thuc hien: Dao Gia Hung - 23103100065
     module 2 - quan ly xe, bang gia thue
@@ -11,9 +12,9 @@
 
 <style>
     .price-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #1c1c1c 0%, #0a0a0a 100%);
         color: #fff;
-        border-radius: 12px;
+        border-radius: 0;
         padding: 32px 28px;
         margin-bottom: 24px;
     }
@@ -25,7 +26,7 @@
     .price-hero p { opacity: .85; margin: 0; }
     .price-hero .stat {
         background: rgba(255,255,255,.12);
-        border-radius: 8px;
+        border-radius: 0;
         padding: 14px 18px;
         backdrop-filter: blur(6px);
     }
@@ -42,9 +43,9 @@
     }
 
     .filter-panel {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         padding: 20px;
     }
     .filter-panel .form-label {
@@ -52,25 +53,25 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: .3px;
-        color: #6b7280;
+        color: #94a3b8;
         margin-bottom: 6px;
     }
     .filter-panel .form-control,
     .filter-panel .form-select {
-        border-radius: 8px;
-        border-color: #d1d5db;
+        border-radius: 0;
+        border-color: rgba(255,255,255,.2);
         font-size: 14px;
     }
     .filter-panel .form-control:focus,
     .filter-panel .form-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+        border-color: #E50914;
+        box-shadow: 0 0 0 3px rgba(229,9,20,.15);
     }
 
     .price-table {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
         overflow: hidden;
     }
     .price-table table {
@@ -78,23 +79,23 @@
         font-size: 14px;
     }
     .price-table thead th {
-        background: #f9fafb;
-        color: #6b7280;
+        background: #1c1c1c;
+        color: #94a3b8;
         font-size: 12px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: .5px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,.1);
         padding: 14px 16px;
         white-space: nowrap;
     }
     .price-table tbody td {
         padding: 16px;
-        border-bottom: 1px solid #f3f4f6;
+        border-bottom: 1px solid rgba(255,255,255,.06);
         vertical-align: middle;
     }
     .price-table tbody tr:hover {
-        background: #f9fafb;
+        background: #1c1c1c;
     }
     .price-table tbody tr:last-child td {
         border-bottom: none;
@@ -105,28 +106,28 @@
         align-items: center;
         gap: 8px;
         padding: 6px 12px;
-        border-radius: 8px;
+        border-radius: 0;
         font-size: 13px;
         font-weight: 600;
         line-height: 1.2;
     }
     .obj-badge.loai {
-        background: #eff6ff;
-        color: #1d4ed8;
-        border: 1px solid #bfdbfe;
+        background: rgba(59,130,246,.15);
+        color: #93c5fd;
+        border: 1px solid rgba(59,130,246,.35);
     }
     .obj-badge.xe {
-        background: #f0fdf4;
-        color: #15803d;
-        border: 1px solid #bbf7d0;
+        background: rgba(34,197,94,.10);
+        color: #86efac;
+        border: 1px solid rgba(34,197,94,.35);
     }
 
     .price-tag {
         font-weight: 700;
-        color: #1e40af;
+        color: #E50914;
         font-size: 15px;
     }
-    .price-tag small { font-weight: 500; color: #6b7280; }
+    .price-tag small { font-weight: 500; color: #94a3b8; }
 
     .status-pill {
         display: inline-block;
@@ -136,32 +137,32 @@
         font-weight: 600;
         letter-spacing: .2px;
     }
-    .status-pill.active { background: #dcfce7; color: #166534; }
-    .status-pill.off    { background: #f3f4f6; color: #6b7280; }
+    .status-pill.active { background: rgba(34,197,94,.15); color: #86efac; }
+    .status-pill.off    { background: #1c1c1c; color: #94a3b8; }
 
     .btn-clean {
         display: inline-block;
         padding: 6px 14px;
         font-size: 13px;
         font-weight: 600;
-        border-radius: 8px;
-        border: 1px solid #d1d5db;
-        background: #fff;
-        color: #374151;
+        border-radius: 0;
+        border: 1px solid rgba(255,255,255,.2);
+        background: #121212;
+        color: #cbd5e1;
         text-decoration: none;
         transition: all .15s;
         line-height: 1.4;
         vertical-align: middle;
     }
     .btn-clean:hover {
-        border-color: #9ca3af;
-        background: #f9fafb;
-        color: #111827;
+        border-color: rgba(255,255,255,.3);
+        background: #1c1c1c;
+        color: #ffffff;
     }
-    .btn-clean.warn { color: #b45309; border-color: #fcd34d; }
-    .btn-clean.warn:hover { background: #fffbeb; }
-    .btn-clean.danger { color: #b91c1c; border-color: #fca5a5; }
-    .btn-clean.danger:hover { background: #fef2f2; }
+    .btn-clean.warn { color: #fbbf24; border-color: rgba(245,158,11,.4); }
+    .btn-clean.warn:hover { background: rgba(245,158,11,.10); }
+    .btn-clean.danger { color: #fca5a5; border-color: rgba(239,68,68,.4); }
+    .btn-clean.danger:hover { background: rgba(239,68,68,.10); }
 
     .action-cell {
         display: flex;
@@ -174,12 +175,12 @@
     .empty-state {
         padding: 72px 24px;
         text-align: center;
-        color: #9ca3af;
+        color: #71717a;
     }
     .empty-state .big {
         font-size: 42px;
         font-weight: 700;
-        color: #e5e7eb;
+        color: #3f3f46;
         letter-spacing: 4px;
     }
 </style>
@@ -208,7 +209,7 @@
                     </div>
                     <div class="col-auto d-flex align-items-center">
                         <a asp-action="Create" class="btn btn-light fw-semibold px-4 py-2"
-                           style="border-radius:8px">
+                           style="border-radius:0">
                             Thêm bảng giá mới
                         </a>
                     </div>
@@ -407,7 +408,7 @@
         @if (Model.TongSoTrang > 1)
         {
             <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top"
-                 style="background:#f9fafb">
+                 style="background:#1c1c1c">
                 <small class="text-muted">
                     Trang <strong>@Model.Trang</strong> / @Model.TongSoTrang —
                     hiển thị @Model.DanhSach.Count trong @Model.TongSoBanGhi bản ghi
