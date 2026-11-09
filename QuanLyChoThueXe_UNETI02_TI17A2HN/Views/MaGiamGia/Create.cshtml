@@ -1,0 +1,332 @@
+﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
+@*
+    Create.cshtml - Tạo mã giảm giá mới
+    Sinh viên thực hiện: Dương Lâm Huy - 23103100120 - SV5
+    Module: Module 5 - Tính tiền, Thanh toán
+*@
+@model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.MaGiamGia.MaGiamGiaFormVM
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
+@{
+    ViewData["Title"] = "Tạo mã giảm giá";
+}
+
+<style>
+    .form-shell {
+        background: #000000;
+        min-height: 100vh;
+        padding: 32px 0;
+    }
+
+    .form-wrap {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .form-head {
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+        .form-head .back {
+            font-size: 13px;
+            color: #94a3b8;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+            .form-head .back:hover {
+                color: #E50914;
+            }
+
+        .form-head h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.4px;
+            margin: 0 0 4px 0;
+        }
+
+        .form-head .sub {
+            font-size: 14px;
+            color: #94a3b8;
+            margin: 0;
+        }
+
+    .form-card {
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 0;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,.45);
+    }
+
+        .form-card .sect {
+            padding: 28px 32px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+
+            .form-card .sect:last-of-type {
+                border-bottom: none;
+            }
+
+        .form-card .sect-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #94a3b8;
+            margin: 0 0 22px 0;
+        }
+
+            .form-card .sect-title .num {
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                background: #b80710;
+                color: #fff;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: 700;
+                flex-shrink: 0;
+            }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #cbd5e1;
+        margin-bottom: 6px;
+    }
+
+        .form-label .req {
+            color: #f87171;
+            margin-left: 2px;
+        }
+
+    .form-control, .form-select {
+        border-radius: 0;
+        border-color: rgba(255,255,255,.2);
+        font-size: 14px;
+        padding: 9px 12px;
+        height: 42px;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #E50914;
+            box-shadow: 0 0 0 3px rgba(229,9,20,.12);
+        }
+
+    .input-group-text {
+        background: #0a0a0a;
+        border-color: rgba(255,255,255,.2);
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .form-text {
+        font-size: 12px;
+        color: #71717a;
+        margin-top: 4px;
+    }
+
+    .form-actions {
+        padding: 20px 32px;
+        background: #1c1c1c;
+        border-top: 1px solid rgba(255,255,255,.1);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+        .form-actions .btn {
+            padding: 10px 26px;
+            font-weight: 600;
+            border-radius: 0;
+        }
+</style>
+
+<div class="form-shell">
+    <div class="form-wrap">
+
+        <div class="form-head">
+            <a asp-action="Index" class="back">← Quay lại danh sách</a>
+            <h1>Tạo mã giảm giá mới</h1>
+            <p class="sub">Cấu hình voucher khuyến mãi cho khách hàng</p>
+        </div>
+
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="form-card">
+
+                <!-- 1: THÔNG TIN CƠ BẢN -->
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">1</span> Thông tin cơ bản
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Code" class="form-label">
+                                Mã giảm giá <span class="req">*</span>
+                            </label>
+                            <input asp-for="Code" class="form-control"
+                                   placeholder="VD: WELCOME10"
+                                   style="text-transform: uppercase; font-family: 'Courier New', monospace; font-weight: 700;" />
+                            <span asp-validation-for="Code" class="text-danger small"></span>
+                            <div class="form-text">Chỉ dùng chữ in hoa, số, gạch dưới</div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label asp-for="TenChuongTrinh" class="form-label">
+                                Tên chương trình <span class="req">*</span>
+                            </label>
+                            <input asp-for="TenChuongTrinh" class="form-control"
+                                   placeholder="VD: Khuyến mãi hè 2026" />
+                            <span asp-validation-for="TenChuongTrinh" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="MoTa" class="form-label">Mô tả</label>
+                            <textarea asp-for="MoTa" rows="2" class="form-control"
+                                      placeholder="Mô tả chi tiết chương trình..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2: GIÁ TRỊ GIẢM -->
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">2</span> Giá trị giảm giá
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="LoaiGiamGia" class="form-label">
+                                Loại giảm <span class="req">*</span>
+                            </label>
+                            <select asp-for="LoaiGiamGia" asp-items="Model.DanhSachLoaiGiamGia"
+                                    class="form-select" id="selLoaiGiamGia"></select>
+                            <span asp-validation-for="LoaiGiamGia" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="GiaTriGiam" class="form-label">
+                                Giá trị giảm <span class="req">*</span>
+                            </label>
+                            <div class="input-group">
+                                <input asp-for="GiaTriGiam" type="number" step="0.01"
+                                       class="form-control" placeholder="10" />
+                                <span class="input-group-text" id="unitGiam">%</span>
+                            </div>
+                            <span asp-validation-for="GiaTriGiam" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4" id="boxGiamToiDa">
+                            <label asp-for="GiamToiDa" class="form-label">Giảm tối đa (VNĐ)</label>
+                            <div class="input-group">
+                                <input asp-for="GiamToiDa" type="number" step="1000"
+                                       class="form-control" placeholder="500000" />
+                                <span class="input-group-text">đ</span>
+                            </div>
+                            <span asp-validation-for="GiamToiDa" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="DonHangToiThieu" class="form-label">Đơn hàng tối thiểu</label>
+                            <div class="input-group">
+                                <input asp-for="DonHangToiThieu" type="number" step="1000"
+                                       class="form-control" placeholder="0" />
+                                <span class="input-group-text">đ</span>
+                            </div>
+                            <span asp-validation-for="DonHangToiThieu" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="SoLuotDungToiDa" class="form-label">
+                                Số lượt dùng tối đa <span class="req">*</span>
+                            </label>
+                            <input asp-for="SoLuotDungToiDa" type="number" min="1"
+                                   class="form-control" placeholder="100" />
+                            <span asp-validation-for="SoLuotDungToiDa" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3: THỜI GIAN & TRẠNG THÁI -->
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">3</span> Thời gian &amp; Trạng thái
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="NgayBatDau" class="form-label">
+                                Ngày bắt đầu <span class="req">*</span>
+                            </label>
+                            <input asp-for="NgayBatDau" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="NgayBatDau" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="NgayKetThuc" class="form-label">
+                                Ngày kết thúc <span class="req">*</span>
+                            </label>
+                            <input asp-for="NgayKetThuc" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="NgayKetThuc" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="MoiKhachMotLan" class="form-check-input" />
+                                <label asp-for="MoiKhachMotLan" class="form-check-label fw-semibold"></label>
+                                <div class="form-text">Nếu bật, mỗi khách hàng chỉ dùng được mã này 1 lần</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="TrangThai" class="form-check-input" />
+                                <label asp-for="TrangThai" class="form-check-label fw-semibold"></label>
+                                <div class="form-text">Mã sẽ có hiệu lực ngay khi bật</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-primary">Tạo mã</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var selLoai = document.getElementById('selLoaiGiamGia');
+            var unitGiam = document.getElementById('unitGiam');
+            var boxGiamToiDa = document.getElementById('boxGiamToiDa');
+
+            function updateUI() {
+                var isPercent = selLoai.value === 'Phần trăm';
+                unitGiam.innerText = isPercent ? '%' : 'đ';
+                boxGiamToiDa.style.display = isPercent ? '' : 'none';
+            }
+
+            selLoai.addEventListener('change', updateUI);
+            updateUI();
+        })();
+    </script>
+}

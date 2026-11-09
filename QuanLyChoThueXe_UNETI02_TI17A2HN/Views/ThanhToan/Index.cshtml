@@ -1,10 +1,7 @@
 ﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
 @*
-    Index.cshtml - Danh sách hóa đơn thanh toán
-    Họ và tên: Dương Lâm Huy
-    Mã sinh viên: 23103100120
-    Nội dung: Danh sách hóa đơn có tìm kiếm, lọc, phân trang
-              + Xuất Excel + Thanh toán online
+    Index.cshtml - Danh sách hóa đơn thanh toán (có voucher + điểm)
+    Sinh viên thực hiện: Dương Lâm Huy - 23103100120
     Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.ThanhToan.ThanhToanListVM
@@ -15,36 +12,71 @@
 }
 
 <style>
-    .page-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
-    .page-wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
+    .page-shell {
+        background: #000000;
+        min-height: 100vh;
+        padding: 32px 0;
+    }
+
+    .page-wrap {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
 
     .page-head {
-        display: flex; justify-content: space-between; align-items: flex-end;
-        margin-bottom: 24px; padding-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 24px;
+        padding-bottom: 20px;
         border-bottom: 1px solid rgba(255,255,255,.1);
-        flex-wrap: wrap; gap: 16px;
+        flex-wrap: wrap;
+        gap: 16px;
     }
-    .page-head h1 {
-        font-size: 26px; font-weight: 800; color: #ffffff;
-        letter-spacing: -0.4px; margin: 0 0 4px 0;
-    }
-    .page-head .sub { font-size: 14px; color: #94a3b8; margin: 0; }
 
-    .head-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .head-actions .btn {
-        padding: 10px 20px; font-weight: 700; font-size: 13px;
-        border-radius: 0; display: inline-flex; align-items: center; gap: 6px;
+        .page-head h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.4px;
+            margin: 0 0 4px 0;
+        }
+
+        .page-head .sub {
+            font-size: 14px;
+            color: #94a3b8;
+            margin: 0;
+        }
+
+    .head-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
     }
+
+        .head-actions .btn {
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
     .btn-export-excel {
         background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        color: #fff; border: none;
+        color: #fff;
+        border: none;
         box-shadow: 0 4px 12px rgba(16,185,129,.25);
     }
-    .btn-export-excel:hover {
-        color: #fff;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(16,185,129,.35);
-    }
+
+        .btn-export-excel:hover {
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(16,185,129,.35);
+        }
 
     .stat-card {
         background: #121212;
@@ -54,16 +86,23 @@
         padding: 20px 24px;
         margin-bottom: 20px;
     }
-    .stat-card .lbl {
-        font-size: 11px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 1px;
-        color: #94a3b8; margin-bottom: 8px;
-    }
-    .stat-card .val {
-        font-size: 28px; font-weight: 800;
-        color: #86efac; letter-spacing: -0.6px;
-        font-variant-numeric: tabular-nums;
-    }
+
+        .stat-card .lbl {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .val {
+            font-size: 28px;
+            font-weight: 800;
+            color: #86efac;
+            letter-spacing: -0.6px;
+            font-variant-numeric: tabular-nums;
+        }
 
     .filter-card {
         background: #121212;
@@ -72,21 +111,29 @@
         padding: 18px 22px;
         margin-bottom: 20px;
     }
-    .filter-card .form-label {
-        font-size: 11px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: .5px;
-        color: #94a3b8; margin-bottom: 6px;
-    }
-    .filter-card .form-control,
-    .filter-card .form-select {
-        border-radius: 0; border-color: rgba(255,255,255,.2);
-        font-size: 14px; height: 40px;
-    }
-    .filter-card .form-control:focus,
-    .filter-card .form-select:focus {
-        border-color: #E50914;
-        box-shadow: 0 0 0 3px rgba(229,9,20,.12);
-    }
+
+        .filter-card .form-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+
+        .filter-card .form-control,
+        .filter-card .form-select {
+            border-radius: 0;
+            border-color: rgba(255,255,255,.2);
+            font-size: 14px;
+            height: 40px;
+        }
+
+            .filter-card .form-control:focus,
+            .filter-card .form-select:focus {
+                border-color: #E50914;
+                box-shadow: 0 0 0 3px rgba(229,9,20,.12);
+            }
 
     .data-card {
         background: #121212;
@@ -94,149 +141,292 @@
         border-radius: 0;
         overflow: hidden;
     }
-    .data-card .card-head {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 18px 22px;
-        border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .data-card .card-head .title {
-        font-size: 14px; font-weight: 700; color: #ffffff; margin: 0;
-    }
-    .data-card .card-head .count {
-        font-size: 12px; color: #94a3b8;
-        background: #1c1c1c;
-        padding: 4px 12px; border-radius: 999px;
-        font-weight: 600;
-    }
-    .data-card table { margin: 0; font-size: 14px; }
-    .data-card thead th {
-        background: #1c1c1c;
-        font-size: 11px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: .5px;
-        color: #cbd5e1; padding: 14px 16px;
-        border-bottom: 1px solid rgba(255,255,255,.1);
-        white-space: nowrap;
-    }
-    .data-card tbody td {
-        padding: 16px;
-        border-bottom: 1px solid rgba(255,255,255,.06);
-        vertical-align: middle;
-    }
-    .data-card tbody tr:last-child td { border-bottom: none; }
-    .data-card tbody tr:hover { background: #161616; }
+
+        .data-card .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 22px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+
+            .data-card .card-head .title {
+                font-size: 14px;
+                font-weight: 700;
+                color: #ffffff;
+                margin: 0;
+            }
+
+            .data-card .card-head .count {
+                font-size: 12px;
+                color: #94a3b8;
+                background: #1c1c1c;
+                padding: 4px 12px;
+                border-radius: 999px;
+                font-weight: 600;
+            }
+
+        .data-card table {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .data-card thead th {
+            background: #1c1c1c;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #cbd5e1;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+            white-space: nowrap;
+        }
+
+        .data-card tbody td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            vertical-align: middle;
+        }
+
+        .data-card tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-card tbody tr:hover {
+            background: #161616;
+        }
 
     .kh-cell .name {
-        font-weight: 700; color: #ffffff;
-        font-size: 14px; margin-bottom: 2px;
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 14px;
+        margin-bottom: 2px;
     }
+
     .kh-cell .phone {
-        font-size: 12px; color: #94a3b8;
+        font-size: 12px;
+        color: #94a3b8;
         font-variant-numeric: tabular-nums;
     }
 
-    .xe-cell { display: flex; align-items: center; gap: 10px; }
+    .xe-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
     .xe-thumb {
-        width: 56px; height: 44px;
-        object-fit: cover; border-radius: 0;
+        width: 56px;
+        height: 44px;
+        object-fit: cover;
+        border-radius: 0;
         border: 1px solid rgba(255,255,255,.1);
         flex-shrink: 0;
     }
+
     .xe-name {
-        font-weight: 700; color: #ffffff;
-        font-size: 13px; margin-bottom: 2px;
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 13px;
+        margin-bottom: 2px;
     }
+
     .xe-plate {
         display: inline-block;
         background: #1c1c1c;
         border: 1px solid rgba(255,255,255,.1);
-        font-size: 11px; font-weight: 700;
+        font-size: 11px;
+        font-weight: 700;
         padding: 2px 8px;
         border-radius: 0;
         font-variant-numeric: tabular-nums;
     }
 
-    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #ffffff; }
-    .money.big { color: #E50914; font-weight: 800; font-size: 15px; }
-    .money.unit { font-size: 11px; color: #71717a; font-weight: 500; margin-left: 2px; }
+    .money {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+        .money.big {
+            color: #E50914;
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .money.unit {
+            font-size: 11px;
+            color: #71717a;
+            font-weight: 500;
+            margin-left: 2px;
+        }
+
+        .money.small {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .money.green {
+            color: #34d399;
+        }
+
+        .money.voucher {
+            color: #c4b5fd;
+        }
+
+    .badge-voucher {
+        display: inline-block;
+        background: rgba(139,92,246,.18);
+        color: #c4b5fd;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        margin-left: 4px;
+    }
+
+    .badge-diem {
+        display: inline-block;
+        background: rgba(251,191,36,.18);
+        color: #fbbf24;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        margin-left: 4px;
+    }
 
     .status-pill {
         display: inline-block;
         padding: 5px 12px;
         border-radius: 999px;
-        font-size: 11px; font-weight: 700;
+        font-size: 11px;
+        font-weight: 700;
         letter-spacing: .3px;
         text-transform: uppercase;
         white-space: nowrap;
     }
-    .status-pill.chua-tt { background: rgba(245,158,11,.15); color: #fcd34d; }
-    .status-pill.da-tt { background: rgba(34,197,94,.15); color: #86efac; }
-    .status-pill.hoan-tien { background: rgba(59,130,246,.20); color: #93c5fd; }
+
+        .status-pill.chua-tt {
+            background: rgba(245,158,11,.15);
+            color: #fcd34d;
+        }
+
+        .status-pill.da-tt {
+            background: rgba(34,197,94,.15);
+            color: #86efac;
+        }
+
+        .status-pill.hoan-tien {
+            background: rgba(59,130,246,.20);
+            color: #93c5fd;
+        }
 
     .action-cell {
-        display: flex; justify-content: flex-end;
-        align-items: center; gap: 6px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 6px;
         flex-wrap: nowrap;
     }
+
     .btn-clean {
         display: inline-flex;
-        align-items: center; justify-content: center;
+        align-items: center;
+        justify-content: center;
         padding: 7px 14px;
-        font-size: 13px; font-weight: 600;
+        font-size: 13px;
+        font-weight: 600;
         border-radius: 0;
         border: 1px solid rgba(255,255,255,.2);
-        background: #121212; color: #cbd5e1;
+        background: #121212;
+        color: #cbd5e1;
         text-decoration: none;
         transition: all .15s;
-        line-height: 1; white-space: nowrap;
+        line-height: 1;
+        white-space: nowrap;
         min-height: 34px;
     }
-    .btn-clean:hover { border-color: rgba(255,255,255,.3); background: #1c1c1c; color: #ffffff; }
 
-    .btn-clean.primary {
-        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        color: #fff;
-        border-color: transparent;
-        box-shadow: 0 4px 12px rgba(16,185,129,.25);
-    }
-    .btn-clean.primary:hover {
-        color: #fff;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(16,185,129,.35);
-    }
+        .btn-clean:hover {
+            border-color: rgba(255,255,255,.3);
+            background: #1c1c1c;
+            color: #ffffff;
+        }
 
-    .btn-clean.online {
-        color: #c4b5fd; border-color: rgba(139,92,246,.4); background: rgba(139,92,246,.10);
-    }
-    .btn-clean.online:hover {
-        background: rgba(139,92,246,.18); border-color: #a78bfa; color: #c4b5fd;
-    }
+        .btn-clean.primary {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(16,185,129,.25);
+        }
+
+            .btn-clean.primary:hover {
+                color: #fff;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 18px rgba(16,185,129,.35);
+            }
+
+        .btn-clean.online {
+            color: #c4b5fd;
+            border-color: rgba(139,92,246,.4);
+            background: rgba(139,92,246,.10);
+        }
+
+            .btn-clean.online:hover {
+                background: rgba(139,92,246,.18);
+                border-color: #a78bfa;
+                color: #c4b5fd;
+            }
 
     .empty-state {
-        padding: 72px 24px; text-align: center; color: #71717a;
+        padding: 72px 24px;
+        text-align: center;
+        color: #71717a;
     }
-    .empty-state .big {
-        font-size: 42px; font-weight: 700;
-        color: #3f3f46; letter-spacing: 4px;
-    }
-    .empty-state .msg { font-size: 15px; margin-top: 8px; }
+
+        .empty-state .big {
+            font-size: 42px;
+            font-weight: 700;
+            color: #3f3f46;
+            letter-spacing: 4px;
+        }
+
+        .empty-state .msg {
+            font-size: 15px;
+            margin-top: 8px;
+        }
 
     .pager {
-        display: flex; justify-content: space-between; align-items: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         padding: 16px 22px;
         background: #1c1c1c;
         border-top: 1px solid rgba(255,255,255,.1);
-        font-size: 13px; color: #94a3b8;
+        font-size: 13px;
+        color: #94a3b8;
     }
-    .pager .pagination { margin: 0; }
-    .pager .page-link {
-        border-radius: 0; margin: 0 2px;
-        border-color: rgba(255,255,255,.1); color: #cbd5e1;
-        font-size: 13px; font-weight: 600;
-        padding: 6px 12px;
-    }
-    .pager .page-item.active .page-link {
-        background: #b80710; border-color: #E50914;
-    }
+
+        .pager .pagination {
+            margin: 0;
+        }
+
+        .pager .page-link {
+            border-radius: 0;
+            margin: 0 2px;
+            border-color: rgba(255,255,255,.1);
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 12px;
+        }
+
+        .pager .page-item.active .page-link {
+            background: #b80710;
+            border-color: #E50914;
+        }
 </style>
 
 <div class="page-shell">
@@ -286,7 +476,7 @@
 
         <!-- STAT -->
         <div class="stat-card">
-            <div class="lbl">Tổng doanh thu (trang hiện tại)</div>
+            <div class="lbl">Tổng doanh thu (toàn bộ đơn đã thanh toán trong bộ lọc)</div>
             <div class="val">@Model.TongDoanhThu.ToString("N0") đ</div>
         </div>
 
@@ -353,7 +543,7 @@
                             <th>Xe</th>
                             <th>Ngày thanh toán</th>
                             <th class="text-end">Tiền thuê</th>
-                            <th class="text-end">Phụ phí</th>
+                            <th class="text-end">Ưu đãi</th>
                             <th class="text-end">Tổng</th>
                             <th>Phương thức</th>
                             <th>Trạng thái</th>
@@ -377,6 +567,8 @@
                                 var chuaThanhToan = item.TrangThaiThanhToan == TrangThaiThanhToan.ChuaThanhToan
                                                  && item.DatXe != null
                                                  && item.DatXe.TrangThai == TrangThaiDatXe.ChoThanhToan;
+
+                                var coUuDai = item.TienGiamVoucher > 0 || item.DiemDaDung > 0;
 
                                 <tr>
                                     <td class="text-muted">@stt</td>
@@ -405,10 +597,39 @@
 
                                     <td class="text-end">
                                         <span class="money">@item.TienThue.ToString("N0") đ</span>
+                                        @if (item.TienThueGoc > item.TienThue)
+                                        {
+                                            <div class="money small" style="text-decoration:line-through">
+                                                @item.TienThueGoc.ToString("N0")
+                                            </div>
+                                        }
                                     </td>
 
                                     <td class="text-end">
-                                        <span class="money">@item.TongPhuPhi.ToString("N0") đ</span>
+                                        @if (coUuDai)
+                                        {
+                                            @if (item.TienGiamVoucher > 0)
+                                            {
+                                                <div class="money voucher">
+                                                    - @item.TienGiamVoucher.ToString("N0")
+                                                    @if (item.MaGiamGia != null)
+                                                    {
+                                                        <span class="badge-voucher">@item.MaGiamGia.Code</span>
+                                                    }
+                                                </div>
+                                            }
+                                            @if (item.DiemDaDung > 0)
+                                            {
+                                                <div class="money green">
+                                                    - @item.TienTruTuDiem.ToString("N0")
+                                                    <span class="badge-diem">@item.DiemDaDung điểm</span>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">—</span>
+                                        }
                                     </td>
 
                                     <td class="text-end">

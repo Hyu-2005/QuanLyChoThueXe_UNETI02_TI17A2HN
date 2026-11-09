@@ -1,11 +1,8 @@
 @*
     ==============================================================
-    Index.cshtml - Trang chủ theo mẫu VIRELLO
-    Họ và tên: Vũ Tiến Đạt - MSSV: 23103100119 - SV3
-    Nội dung: Hero + Bộ sưu tập xe (dữ liệu thật từ database) + Giới thiệu
-              - Khách chưa đăng nhập: kêu gọi đăng nhập / xem xe
-              - Khách hàng: tìm xe trống nhanh (modal), lối tắt chức năng
-              - Admin/Nhân viên: bảng điều khiển hệ thống
+    Index.cshtml - Trang chủ VIRELLO (Bản hoàn chỉnh)
+    - Hiệu ứng Reveal, Bộ sưu tập xe, Khuyến mãi
+    - Bản đồ Google Maps có Ghim đỏ (Miễn phí, không cần API Key)
     ==============================================================
 *@
 @using System.Globalization
@@ -34,11 +31,73 @@
         .Distinct()
         .ToList();
 
+    // LẤY DỮ LIỆU KHUYẾN MÃI TỪ VIEWBAG
+    var khuyenMais = ViewBag.KhuyenMai as List<QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.MaGiamGia>;
+
     var anhNen = "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=2070&auto=format&fit=crop";
     var anhGioiThieu = "https://images.unsplash.com/photo-1563720223185-11003d516935?w=800&auto=format&fit=crop&q=80";
     var ngayNhanMacDinh = DateTime.Now.AddDays(1).ToString("yyyy-MM-ddTHH:00");
     var ngayTraMacDinh = DateTime.Now.AddDays(3).ToString("yyyy-MM-ddTHH:00");
 }
+
+<style>
+    /* Custom CSS cho Thẻ thông tin cửa hàng */
+    .info-card-map {
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 16px;
+        padding: 32px;
+        height: 100%;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+    }
+    /* Dải màu đỏ trang trí ở góc thẻ */
+    .info-card-map::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 4px;
+        background: linear-gradient(90deg, #E50914, #ff4d4d);
+    }
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(229,9,20,.1);
+        color: #E50914;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+    .info-row:hover .icon-box {
+        background: #E50914;
+        color: #fff;
+        transform: scale(1.05);
+    }
+    
+    /* CSS cho khung chứa Bản đồ Google */
+    .google-map-wrapper {
+        width: 100%;
+        height: 100%;
+        min-height: 450px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,.1);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        overflow: hidden;
+        background: #121212; /* Nền tối phòng trường hợp iframe chưa tải kịp */
+    }
+    .google-map-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+    }
+</style>
 
 <!-- ============================================================ -->
 <!-- HERO                                                         -->
@@ -218,6 +277,37 @@ else
     </section>
 
     <!-- ============================================================ -->
+    <!-- CHƯƠNG TRÌNH KHUYẾN MÃI                                      -->
+    <!-- ============================================================ -->
+    @if (khuyenMais != null && khuyenMais.Any())
+    {
+        <section id="promotions" class="vr-section black" style="padding: 60px 0;">
+            <div class="vr-wrap">
+                <div class="vr-head vr-reveal">
+                    <span class="vr-label">— ƯU ĐÃI ĐẶC BIỆT —</span>
+                    <h2 class="vr-h2">Khuyến mãi đang diễn ra</h2>
+                    <p class="vr-sub">Nhập mã khi thanh toán để nhận ưu đãi.</p>
+                </div>
+                <div class="row g-4">
+                    @foreach (var km in khuyenMais)
+                    {
+                        <div class="col-md-4">
+                            <div class="p-4 h-100" style="background: linear-gradient(135deg, #1c1c1c, #0a0a0a); border-left: 4px solid #E50914; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <h5 class="text-white fw-bold mb-2">@km.TenChuongTrinh</h5>
+                                <p class="text-muted small mb-3">@km.MoTa</p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="badge bg-danger fs-6 px-3 py-2" style="letter-spacing: 1px;">@km.Code</span>
+                                    <span class="text-warning small">HSD: @km.NgayKetThuc.ToString("dd/MM/yyyy")</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+
+    <!-- ============================================================ -->
     <!-- GIỚI THIỆU                                                   -->
     <!-- ============================================================ -->
     <section id="about" class="vr-section black">
@@ -264,12 +354,83 @@ else
             </div>
         </div>
     </section>
+
+    <!-- ============================================================ -->
+    <!-- BẢN ĐỒ VỊ TRÍ CỬA HÀNG (GOOGLE MAPS - CÓ GHIM ĐỎ)            -->
+    <!-- ============================================================ -->
+    <section id="map-location" class="vr-section dark" style="padding: 80px 0; border-top: 1px solid rgba(255,255,255,.05); background: #0a0a0a;">
+        <div class="vr-wrap">
+            <div class="vr-head vr-reveal text-center" style="margin-bottom: 50px;">
+                <span class="vr-label">— VỊ TRÍ CỬA HÀNG —</span>
+                <h2 class="vr-h2">Ghé thăm UNETI Car Rental</h2>
+                <p class="vr-sub">Chúng tôi luôn sẵn sàng phục vụ bạn tại địa chỉ dưới đây.</p>
+            </div>
+
+            <div class="row g-4 align-items-stretch justify-content-center">
+                <!-- CỘT TRÁI: THÔNG TIN CỬA HÀNG -->
+                <div class="col-lg-4">
+                    <div class="info-card-map">
+                        <h4 class="text-white fw-bold mb-4">Trụ sở chính</h4>
+                        
+                        <div class="d-flex align-items-start gap-3 mb-4 info-row">
+                            <div class="icon-box">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-white mb-1">Địa chỉ</h6>
+                                <p class="text-muted small mb-0">218 Lĩnh Nam, P. Hoàng Mai, Q. Hoàng Mai, TP. Hà Nội (Trường ĐH Kinh tế - Kỹ thuật Công nghiệp)</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-start gap-3 mb-4 info-row">
+                            <div class="icon-box">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-white mb-1">Hotline</h6>
+                                <p class="text-muted small mb-0">1900 6868</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-start gap-3 mb-4 info-row">
+                            <div class="icon-box">
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-white mb-1">Giờ mở cửa</h6>
+                                <p class="text-muted small mb-0">Thứ 2 - Chủ Nhật<br />07:00 AM - 22:00 PM</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto pt-3">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=20.980583356782315,105.87587610445243" target="_blank" class="vr-btn-red full text-decoration-none text-center d-block py-3">
+                                <i class="fa-solid fa-diamond-turn-right me-2"></i> Lấy chỉ đường
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CỘT PHẢI: BẢN ĐỒ GOOGLE MAPS -->
+                <div class="col-lg-8">
+                    <div class="google-map-wrapper">
+                        <!-- Link nhúng Google Maps có Ghim đỏ chính xác -->
+                        <iframe 
+                            src="https://maps.google.com/maps?q=20.980583356782315,105.87587610445243&hl=vi&z=16&output=embed" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 }
 
 @if (laKhachHang)
 {
     <!-- ============================================================ -->
-    <!-- MODAL: TÌM XE TRỐNG NHANH (gửi thẳng sang chức năng thật)    -->
+    <!-- MODAL: TÌM XE TRỐNG NHANH                                    -->
     <!-- ============================================================ -->
     <div id="vrQuickModal" class="vr-modal" aria-hidden="true">
         <div class="vr-modal-box">
@@ -294,4 +455,8 @@ else
             </form>
         </div>
     </div>
+}
+
+@section Scripts {
+    <!-- Không cần script khởi tạo bản đồ vì Google Maps iframe tự xử lý -->
 }

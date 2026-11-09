@@ -1,7 +1,8 @@
-// ThanhToanController.cs - quan ly thanh toan
+// ThanhToanController.cs - quản lý thanh toán (có voucher + điểm thưởng)
 // sinh vien thuc hien: Duong Lam Huy - 23103100120
 // module 5 - tinh tien, thanh toan, lich su va thong ke
 // + Chuc nang nang cao: Xuat Excel danh sach + In hoa don PDF
+// + Chuc nang moi: Voucher + Vi diem thuong (Loyalty Points)
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,24 +18,21 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
     [SessionAuthorize]
     public class ThanhToanController : Controller
     {
-        // =====================================================
-        // FIELDS - KHAI BAO DUY NHAT 1 LAN
-        // =====================================================
         private readonly AppDbContext _context;
         private readonly ITinhTienService _tinhTienService;
         private readonly IExportService _exportService;
+        private readonly IMaGiamGiaService _maGiamGiaService;
 
-        // =====================================================
-        // CONSTRUCTOR - CHI 1 DUY NHAT
-        // =====================================================
         public ThanhToanController(
             AppDbContext context,
             ITinhTienService tinhTienService,
-            IExportService exportService)
+            IExportService exportService,
+            IMaGiamGiaService maGiamGiaService)
         {
             _context = context;
             _tinhTienService = tinhTienService;
             _exportService = exportService;
+            _maGiamGiaService = maGiamGiaService;
         }
 
         // =====================================================
@@ -60,6 +58,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                     .ThenInclude(d => d!.KhachHang)
                 .Include(t => t.DatXe)
                     .ThenInclude(d => d!.Xe)
+                .Include(t => t.MaGiamGia)
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -109,6 +108,11 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 .Take(kichThuocTrang)
                 .ToListAsync();
 
+            // Tong doanh thu tren toan bo query (không chỉ trang hiện tại)
+            var tongDoanhThu = await query
+                .Where(t => t.TrangThaiThanhToan == TrangThaiThanhToan.DaThanhToan)
+                .SumAsync(t => (decimal?)t.TongThanhToan) ?? 0;
+
             var vm = new ThanhToanListVM
             {
                 DanhSach = danhSach,
@@ -124,9 +128,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 TongSoBanGhi = tongSo,
                 DanhSachTrangThai = LayDanhSachTrangThai(),
                 DanhSachPhuongThuc = LayDanhSachPhuongThuc(),
-                TongDoanhThu = danhSach
-                    .Where(t => t.TrangThaiThanhToan == TrangThaiThanhToan.DaThanhToan)
-                    .Sum(t => t.TongThanhToan)
+                TongDoanhThu = tongDoanhThu
             };
 
             return View(vm);
@@ -153,25 +155,31 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Chi don Cho thanh toan moi duoc thanh toan
             if (datXe.TrangThai != TrangThaiDatXe.ChoThanhToan)
             {
                 TempData["Error"] = $"Don dang o trang thai '{datXe.TrangThai}', khong the thanh toan";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Kiem tra khong thanh toan lai
             var daThanhToan = datXe.ThanhToans
                 .Any(t => t.TrangThaiThanhToan == TrangThaiThanhToan.DaThanhToan);
-
             if (daThanhToan)
             {
                 TempData["Error"] = "Don nay da duoc thanh toan truoc do";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Tinh toan
-            var ketQua = _tinhTienService.TinhThanhToan(datXe, datXe.TraXe);
+            // Lấy thông tin khách hàng để nạp điểm
+            var khachHang = await _context.KhachHangs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(k => k.MaKhachHang == datXe.MaKhachHang);
+
+            // Tính toán ban đầu (chưa voucher, chưa điểm)
+            var ketQua = _tinhTienService.TinhThanhToanDayDu(datXe, datXe.TraXe, null, 0);
+
+            var giaTriMotDiem = HttpContext.RequestServices
+                .GetRequiredService<IConfiguration>()
+                .GetValue<decimal?>("LoyaltyPoints:GiaTriMotDiem") ?? 5000m;
 
             var vm = new ThanhToanVM
             {
@@ -183,21 +191,133 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 ThoiGianNhanDuKien = datXe.ThoiGianNhanDuKien,
                 ThoiGianTraDuKien = datXe.ThoiGianTraDuKien,
                 ThoiGianTraThucTe = datXe.TraXe?.ThoiGianTraThucTe,
+
                 SoNgayThue = ketQua.SoNgayThue,
+                TienThueGoc = ketQua.TienThueGoc,
                 TienThue = ketQua.TienThue,
                 TongPhuPhi = ketQua.TongPhuPhi,
                 TienCocDaThu = ketQua.TienCocDaThu,
                 TongThanhToan = ketQua.TongThanhToan,
                 SoTienConLai = ketQua.SoTienConLai,
+
                 PhiQuaHan = datXe.TraXe?.PhiQuaHan ?? 0,
                 PhiVuotKm = datXe.TraXe?.PhiVuotKm ?? 0,
                 PhiNhienLieu = datXe.TraXe?.PhiNhienLieu ?? 0,
                 PhiHuHong = datXe.TraXe?.PhiHuHong ?? 0,
+
+                // Điểm thưởng
+                DiemHienCo = khachHang?.DiemTichLuy ?? 0,
+                GiaTriMotDiem = giaTriMotDiem,
+                DiemToiDaCoTheDung = 0,
+                DiemSuDung = 0,
+                TienTruTuDiem = 0,
+                DiemDuocCongSauThanhToan = _tinhTienService.TinhDiemDuocCong(ketQua.TienThue),
+
                 PhuongThucThanhToan = PhuongThucThanhToan.TienMat,
                 DanhSachPhuongThuc = LayDanhSachPhuongThuc()
             };
 
+            // Tính điểm tối đa có thể dùng
+            if (khachHang != null && khachHang.DiemTichLuy > 0)
+            {
+                var (hopLe, _) = _tinhTienService.KiemTraDiemSuDung(
+                    khachHang.DiemTichLuy, khachHang.DiemTichLuy, ketQua.TienThueGoc);
+                vm.DiemToiDaCoTheDung = hopLe;
+            }
+
             return View(vm);
+        }
+
+        // =====================================================
+        // AJAX: ÁP DỤNG VOUCHER + ĐIỂM (preview trước khi lưu)
+        // =====================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [SessionAuthorize(Roles = new[] { VaiTro.Admin, VaiTro.NhanVien })]
+        public async Task<IActionResult> ApDungVoucher([FromBody] ApDungVoucherRequestVM req)
+        {
+            if (req == null || req.MaDatXe <= 0)
+                return Json(new ApDungVoucherResponseVM { ThanhCong = false, Loi = "Dữ liệu không hợp lệ" });
+
+            var datXe = await _context.DatXes
+                .Include(d => d.KhachHang)
+                .Include(d => d.TraXe)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.MaDatXe == req.MaDatXe);
+
+            if (datXe == null)
+                return Json(new ApDungVoucherResponseVM { ThanhCong = false, Loi = "Không tìm thấy đơn đặt xe" });
+
+            if (datXe.TrangThai != TrangThaiDatXe.ChoThanhToan)
+                return Json(new ApDungVoucherResponseVM { ThanhCong = false, Loi = "Đơn không ở trạng thái chờ thanh toán" });
+
+            var khachHang = datXe.KhachHang;
+
+            // 1. Tính tiền gốc (chưa voucher, chưa điểm)
+            var tienThueGoc = _tinhTienService.TinhThanhToan(datXe, datXe.TraXe).TienThueGoc;
+
+            // 2. Validate voucher
+            Models.Entities.MaGiamGia? voucher = null;
+            string? loiVoucher = null;
+            if (!string.IsNullOrWhiteSpace(req.Code))
+            {
+                (voucher, loiVoucher) = await _maGiamGiaService.TimVaKiemTraAsync(
+                    req.Code, datXe.MaKhachHang, tienThueGoc);
+                if (loiVoucher != null)
+                    return Json(new ApDungVoucherResponseVM { ThanhCong = false, Loi = loiVoucher });
+            }
+
+            // 3. Validate điểm
+            int diemSuDung = Math.Max(0, req.DiemSuDung);
+            if (diemSuDung > 0 && khachHang != null)
+            {
+                // Tính tiền sau voucher (để kiểm tra điểm tối đa trên số tiền đã giảm voucher)
+                decimal tienThueSauVoucher = tienThueGoc;
+                if (voucher != null) tienThueSauVoucher -= voucher.TinhTienGiam(tienThueGoc);
+                if (tienThueSauVoucher < 0) tienThueSauVoucher = 0;
+
+                var (diemHopLe, loiDiem) = _tinhTienService.KiemTraDiemSuDung(
+                    diemSuDung, khachHang.DiemTichLuy, tienThueSauVoucher);
+
+                if (loiDiem != null)
+                {
+                    return Json(new ApDungVoucherResponseVM
+                    {
+                        ThanhCong = false,
+                        Loi = loiDiem,
+                        MaGiamGiaId = voucher?.MaGiamGiaId,
+                        TienGiamVoucher = voucher?.TinhTienGiam(tienThueGoc) ?? 0,
+                        Code = voucher?.Code
+                    });
+                }
+                diemSuDung = diemHopLe;
+            }
+
+            // 4. Tính toán đầy đủ
+            var ketQua = _tinhTienService.TinhThanhToanDayDu(datXe, datXe.TraXe, voucher, diemSuDung);
+
+            return Json(new ApDungVoucherResponseVM
+            {
+                ThanhCong = true,
+                Code = voucher?.Code,
+                MaGiamGiaId = voucher?.MaGiamGiaId,
+                TenChuongTrinh = voucher?.TenChuongTrinh,
+                TienGiamVoucher = ketQua.TienGiamVoucher,
+
+                TienTruTuDiem = ketQua.TienTruTuDiem,
+                DiemDaDung = ketQua.DiemDaDung,
+                DiemHienCo = khachHang?.DiemTichLuy ?? 0,
+                GiaTriMotDiem = HttpContext.RequestServices
+                    .GetRequiredService<IConfiguration>()
+                    .GetValue<decimal?>("LoyaltyPoints:GiaTriMotDiem") ?? 5000m,
+
+                TienThueGoc = ketQua.TienThueGoc,
+                TienThueSauGiam = ketQua.TienThue,
+                TongPhuPhi = ketQua.TongPhuPhi,
+                TongThanhToan = ketQua.TongThanhToan,
+                TienCocDaThu = ketQua.TienCocDaThu,
+                SoTienConLai = ketQua.SoTienConLai
+            });
         }
 
         // =====================================================
@@ -218,6 +338,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             }
 
             var datXe = await _context.DatXes
+                .Include(d => d.KhachHang)
                 .Include(d => d.TraXe)
                 .Include(d => d.ThanhToans)
                 .FirstOrDefaultAsync(d => d.MaDatXe == id);
@@ -236,23 +357,76 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
             var daThanhToan = datXe.ThanhToans
                 .Any(t => t.TrangThaiThanhToan == TrangThaiThanhToan.DaThanhToan);
-
             if (daThanhToan)
             {
                 TempData["Error"] = "Don nay da duoc thanh toan truoc do";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Tinh lai tu DB (khong tin du lieu client)
-            var ketQua = _tinhTienService.TinhThanhToan(datXe, datXe.TraXe);
+            // ===== TÍNH TOÁN LẠI TỪ DB =====
+            var khachHang = datXe.KhachHang;
+            if (khachHang == null)
+            {
+                TempData["Error"] = "Không tìm thấy khách hàng của đơn";
+                return RedirectToAction(nameof(Index));
+            }
 
-            // Kiem tra xem da co ban ghi Chua Thanh Toan nao chua (thuong do Seed tao)
+            // 1. Kiểm tra voucher
+            Models.Entities.MaGiamGia? voucher = null;
+            if (!string.IsNullOrWhiteSpace(vm.MaGiamGiaCode))
+            {
+                var (v, loi) = await _maGiamGiaService.TimVaKiemTraAsync(
+                    vm.MaGiamGiaCode, datXe.MaKhachHang,
+                    _tinhTienService.TinhThanhToan(datXe, datXe.TraXe).TienThueGoc);
+
+                if (loi != null)
+                {
+                    ModelState.AddModelError(nameof(vm.MaGiamGiaCode), loi);
+                    await LoadThongTinThanhToanAsync(vm);
+                    return View(vm);
+                }
+                voucher = v;
+            }
+
+            // 2. Kiểm tra điểm
+            int diemSuDung = Math.Max(0, vm.DiemSuDung);
+            if (diemSuDung > 0)
+            {
+                decimal tienThueSauVoucher = _tinhTienService.TinhThanhToan(datXe, datXe.TraXe).TienThueGoc;
+                if (voucher != null) tienThueSauVoucher -= voucher.TinhTienGiam(tienThueSauVoucher);
+                if (tienThueSauVoucher < 0) tienThueSauVoucher = 0;
+
+                var (diemHopLe, loiDiem) = _tinhTienService.KiemTraDiemSuDung(
+                    diemSuDung, khachHang.DiemTichLuy, tienThueSauVoucher);
+
+                if (loiDiem != null)
+                {
+                    ModelState.AddModelError(nameof(vm.DiemSuDung), loiDiem);
+                    await LoadThongTinThanhToanAsync(vm);
+                    return View(vm);
+                }
+                diemSuDung = diemHopLe;
+            }
+
+            // 3. Tính toán đầy đủ
+            var ketQua = _tinhTienService.TinhThanhToanDayDu(datXe, datXe.TraXe, voucher, diemSuDung);
+
+            // 4. Số điểm được cộng sau khi thanh toán = dựa trên tiền thuê sau giảm
+            var diemDuocCong = _tinhTienService.TinhDiemDuocCong(ketQua.TienThue);
+
+            // ===== LƯU THANH TOÁN =====
             var thanhToan = datXe.ThanhToans
                 .FirstOrDefault(t => t.TrangThaiThanhToan == TrangThaiThanhToan.ChuaThanhToan);
 
             if (thanhToan != null)
             {
-                // Cap nhat ban ghi hien tai
+                // Cập nhật bản ghi hiện tại
+                thanhToan.TienThueGoc = ketQua.TienThueGoc;
+                thanhToan.TienGiamVoucher = ketQua.TienGiamVoucher;
+                thanhToan.DiemDaDung = ketQua.DiemDaDung;
+                thanhToan.TienTruTuDiem = ketQua.TienTruTuDiem;
+                thanhToan.DiemDuocCong = diemDuocCong;
+                thanhToan.MaGiamGiaId = voucher?.MaGiamGiaId;
                 thanhToan.TienThue = ketQua.TienThue;
                 thanhToan.TongPhuPhi = ketQua.TongPhuPhi;
                 thanhToan.TienCocDaThu = ketQua.TienCocDaThu;
@@ -265,10 +439,16 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             }
             else
             {
-                // Tao ban ghi thanh toan moi
+                // Tạo bản ghi thanh toán mới
                 thanhToan = new Models.Entities.ThanhToan
                 {
                     MaDatXe = datXe.MaDatXe,
+                    TienThueGoc = ketQua.TienThueGoc,
+                    TienGiamVoucher = ketQua.TienGiamVoucher,
+                    DiemDaDung = ketQua.DiemDaDung,
+                    TienTruTuDiem = ketQua.TienTruTuDiem,
+                    DiemDuocCong = diemDuocCong,
+                    MaGiamGiaId = voucher?.MaGiamGiaId,
                     TienThue = ketQua.TienThue,
                     TongPhuPhi = ketQua.TongPhuPhi,
                     TienCocDaThu = ketQua.TienCocDaThu,
@@ -282,12 +462,41 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 _context.ThanhToans.Add(thanhToan);
             }
 
-            // Chuyen don sang Hoan thanh
+            // ===== TRỪ ĐIỂM ĐÃ DÙNG + CỘNG ĐIỂM MỚI =====
+            if (ketQua.DiemDaDung > 0)
+            {
+                khachHang.DiemTichLuy -= ketQua.DiemDaDung;
+                if (khachHang.DiemTichLuy < 0) khachHang.DiemTichLuy = 0;
+            }
+
+            if (diemDuocCong > 0)
+            {
+                khachHang.DiemTichLuy += diemDuocCong;
+                khachHang.TongDiemDaTichLuy += diemDuocCong;
+            }
+
+            // ===== CHUYỂN ĐƠN SANG HOÀN THÀNH =====
             datXe.TrangThai = TrangThaiDatXe.HoanThanh;
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Da thanh toan don #{datXe.MaDatXe} thanh cong";
+            // ===== GHI NHẬN LƯỢT DÙNG VOUCHER (sau khi đã lưu thanh toán thành công) =====
+            if (voucher != null && ketQua.TienGiamVoucher > 0)
+            {
+                await _maGiamGiaService.GhiNhanSuDungAsync(
+                    voucher, datXe.MaKhachHang, datXe.MaDatXe, ketQua.TienGiamVoucher);
+            }
+
+            // ===== THÔNG BÁO =====
+            var thongBao = $"Đã thanh toán đơn #{datXe.MaDatXe} thành công";
+            if (ketQua.TienGiamVoucher > 0)
+                thongBao += $" | Giảm voucher: {ketQua.TienGiamVoucher:N0}đ";
+            if (ketQua.DiemDaDung > 0)
+                thongBao += $" | Dùng {ketQua.DiemDaDung} điểm = {ketQua.TienTruTuDiem:N0}đ";
+            if (diemDuocCong > 0)
+                thongBao += $" | Cộng +{diemDuocCong} điểm";
+
+            TempData["Success"] = thongBao;
             return RedirectToAction(nameof(Index));
         }
 
@@ -304,6 +513,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                     .ThenInclude(d => d!.Xe)
                 .Include(t => t.DatXe)
                     .ThenInclude(d => d!.TraXe)
+                .Include(t => t.MaGiamGia)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.MaThanhToan == id);
 
@@ -313,7 +523,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Kiem tra quyen: khach hang chi xem cua minh
             var vaiTro = HttpContext.Session.GetVaiTro();
             if (vaiTro == VaiTro.KhachHang)
             {
@@ -329,7 +538,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         }
 
         // =====================================================
-        // XUAT EXCEL DANH SACH THANH TOAN (Chuc nang nang cao)
+        // XUAT EXCEL DANH SACH THANH TOAN
         // =====================================================
         [HttpGet]
         [SessionAuthorize(Roles = new[] { VaiTro.Admin, VaiTro.NhanVien })]
@@ -343,10 +552,10 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             var query = _context.ThanhToans
                 .Include(t => t.DatXe).ThenInclude(d => d!.KhachHang)
                 .Include(t => t.DatXe).ThenInclude(d => d!.Xe)
+                .Include(t => t.MaGiamGia)
                 .AsNoTracking()
                 .AsQueryable();
 
-            // Ap dung filter (giong Index)
             if (!string.IsNullOrWhiteSpace(tuKhoa))
             {
                 var kw = tuKhoa.Trim();
@@ -377,7 +586,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         }
 
         // =====================================================
-        // XUAT PDF HOA DON (Chuc nang nang cao)
+        // XUAT PDF HOA DON
         // =====================================================
         [HttpGet]
         public async Task<IActionResult> XuatHoaDonPdf(int id)
@@ -385,6 +594,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             var thanhToan = await _context.ThanhToans
                 .Include(t => t.DatXe).ThenInclude(d => d!.KhachHang)
                 .Include(t => t.DatXe).ThenInclude(d => d!.Xe)
+                .Include(t => t.MaGiamGia)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.MaThanhToan == id);
 
@@ -410,10 +620,12 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
             if (datXe == null) return;
 
+            var khachHang = datXe.KhachHang;
+
             vm.BienSo = datXe.Xe?.BienSo;
             vm.TenXe = datXe.Xe?.TenXe;
-            vm.TenKhachHang = datXe.KhachHang?.HoTen;
-            vm.SoDienThoaiKhachHang = datXe.KhachHang?.SoDienThoai;
+            vm.TenKhachHang = khachHang?.HoTen;
+            vm.SoDienThoaiKhachHang = khachHang?.SoDienThoai;
             vm.ThoiGianNhanDuKien = datXe.ThoiGianNhanDuKien;
             vm.ThoiGianTraDuKien = datXe.ThoiGianTraDuKien;
             vm.ThoiGianTraThucTe = datXe.TraXe?.ThoiGianTraThucTe;
@@ -422,13 +634,32 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             vm.PhiNhienLieu = datXe.TraXe?.PhiNhienLieu ?? 0;
             vm.PhiHuHong = datXe.TraXe?.PhiHuHong ?? 0;
 
-            var ketQua = _tinhTienService.TinhThanhToan(datXe, datXe.TraXe);
+            // Nếu form post có mã voucher + điểm thì tính lại theo giá trị đã post
+            Models.Entities.MaGiamGia? voucher = null;
+            if (!string.IsNullOrWhiteSpace(vm.MaGiamGiaCode))
+            {
+                voucher = await _context.MaGiamGias
+                    .FirstOrDefaultAsync(v => v.Code.ToUpper() == vm.MaGiamGiaCode.Trim().ToUpper());
+            }
+
+            var ketQua = _tinhTienService.TinhThanhToanDayDu(
+                datXe, datXe.TraXe, voucher, Math.Max(0, vm.DiemSuDung));
+
             vm.SoNgayThue = ketQua.SoNgayThue;
+            vm.TienThueGoc = ketQua.TienThueGoc;
+            vm.TienGiamVoucher = ketQua.TienGiamVoucher;
+            vm.TienTruTuDiem = ketQua.TienTruTuDiem;
             vm.TienThue = ketQua.TienThue;
             vm.TongPhuPhi = ketQua.TongPhuPhi;
             vm.TienCocDaThu = ketQua.TienCocDaThu;
             vm.TongThanhToan = ketQua.TongThanhToan;
             vm.SoTienConLai = ketQua.SoTienConLai;
+
+            vm.DiemHienCo = khachHang?.DiemTichLuy ?? 0;
+            vm.GiaTriMotDiem = HttpContext.RequestServices
+                .GetRequiredService<IConfiguration>()
+                .GetValue<decimal?>("LoyaltyPoints:GiaTriMotDiem") ?? 5000m;
+            vm.DiemDuocCongSauThanhToan = _tinhTienService.TinhDiemDuocCong(ketQua.TienThue);
 
             vm.DanhSachPhuongThuc = LayDanhSachPhuongThuc();
         }

@@ -1,8 +1,7 @@
 ﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
 @*
-    Details.cshtml - chi tiet hoa don thanh toan
+    Details.cshtml - chi tiet hoa don thanh toan (có voucher + điểm)
     Sinh viên thực hiện: Duong Lam Huy - 23103100120
-    Nội dung: Chi tiết hóa đơn + nút In hóa đơn PDF
     Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
 *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.ThanhToan
@@ -11,60 +10,94 @@
 }
 
 <style>
-    .detail-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
-    .detail-wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+    .detail-shell {
+        background: #000000;
+        min-height: 100vh;
+        padding: 32px 0;
+    }
+
+    .detail-wrap {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
 
     .detail-head {
-        display: flex; justify-content: space-between; align-items: flex-end;
-        margin-bottom: 28px; padding-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 28px;
+        padding-bottom: 20px;
         border-bottom: 1px solid rgba(255,255,255,.1);
-        flex-wrap: wrap; gap: 16px;
+        flex-wrap: wrap;
+        gap: 16px;
     }
-    .detail-head .back {
-        font-size: 13px; color: #94a3b8; text-decoration: none;
-        display: inline-block; margin-bottom: 8px;
-    }
-    .detail-head .back:hover { color: #E50914; }
-    .detail-head h1 {
-        font-size: 26px; font-weight: 800; color: #ffffff;
-        letter-spacing: -0.4px; margin: 0 0 8px 0;
-    }
+
+        .detail-head .back {
+            font-size: 13px;
+            color: #94a3b8;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+            .detail-head .back:hover {
+                color: #E50914;
+            }
+
+        .detail-head h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.4px;
+            margin: 0 0 8px 0;
+        }
+
     .id-chip {
         display: inline-block;
-        background: rgba(99,102,241,.18); color: #a5b4fc;
-        font-weight: 700; font-size: 13px;
-        padding: 4px 12px; border-radius: 0;
+        background: rgba(99,102,241,.18);
+        color: #a5b4fc;
+        font-weight: 700;
+        font-size: 13px;
+        padding: 4px 12px;
+        border-radius: 0;
         margin-right: 8px;
     }
+
     .status-pill {
         display: inline-block;
         padding: 6px 14px;
         border-radius: 999px;
-        font-size: 12px; font-weight: 700;
+        font-size: 12px;
+        font-weight: 700;
         letter-spacing: .3px;
         text-transform: uppercase;
-        background: rgba(34,197,94,.15); color: #86efac;
+        background: rgba(34,197,94,.15);
+        color: #86efac;
     }
 
-    /* ===== NÚT IN PDF ===== */
     .btn-print-pdf {
-        display: inline-flex; align-items: center; gap: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         padding: 11px 22px;
         background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
         color: #fff;
-        border: none; border-radius: 0;
-        font-size: 13px; font-weight: 700;
+        border: none;
+        border-radius: 0;
+        font-size: 13px;
+        font-weight: 700;
         text-decoration: none;
         box-shadow: 0 4px 12px rgba(220,38,38,.25);
         transition: all .2s;
         white-space: nowrap;
     }
-    .btn-print-pdf:hover {
-        color: #fff;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(220,38,38,.4);
-    }
-    .btn-print-pdf .icon { font-size: 16px; }
+
+        .btn-print-pdf:hover {
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(220,38,38,.4);
+        }
 
     .info-card {
         background: #121212;
@@ -73,24 +106,38 @@
         padding: 26px 30px;
         margin-bottom: 20px;
     }
-    .info-card .title {
-        font-size: 12px; font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1.2px;
-        color: #94a3b8; margin: 0 0 18px 0;
-    }
+
+        .info-card .title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #94a3b8;
+            margin: 0 0 18px 0;
+        }
+
     .info-row {
-        display: flex; justify-content: space-between;
+        display: flex;
+        justify-content: space-between;
         padding: 11px 0;
         border-bottom: 1px solid rgba(255,255,255,.06);
         font-size: 14px;
     }
-    .info-row:last-child { border-bottom: none; }
-    .info-row .lbl { color: #94a3b8; }
-    .info-row .val {
-        font-weight: 600; color: #ffffff;
-        text-align: right; font-variant-numeric: tabular-nums;
-    }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row .lbl {
+            color: #94a3b8;
+        }
+
+        .info-row .val {
+            font-weight: 600;
+            color: #ffffff;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
 
     .price-card {
         background: #0a0a0a;
@@ -99,35 +146,77 @@
         padding: 24px 30px;
         margin-bottom: 20px;
     }
-    .price-card .title {
-        font-size: 12px; font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1.2px;
-        color: #94a3b8; margin: 0 0 18px 0;
-    }
+
+        .price-card .title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #94a3b8;
+            margin: 0 0 18px 0;
+        }
+
     .price-row {
-        display: flex; justify-content: space-between;
+        display: flex;
+        justify-content: space-between;
         padding: 10px 0;
         border-bottom: 1px solid rgba(255,255,255,.1);
         font-size: 14px;
     }
-    .price-row:last-child { border-bottom: none; }
-    .price-row .lbl { color: #94a3b8; }
-    .price-row .val {
-        color: #ffffff; font-weight: 600;
-        font-variant-numeric: tabular-nums;
-    }
-    .price-row.minus .val { color: #34d399; }
-    .price-row.total {
-        margin-top: 8px; padding-top: 14px;
-        border-top: 2px solid rgba(255,255,255,.2);
-        border-bottom: none;
-    }
-    .price-row.total .lbl {
-        color: #ffffff; font-weight: 800; font-size: 15px;
-    }
-    .price-row.total .val {
-        color: #fbbf24; font-weight: 800; font-size: 20px;
+
+        .price-row:last-child {
+            border-bottom: none;
+        }
+
+        .price-row .lbl {
+            color: #94a3b8;
+        }
+
+        .price-row .val {
+            color: #ffffff;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .price-row.minus .val {
+            color: #34d399;
+        }
+
+        .price-row.green .val {
+            color: #34d399;
+        }
+
+        .price-row.voucher .val {
+            color: #c4b5fd;
+        }
+
+        .price-row.total {
+            margin-top: 8px;
+            padding-top: 14px;
+            border-top: 2px solid rgba(255,255,255,.2);
+            border-bottom: none;
+        }
+
+            .price-row.total .lbl {
+                color: #ffffff;
+                font-weight: 800;
+                font-size: 15px;
+            }
+
+            .price-row.total .val {
+                color: #fbbf24;
+                font-weight: 800;
+                font-size: 20px;
+            }
+
+    .badge-voucher {
+        display: inline-block;
+        background: rgba(139,92,246,.18);
+        color: #c4b5fd;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
     }
 </style>
 
@@ -147,8 +236,7 @@
 
             <a asp-action="XuatHoaDonPdf" asp-route-id="@Model.MaThanhToan"
                class="btn-print-pdf">
-                <span class="icon">🖨️</span>
-                In hóa đơn PDF
+                <span>🖨️</span> In hóa đơn PDF
             </a>
         </div>
 
@@ -182,6 +270,37 @@
 
         <div class="price-card">
             <h6 class="title">Chi tiết thanh toán</h6>
+
+            @if (Model.TienThueGoc > 0)
+            {
+                <div class="price-row">
+                    <span class="lbl">Tiền thuê gốc</span>
+                    <span class="val">@Model.TienThueGoc.ToString("N0") đ</span>
+                </div>
+            }
+
+            @if (Model.TienGiamVoucher > 0)
+            {
+                <div class="price-row voucher">
+                    <span class="lbl">
+                        Giảm giá voucher
+                        @if (Model.MaGiamGia != null)
+                        {
+                            <span class="badge-voucher">@Model.MaGiamGia.Code</span>
+                        }
+                    </span>
+                    <span class="val">- @Model.TienGiamVoucher.ToString("N0") đ</span>
+                </div>
+            }
+
+            @if (Model.DiemDaDung > 0)
+            {
+                <div class="price-row green">
+                    <span class="lbl">Trừ từ điểm thưởng (@Model.DiemDaDung điểm)</span>
+                    <span class="val">- @Model.TienTruTuDiem.ToString("N0") đ</span>
+                </div>
+            }
+
             <div class="price-row">
                 <span class="lbl">Tiền thuê</span>
                 <span class="val">@Model.TienThue.ToString("N0") đ</span>
@@ -214,6 +333,13 @@
                 <span class="lbl">Ngày thanh toán</span>
                 <span class="val">@Model.NgayThanhToan.ToString("dd/MM/yyyy HH:mm")</span>
             </div>
+            @if (Model.DiemDuocCong > 0)
+            {
+                <div class="info-row">
+                    <span class="lbl">Điểm được cộng</span>
+                    <span class="val" style="color:#34d399">+ @Model.DiemDuocCong điểm</span>
+                </div>
+            }
             @if (!string.IsNullOrEmpty(Model.GhiChu))
             {
                 <div class="info-row">

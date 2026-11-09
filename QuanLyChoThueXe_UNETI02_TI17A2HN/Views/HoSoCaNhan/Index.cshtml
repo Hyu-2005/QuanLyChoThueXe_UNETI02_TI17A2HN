@@ -1,0 +1,115 @@
+﻿@model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.KhachHang
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+    var giaTriMotDiem = (decimal)(ViewBag.GiaTriMotDiem ?? 5000m);
+}
+
+<style>
+    .profile-card {
+        background: #121212;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 8px;
+        padding: 32px;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #E50914, #b80710);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: 800;
+        margin: 0 auto 16px auto;
+        box-shadow: 0 8px 24px rgba(229,9,20,.3);
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255,255,255,.06);
+        font-size: 14px;
+    }
+    .info-row .lbl {
+        color: #94a3b8;
+    }
+    .info-row .val {
+        color: #fff;
+        font-weight: 600;
+        text-align: right;
+    }
+    .loyalty-box {
+        background: linear-gradient(135deg, rgba(251,191,36,.15), rgba(251,191,36,.05));
+        border: 1px solid rgba(251,191,36,.3);
+        border-radius: 8px;
+        padding: 24px;
+        margin-top: 32px;
+        text-align: center;
+    }
+    .loyalty-points {
+        font-size: 42px;
+        font-weight: 800;
+        color: #fbbf24;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="profile-card">
+        <div class="text-center mb-4">
+            <div class="avatar-circle">
+                @(Model.HoTen?.FirstOrDefault().ToString().ToUpper() ?? "?")
+            </div>
+            <h3 class="text-white fw-bold mb-1">@Model.HoTen</h3>
+            <p class="text-muted mb-0">Thành viên từ @DateTime.Now.Year</p>
+        </div>
+
+        <div class="info-row">
+            <span class="lbl">Số điện thoại</span>
+            <span class="val">@Model.SoDienThoai</span>
+        </div>
+        <div class="info-row">
+            <span class="lbl">Email</span>
+            <span class="val">@(string.IsNullOrEmpty(Model.Email) ? "Chưa cập nhật" : Model.Email)</span>
+        </div>
+        <div class="info-row">
+            <span class="lbl">Địa chỉ</span>
+            <span class="val">@(string.IsNullOrEmpty(Model.DiaChi) ? "Chưa cập nhật" : Model.DiaChi)</span>
+        </div>
+        <div class="info-row">
+            <span class="lbl">Số GPLX</span>
+            <span class="val">@(string.IsNullOrEmpty(Model.SoGiayPhepLaiXe) ? "Chưa cập nhật" : Model.SoGiayPhepLaiXe)</span>
+        </div>
+        <div class="info-row" style="border-bottom: none;">
+            <span class="lbl">Trạng thái tài khoản</span>
+            <span class="val text-success">
+                @if (Model.TrangThai) { <span>Đang hoạt động</span> } else { <span class="text-danger">Đã bị khóa</span> }
+            </span>
+        </div>
+
+        <!-- VÍ ĐIỂM THƯỞNG -->
+        <div class="loyalty-box">
+            <h5 class="text-warning fw-bold mb-3">⭐ Ví điểm thưởng</h5>
+            <div class="loyalty-points">@Model.DiemTichLuy.ToString("N0")</div>
+            <p class="text-muted small mb-1">điểm khả dụng</p>
+            <div class="d-flex justify-content-center gap-4 mt-3">
+                <div>
+                    <div class="text-white fw-bold">@giaTriMotDiem.ToString("N0") đ</div>
+                    <div class="text-muted" style="font-size: 11px;">Giá trị 1 điểm</div>
+                </div>
+                <div>
+                    <div class="text-white fw-bold">@Model.TongDiemDaTichLuy.ToString("N0")</div>
+                    <div class="text-muted" style="font-size: 11px;">Tổng tích lũy</div>
+                </div>
+            </div>
+            <p class="text-muted small mt-3 mb-0">
+                * Điểm sẽ được trừ khi thanh toán hóa đơn và tự động cộng thêm khi hoàn thành chuyến đi.
+            </p>
+        </div>
+    </div>
+</div>

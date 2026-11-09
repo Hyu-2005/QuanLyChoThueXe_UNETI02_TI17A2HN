@@ -417,6 +417,7 @@
                             <th>Liên hệ</th>
                             <th>Địa chỉ</th>
                             <th>Giấy phép lái xe</th>
+                            <th class="text-center">Ví điểm</th>
                             <th>Trạng thái</th>
                             <th class="text-end" style="width:200px">Thao tác</th>
                         </tr>
@@ -485,6 +486,12 @@
                                         <span class="gplx-chip @gplxStatus">@gplxText</span>
                                     </td>
 
+                                    <td class="text-center">
+                                        <span class="badge" style="background: rgba(251,191,36,.2); color: #fbbf24; font-size: 14px; padding: 6px 12px;">
+                                            ⭐ @item.DiemTichLuy.ToString("N0")
+                                        </span>
+                                    </td>
+
                                     <td>
                                         @if (item.TrangThai)
                                         {
@@ -518,7 +525,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="7">
+                                <td colspan="8">
                                     <div class="empty-state">
                                         <div class="big">— — —</div>
                                         <div class="msg">Không có khách hàng nào phù hợp</div>

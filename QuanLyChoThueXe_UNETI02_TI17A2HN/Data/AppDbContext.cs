@@ -10,7 +10,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data
         {
         }
 
-        // ===== 10 DbSet chinh =====
+        // ===== 12 DbSet chính =====
         public DbSet<TaiKhoan> TaiKhoans { get; set; }
         public DbSet<LoaiXe> LoaiXes { get; set; }
         public DbSet<HangXe> HangXes { get; set; }
@@ -33,6 +33,18 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data
         public DbSet<LichSuBaoDuong> LichSuBaoDuongs { get; set; }
         // ==============================================================
         // Kết thúc Code của SV4
+        // ==============================================================
+
+        // ==============================================================
+        // Bắt Đầu Code của SV5: Dương Lâm Huy - 23103100120
+        // file: Data/AppDbContext.cs
+        // nội dung: Thêm 2 DbSet cho Voucher (MaGiamGia) và lịch sử sử dụng (SuDungMaGiamGia)
+        // Module: Module 5 - Tính tiền, Thanh toán
+        // ==============================================================
+        public DbSet<MaGiamGia> MaGiamGias { get; set; }
+        public DbSet<SuDungMaGiamGia> SuDungMaGiamGias { get; set; }
+        // ==============================================================
+        // Kết thúc Code của SV5
         // ==============================================================
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

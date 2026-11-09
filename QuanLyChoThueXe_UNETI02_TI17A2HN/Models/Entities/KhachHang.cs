@@ -44,6 +44,29 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities
         [Display(Name = "Trạng thái")]
         public bool TrangThai { get; set; } = true;
 
+        // ============================================================
+        // BẮT ĐẦU CODE CỦA SV5: Dương Lâm Huy - 23103100120
+        // Nội dung: Thêm 2 cột điểm thưởng cho ví Loyalty Points
+        // Module: Module 5 - Tính tiền, Thanh toán
+        // ============================================================
+
+        /// <summary>Số điểm tích lũy hiện tại (có thể dùng để trừ tiền)</summary>
+        [Display(Name = "Điểm tích lũy")]
+        [Range(0, int.MaxValue, ErrorMessage = "Điểm tích lũy phải >= 0")]
+        public int DiemTichLuy { get; set; } = 0;
+
+        /// <summary>
+        /// Tổng điểm đã tích lũy (không bị trừ khi dùng điểm) - dùng để xếp hạng VIP
+        /// VD: 0-100 điểm = Bạc, 100-500 = Vàng, >500 = Kim cương
+        /// </summary>
+        [Display(Name = "Tổng điểm đã tích lũy")]
+        [Range(0, int.MaxValue)]
+        public int TongDiemDaTichLuy { get; set; } = 0;
+
+        // ============================================================
+        // KẾT THÚC CODE CỦA SV5
+        // ============================================================
+
         // ===== Navigation =====
         [ForeignKey(nameof(MaTaiKhoan))]
         public TaiKhoan? TaiKhoan { get; set; }

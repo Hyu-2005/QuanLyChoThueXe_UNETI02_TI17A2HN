@@ -17,12 +17,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             _context = context;
         }
 
-        // ==============================================================
-        // Bắt Đầu Code của SV3: Vũ Tiến Đạt
-        // file: Controllers/HomeController.cs
-        // nội dung: Trang chủ lấy danh sách xe sẵn sàng (kèm giá/ngày) để hiện ở mục "Bộ sưu tập xe" theo giao diện VIRELLO.
-        // sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
-        // ==============================================================
         public async Task<IActionResult> Index()
         {
             var vm = new HomeIndexVM();
@@ -30,6 +24,15 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             try
             {
                 vm.XeNoiBat = await LayXeNoiBatAsync();
+
+                // Lấy Voucher đang chạy để hiển thị ở trang chủ
+                var now = DateTime.Now;
+                ViewBag.KhuyenMai = await _context.MaGiamGias
+                    .Where(v => v.TrangThai && v.NgayBatDau <= now && v.NgayKetThuc >= now && v.SoLuotDaDung < v.SoLuotDungToiDa)
+                    .OrderByDescending(v => v.GiaTriGiam)
+                    .Take(3)
+                    .AsNoTracking()
+                    .ToListAsync();
             }
             catch
             {
@@ -61,7 +64,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
             foreach (var xe in xes)
             {
-                // Ưu tiên giá riêng của xe, không có thì dùng giá theo loại xe
                 var gia = bangGias.Where(b => b.MaXe == xe.MaXe)
                                   .Select(b => b.DonGiaNgay).FirstOrDefault();
                 if (gia <= 0)
@@ -69,7 +71,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                     gia = bangGias.Where(b => b.MaXe == null && b.MaLoaiXe == xe.MaLoaiXe)
                                   .Select(b => b.DonGiaNgay).FirstOrDefault();
                 }
-                if (gia <= 0) continue;   // xe chưa có bảng giá thì không hiển thị (giống trang Tìm xe trống)
+                if (gia <= 0) continue;
 
                 ketQua.Add(new XeNoiBatVM
                 {
@@ -89,9 +91,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
             return ketQua;
         }
-        // ==============================================================
-        // Kết thúc Code của SV3
-        // ==============================================================
 
         public IActionResult Privacy()
         {

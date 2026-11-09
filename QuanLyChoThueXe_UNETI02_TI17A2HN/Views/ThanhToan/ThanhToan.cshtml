@@ -1,6 +1,6 @@
 ﻿@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
 @*
-    ThanhToan.cshtml - Form thanh toán tại quầy
+    ThanhToan.cshtml - Form thanh toán tại quầy (có voucher + điểm thưởng)
     Sinh viên thực hiện: Dương Lâm Huy - 23103100120
     Module: Module 5 - Tính tiền, Thanh toán, Lịch sử, Thống kê
 *@
@@ -11,23 +11,49 @@
 }
 
 <style>
-    .form-shell { background: #000000; min-height: 100vh; padding: 32px 0; }
-    .form-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .form-shell {
+        background: #000000;
+        min-height: 100vh;
+        padding: 32px 0;
+    }
+
+    .form-wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
 
     .form-head {
-        margin-bottom: 28px; padding-bottom: 20px;
+        margin-bottom: 28px;
+        padding-bottom: 20px;
         border-bottom: 1px solid rgba(255,255,255,.1);
     }
-    .form-head .back {
-        font-size: 13px; color: #94a3b8; text-decoration: none;
-        display: inline-block; margin-bottom: 8px;
-    }
-    .form-head .back:hover { color: #E50914; }
-    .form-head h1 {
-        font-size: 26px; font-weight: 800; color: #ffffff;
-        letter-spacing: -0.4px; margin: 0 0 4px 0;
-    }
-    .form-head .sub { font-size: 14px; color: #94a3b8; margin: 0; }
+
+        .form-head .back {
+            font-size: 13px;
+            color: #94a3b8;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+            .form-head .back:hover {
+                color: #E50914;
+            }
+
+        .form-head h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.4px;
+            margin: 0 0 4px 0;
+        }
+
+        .form-head .sub {
+            font-size: 14px;
+            color: #94a3b8;
+            margin: 0;
+        }
 
     .info-summary {
         background: linear-gradient(135deg, #b80710 0%, #E50914 100%);
@@ -41,17 +67,27 @@
         flex-wrap: wrap;
         gap: 20px;
     }
-    .info-summary .item h6 {
-        font-size: 11px; text-transform: uppercase;
-        letter-spacing: .8px; opacity: .85; margin: 0 0 6px 0;
-    }
-    .info-summary .item .val {
-        font-size: 18px; font-weight: 800;
-        letter-spacing: -0.3px; margin: 0;
-    }
-    .info-summary .item .sub {
-        font-size: 12px; opacity: .8; margin-top: 2px;
-    }
+
+        .info-summary .item h6 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            opacity: .85;
+            margin: 0 0 6px 0;
+        }
+
+        .info-summary .item .val {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin: 0;
+        }
+
+        .info-summary .item .sub {
+            font-size: 12px;
+            opacity: .8;
+            margin-top: 2px;
+        }
 
     .form-card {
         background: #121212;
@@ -60,75 +96,147 @@
         overflow: hidden;
         box-shadow: 0 1px 3px rgba(0,0,0,.45);
     }
-    .form-card .sect {
-        padding: 28px 32px;
-        border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .form-card .sect:last-of-type { border-bottom: none; }
-    .form-card .sect-title {
-        display: flex; align-items: center; gap: 12px;
-        font-size: 12px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 1.2px;
-        color: #94a3b8; margin: 0 0 22px 0;
-    }
-    .form-card .sect-title .num {
-        width: 26px; height: 26px; border-radius: 50%;
-        background: #b80710; color: #fff;
-        display: inline-flex; align-items: center; justify-content: center;
-        font-size: 12px; font-weight: 700; flex-shrink: 0;
-    }
-    .form-card .sect-title .hint {
-        margin-left: auto; font-size: 11px; font-weight: 500;
-        text-transform: none; letter-spacing: 0; color: #71717a;
+
+        .form-card .sect {
+            padding: 28px 32px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+
+            .form-card .sect:last-of-type {
+                border-bottom: none;
+            }
+
+        .form-card .sect-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #94a3b8;
+            margin: 0 0 22px 0;
+        }
+
+            .form-card .sect-title .num {
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                background: #b80710;
+                color: #fff;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: 700;
+                flex-shrink: 0;
+            }
+
+            .form-card .sect-title .hint {
+                margin-left: auto;
+                font-size: 11px;
+                font-weight: 500;
+                text-transform: none;
+                letter-spacing: 0;
+                color: #71717a;
+            }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #cbd5e1;
+        margin-bottom: 6px;
     }
 
-    .form-label { font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px; }
-    .form-label .req { color: #f87171; margin-left: 2px; }
+        .form-label .req {
+            color: #f87171;
+            margin-left: 2px;
+        }
+
     .form-control, .form-select {
-        border-radius: 0; border-color: rgba(255,255,255,.2);
-        font-size: 14px; padding: 9px 12px; height: 42px;
+        border-radius: 0;
+        border-color: rgba(255,255,255,.2);
+        font-size: 14px;
+        padding: 9px 12px;
+        height: 42px;
     }
-    .form-control:focus, .form-select:focus {
-        border-color: #E50914;
-        box-shadow: 0 0 0 3px rgba(229,9,20,.12);
-    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #E50914;
+            box-shadow: 0 0 0 3px rgba(229,9,20,.12);
+        }
 
     .price-breakdown {
         background: #0a0a0a;
         border-radius: 0;
         padding: 20px 24px;
     }
+
     .price-row {
-        display: flex; justify-content: space-between;
+        display: flex;
+        justify-content: space-between;
         padding: 10px 0;
         border-bottom: 1px solid rgba(255,255,255,.1);
         font-size: 14px;
     }
-    .price-row:last-child { border-bottom: none; }
-    .price-row .lbl { color: #94a3b8; }
-    .price-row .val {
-        color: #ffffff; font-weight: 600;
-        font-variant-numeric: tabular-nums;
-    }
-    .price-row.highlight .lbl {
-        color: #ffffff; font-weight: 700; font-size: 15px;
-    }
-    .price-row.highlight .val {
-        color: #E50914; font-weight: 800; font-size: 18px;
-    }
-    .price-row.minus .val { color: #34d399; }
-    .price-row.total {
-        margin-top: 8px; padding-top: 14px;
-        border-top: 2px solid rgba(255,255,255,.2);
-        border-bottom: none;
-    }
-    .price-row.total .lbl {
-        color: #ffffff; font-weight: 800; font-size: 15px;
-    }
-    .price-row.total .val {
-        color: #fbbf24; font-weight: 800; font-size: 22px;
-        letter-spacing: -0.5px;
-    }
+
+        .price-row:last-child {
+            border-bottom: none;
+        }
+
+        .price-row .lbl {
+            color: #94a3b8;
+        }
+
+        .price-row .val {
+            color: #ffffff;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .price-row.highlight .lbl {
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .price-row.highlight .val {
+            color: #E50914;
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .price-row.minus .val {
+            color: #34d399;
+        }
+
+        .price-row.green .val {
+            color: #34d399;
+        }
+
+        .price-row.amber .val {
+            color: #fbbf24;
+        }
+
+        .price-row.total {
+            margin-top: 8px;
+            padding-top: 14px;
+            border-top: 2px solid rgba(255,255,255,.2);
+            border-bottom: none;
+        }
+
+            .price-row.total .lbl {
+                color: #ffffff;
+                font-weight: 800;
+                font-size: 15px;
+            }
+
+            .price-row.total .val {
+                color: #fbbf24;
+                font-weight: 800;
+                font-size: 22px;
+                letter-spacing: -0.5px;
+            }
 
     .phi-detail-box {
         background: rgba(245,158,11,.10);
@@ -137,53 +245,145 @@
         padding: 16px 20px;
         margin-top: 16px;
     }
-    .phi-detail-box h6 {
-        font-size: 12px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: .5px;
-        color: #fcd34d; margin: 0 0 10px 0;
-    }
+
+        .phi-detail-box h6 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #fcd34d;
+            margin: 0 0 10px 0;
+        }
+
     .phi-line {
-        display: flex; justify-content: space-between;
-        font-size: 13px; padding: 4px 0;
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        padding: 4px 0;
         color: #fcd34d;
     }
-    .phi-line .val { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+        .phi-line .val {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+    .voucher-box {
+        background: rgba(139,92,246,.10);
+        border: 1px solid rgba(139,92,246,.35);
+        border-radius: 0;
+        padding: 16px 20px;
+        margin-bottom: 16px;
+    }
+
+        .voucher-box h6 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #c4b5fd;
+            margin: 0 0 10px 0;
+        }
+
+    .voucher-applied {
+        background: rgba(34,197,94,.10);
+        border: 1px solid rgba(34,197,94,.35);
+        border-radius: 0;
+        padding: 10px 14px;
+        font-size: 13px;
+        color: #86efac;
+        margin-top: 10px;
+        display: none;
+    }
+
+        .voucher-applied.show {
+            display: block;
+        }
+
+    .loyalty-box {
+        background: rgba(251,191,36,.10);
+        border: 1px solid rgba(251,191,36,.35);
+        border-radius: 0;
+        padding: 16px 20px;
+        margin-bottom: 16px;
+    }
+
+        .loyalty-box h6 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #fbbf24;
+            margin: 0 0 10px 0;
+        }
+
+        .loyalty-box .info {
+            font-size: 13px;
+            color: #fcd34d;
+            margin-bottom: 10px;
+        }
+
+            .loyalty-box .info strong {
+                color: #ffffff;
+            }
 
     .form-actions {
         padding: 20px 32px;
         background: #1c1c1c;
         border-top: 1px solid rgba(255,255,255,.1);
-        display: flex; justify-content: space-between; align-items: center;
-        flex-wrap: wrap; gap: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
     }
-    .form-actions .btn { padding: 10px 26px; font-weight: 600; border-radius: 0; }
+
+        .form-actions .btn {
+            padding: 10px 26px;
+            font-weight: 600;
+            border-radius: 0;
+        }
 
     .btn-primary-custom {
         background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        color: #fff; border: none;
+        color: #fff;
+        border: none;
         box-shadow: 0 4px 12px rgba(16,185,129,.25);
     }
-    .btn-primary-custom:hover {
-        color: #fff;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(16,185,129,.35);
-    }
+
+        .btn-primary-custom:hover {
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(16,185,129,.35);
+        }
+
+        .btn-primary-custom:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
 
     .btn-online {
         background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
-        color: #fff; border: none;
+        color: #fff;
+        border: none;
         box-shadow: 0 4px 12px rgba(139,92,246,.25);
-        padding: 10px 22px; border-radius: 0;
-        font-weight: 700; font-size: 13px;
+        padding: 10px 22px;
+        border-radius: 0;
+        font-weight: 700;
+        font-size: 13px;
         text-decoration: none;
-        display: inline-flex; align-items: center; gap: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         transition: all .2s;
     }
-    .btn-online:hover {
-        color: #fff;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(139,92,246,.35);
-    }
+
+        .btn-online:hover {
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(139,92,246,.35);
+        }
 </style>
 
 <div class="form-shell">
@@ -192,7 +392,7 @@
         <div class="form-head">
             <a asp-action="Index" class="back">← Quay lại danh sách</a>
             <h1>Thanh toán đơn đặt xe</h1>
-            <p class="sub">Xác nhận thanh toán và hoàn tất đơn thuê xe</p>
+            <p class="sub">Áp dụng voucher + điểm thưởng và hoàn tất thanh toán</p>
         </div>
 
         <div class="info-summary">
@@ -216,7 +416,7 @@
             </div>
         </div>
 
-        <form asp-action="ThanhToan" asp-route-id="@Model.MaDatXe" method="post">
+        <form asp-action="ThanhToan" asp-route-id="@Model.MaDatXe" method="post" id="formThanhToan">
             <input type="hidden" asp-for="MaDatXe" />
             <input type="hidden" asp-for="BienSo" />
             <input type="hidden" asp-for="TenXe" />
@@ -225,11 +425,17 @@
             <input type="hidden" asp-for="ThoiGianNhanDuKien" />
             <input type="hidden" asp-for="ThoiGianTraDuKien" />
             <input type="hidden" asp-for="SoNgayThue" />
+            <input type="hidden" asp-for="TienThueGoc" />
+            <input type="hidden" asp-for="TienGiamVoucher" />
+            <input type="hidden" asp-for="MaGiamGiaId" />
+            <input type="hidden" asp-for="TienTruTuDiem" />
             <input type="hidden" asp-for="TienThue" />
             <input type="hidden" asp-for="TongPhuPhi" />
             <input type="hidden" asp-for="TienCocDaThu" />
             <input type="hidden" asp-for="TongThanhToan" />
             <input type="hidden" asp-for="SoTienConLai" />
+            <input type="hidden" asp-for="DiemToiDaCoTheDung" />
+            <input type="hidden" asp-for="DiemDuocCongSauThanhToan" />
 
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
@@ -242,30 +448,42 @@
                         <span class="hint">Tính tự động từ dữ liệu hệ thống</span>
                     </h6>
 
-                    <div class="price-breakdown">
+                    <div class="price-breakdown" id="priceBreakdown">
                         <div class="price-row">
                             <span class="lbl">Số ngày thuê</span>
-                            <span class="val">@Model.SoNgayThue ngày</span>
+                            <span class="val" id="lblSoNgay">@Model.SoNgayThue ngày</span>
                         </div>
                         <div class="price-row">
-                            <span class="lbl">Tiền thuê</span>
-                            <span class="val">@Model.TienThue.ToString("N0") đ</span>
+                            <span class="lbl">Tiền thuê gốc</span>
+                            <span class="val" id="lblTienThueGoc">@Model.TienThueGoc.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row green" id="rowVoucher" style="display:@(Model.TienGiamVoucher > 0 ? "flex" : "none");">
+                            <span class="lbl">Giảm giá voucher</span>
+                            <span class="val" id="lblTienGiamVoucher">- @Model.TienGiamVoucher.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row green" id="rowDiem" style="display:@(Model.TienTruTuDiem > 0 ? "flex" : "none");">
+                            <span class="lbl">Trừ từ điểm thưởng (<span id="lblDiemDaDung">@Model.DiemSuDung</span> điểm)</span>
+                            <span class="val" id="lblTienTruTuDiem">- @Model.TienTruTuDiem.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="lbl">Tiền thuê sau giảm</span>
+                            <span class="val" id="lblTienThue">@Model.TienThue.ToString("N0") đ</span>
                         </div>
                         <div class="price-row">
                             <span class="lbl">Tổng phụ phí</span>
-                            <span class="val">@Model.TongPhuPhi.ToString("N0") đ</span>
+                            <span class="val" id="lblTongPhuPhi">@Model.TongPhuPhi.ToString("N0") đ</span>
                         </div>
                         <div class="price-row highlight">
                             <span class="lbl">Tổng thanh toán</span>
-                            <span class="val">@Model.TongThanhToan.ToString("N0") đ</span>
+                            <span class="val" id="lblTongThanhToan">@Model.TongThanhToan.ToString("N0") đ</span>
                         </div>
                         <div class="price-row minus">
                             <span class="lbl">Trừ tiền cọc đã thu</span>
-                            <span class="val">- @Model.TienCocDaThu.ToString("N0") đ</span>
+                            <span class="val" id="lblTienCoc">- @Model.TienCocDaThu.ToString("N0") đ</span>
                         </div>
                         <div class="price-row total">
                             <span class="lbl">Số tiền còn lại</span>
-                            <span class="val">@Model.SoTienConLai.ToString("N0") đ</span>
+                            <span class="val" id="lblSoTienConLai">@Model.SoTienConLai.ToString("N0") đ</span>
                         </div>
                     </div>
 
@@ -291,16 +509,77 @@
                             </div>
                         </div>
                     }
+                </div>
 
-                    <div style="margin-top:16px;font-size:13px;color:#71717a">
-                        Tiền thuê và tổng thanh toán được tính tự động, không thể nhập tay.
+                <!-- SECTION 2: VOUCHER + ĐIỂM -->
+                <div class="sect">
+                    <h6 class="sect-title">
+                        <span class="num">2</span> Ưu đãi &amp; Điểm thưởng
+                        <span class="hint">Tùy chọn - không bắt buộc</span>
+                    </h6>
+
+                    <!-- Voucher -->
+                    <div class="voucher-box">
+                        <h6>🎟️ Mã giảm giá</h6>
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label asp-for="MaGiamGiaCode" class="form-label">Nhập mã</label>
+                                <input asp-for="MaGiamGiaCode" class="form-control"
+                                       placeholder="VD: WELCOME10, SUMMER50..."
+                                       style="text-transform: uppercase;" />
+                                <span asp-validation-for="MaGiamGiaCode" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button" class="btn btn-outline-primary w-100"
+                                        id="btnApDungVoucher" style="border-radius:0">
+                                    Áp dụng mã
+                                </button>
+                            </div>
+                        </div>
+                        <div class="voucher-applied" id="voucherApplied">
+                            ✅ Đã áp dụng mã <strong id="lblCodeApDung"></strong> -
+                            giảm <strong id="lblSoTienGiam"></strong>đ
+                        </div>
+                        <div id="voucherError" class="text-danger small mt-2" style="display:none"></div>
+                    </div>
+
+                    <!-- Điểm thưởng -->
+                    <div class="loyalty-box">
+                        <h6>⭐ Ví điểm thưởng</h6>
+                        <div class="info">
+                            Bạn có <strong>@Model.DiemHienCo.ToString("N0")</strong> điểm.
+                            Giá trị quy đổi: <strong>1 điểm = @Model.GiaTriMotDiem.ToString("N0") đ</strong>.
+                            Tối đa có thể dùng cho đơn này: <strong>@Model.DiemToiDaCoTheDung.ToString("N0") điểm</strong>.
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="DiemSuDung" class="form-label">Số điểm muốn dùng</label>
+                                <input asp-for="DiemSuDung" type="number" min="0"
+                                       max="@Model.DiemHienCo" step="1"
+                                       class="form-control" id="txtDiemSuDung" />
+                                <span asp-validation-for="DiemSuDung" class="text-danger small"></span>
+                                <div class="small text-muted mt-1">
+                                    Tương đương: <span id="previewTienDiem">0</span> đ
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <button type="button" class="btn btn-outline-warning w-100"
+                                        id="btnApDungDiem" style="border-radius:0">
+                                    Áp dụng điểm
+                                </button>
+                            </div>
+                        </div>
+                        <div class="small text-muted mt-3">
+                            Sau khi thanh toán, bạn sẽ được cộng thêm
+                            <strong id="lblDiemCong">@Model.DiemDuocCongSauThanhToan</strong> điểm.
+                        </div>
                     </div>
                 </div>
 
-                <!-- SECTION 2: PHUONG THUC -->
+                <!-- SECTION 3: PHUONG THUC -->
                 <div class="sect">
                     <h6 class="sect-title">
-                        <span class="num">2</span> Phương thức thanh toán
+                        <span class="num">3</span> Phương thức thanh toán
                     </h6>
 
                     <div class="row g-3">
@@ -333,7 +612,7 @@
                            class="btn-online">
                             💳 Thanh toán online
                         </a>
-                        <button type="submit" class="btn btn-primary-custom"
+                        <button type="submit" class="btn btn-primary-custom" id="btnXacNhan"
                                 onclick="return confirm('Xác nhận thanh toán đơn này và chuyển sang Hoàn thành?')">
                             ✅ Xác nhận thanh toán
                         </button>
@@ -346,4 +625,106 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var maDatXe = @Model.MaDatXe;
+            var token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            var btnApDungVoucher = document.getElementById('btnApDungVoucher');
+            var btnApDungDiem = document.getElementById('btnApDungDiem');
+            var txtDiemSuDung = document.getElementById('txtDiemSuDung');
+            var previewTienDiem = document.getElementById('previewTienDiem');
+            var giaTriMotDiem = parseFloat('@Model.GiaTriMotDiem.ToString(System.Globalization.CultureInfo.InvariantCulture)');
+
+            // Cập nhật preview khi gõ điểm
+            txtDiemSuDung.addEventListener('input', function () {
+                var diem = parseInt(this.value) || 0;
+                if (diem < 0) diem = 0;
+                previewTienDiem.innerText = (diem * giaTriMotDiem).toLocaleString('vi-VN');
+            });
+
+            // Gọi AJAX áp dụng voucher + điểm
+            function apDung() {
+                var code = document.getElementById('MaGiamGiaCode').value.trim();
+                var diem = parseInt(txtDiemSuDung.value) || 0;
+
+                btnApDungVoucher.disabled = true;
+                btnApDungDiem.disabled = true;
+
+                fetch('/ThanhToan/ApDungVoucher', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify({ MaDatXe: maDatXe, Code: code, DiemSuDung: diem })
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (!data.thanhCong) {
+                            document.getElementById('voucherError').innerText = data.loi || 'Có lỗi xảy ra';
+                            document.getElementById('voucherError').style.display = 'block';
+                            document.getElementById('voucherApplied').classList.remove('show');
+                            return;
+                        }
+
+                        document.getElementById('voucherError').style.display = 'none';
+
+                        // Hiển thị voucher đã áp dụng
+                        if (data.maGiamGiaId > 0) {
+                            document.getElementById('voucherApplied').classList.add('show');
+                            document.getElementById('lblCodeApDung').innerText = data.code;
+                            document.getElementById('lblSoTienGiam').innerText = Number(data.tienGiamVoucher).toLocaleString('vi-VN');
+                        } else {
+                            document.getElementById('voucherApplied').classList.remove('show');
+                        }
+
+                        // Cập nhật các dòng tiền
+                        document.getElementById('lblTienThueGoc').innerText = Number(data.tienThueGoc).toLocaleString('vi-VN') + ' đ';
+
+                        var rowVoucher = document.getElementById('rowVoucher');
+                        if (data.tienGiamVoucher > 0) {
+                            rowVoucher.style.display = 'flex';
+                            document.getElementById('lblTienGiamVoucher').innerText = '- ' + Number(data.tienGiamVoucher).toLocaleString('vi-VN') + ' đ';
+                        } else {
+                            rowVoucher.style.display = 'none';
+                        }
+
+                        var rowDiem = document.getElementById('rowDiem');
+                        if (data.diemDaDung > 0) {
+                            rowDiem.style.display = 'flex';
+                            document.getElementById('lblDiemDaDung').innerText = data.diemDaDung;
+                            document.getElementById('lblTienTruTuDiem').innerText = '- ' + Number(data.tienTruTuDiem).toLocaleString('vi-VN') + ' đ';
+                            txtDiemSuDung.value = data.diemDaDung;
+                        } else {
+                            rowDiem.style.display = 'none';
+                        }
+
+                        document.getElementById('lblTienThue').innerText = Number(data.tienThueSauGiam).toLocaleString('vi-VN') + ' đ';
+                        document.getElementById('lblTongPhuPhi').innerText = Number(data.tongPhuPhi).toLocaleString('vi-VN') + ' đ';
+                        document.getElementById('lblTongThanhToan').innerText = Number(data.tongThanhToan).toLocaleString('vi-VN') + ' đ';
+                        document.getElementById('lblTienCoc').innerText = '- ' + Number(data.tienCocDaThu).toLocaleString('vi-VN') + ' đ';
+                        document.getElementById('lblSoTienConLai').innerText = Number(data.soTienConLai).toLocaleString('vi-VN') + ' đ';
+                    })
+                    .catch(err => {
+                        document.getElementById('voucherError').innerText = 'Lỗi kết nối: ' + err.message;
+                        document.getElementById('voucherError').style.display = 'block';
+                    })
+                    .finally(() => {
+                        btnApDungVoucher.disabled = false;
+                        btnApDungDiem.disabled = false;
+                    });
+            }
+
+            btnApDungVoucher.addEventListener('click', apDung);
+            btnApDungDiem.addEventListener('click', apDung);
+
+            // Enter ở ô mã voucher → áp dụng
+            document.getElementById('MaGiamGiaCode').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    apDung();
+                }
+            });
+        })();
+    </script>
 }

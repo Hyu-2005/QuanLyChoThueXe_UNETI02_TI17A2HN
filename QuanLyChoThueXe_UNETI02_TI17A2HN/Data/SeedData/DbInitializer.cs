@@ -572,6 +572,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 {
                     MaDatXe = don.MaDatXe,
                     TienThue = tienThue,
+                    TienThueGoc = tienThue,
                     TongPhuPhi = tongPhuPhi,
                     TienCocDaThu = don.TienCoc,
                     TongThanhToan = tong,
@@ -602,6 +603,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
                 {
                     MaDatXe = don.MaDatXe,
                     TienThue = tienThue,
+                    TienThueGoc = tienThue,
                     TongPhuPhi = tongPhuPhi,
                     TienCocDaThu = don.TienCoc,
                     TongThanhToan = tong,
@@ -665,6 +667,142 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data.SeedData
             }
             // ==============================================================
             // Kết thúc Code của SV4
+            // ==============================================================
+
+            // ==============================================================
+            // Bắt Đầu Code của SV5: Dương Lâm Huy - 23103100120
+            // file: Data/SeedData/DbInitializer.cs
+            // nội dung: Seed 5 mã giảm giá mẫu + cộng điểm thưởng cho 5 khách hàng mẫu
+            // Module: Module 5 - Tính tiền, Thanh toán
+            // ==============================================================
+            if (!await context.MaGiamGias.AnyAsync())
+            {
+                var nowVoucher = DateTime.Now;
+
+                var sampleVouchers = new List<MaGiamGia>
+                {
+                    // 1. WELCOME10 - Mã chào mừng, giảm 10%, tối đa 500k
+                    new()
+                    {
+                        Code = "WELCOME10",
+                        TenChuongTrinh = "Chào mừng khách hàng mới",
+                        MoTa = "Giảm 10% cho khách hàng mới, tối đa 500.000đ. Áp dụng cho mọi đơn hàng từ 1.000.000đ.",
+                        LoaiGiamGia = LoaiGiamGia.PhanTram,
+                        GiaTriGiam = 10,
+                        GiamToiDa = 500_000,
+                        DonHangToiThieu = 1_000_000,
+                        NgayBatDau = nowVoucher.AddDays(-30),
+                        NgayKetThuc = nowVoucher.AddMonths(6),
+                        SoLuotDungToiDa = 200,
+                        SoLuotDaDung = 0,
+                        MoiKhachMotLan = true,
+                        TrangThai = true
+                    },
+
+                    // 2. SUMMER50 - Giảm 50k cố định
+                    new()
+                    {
+                        Code = "SUMMER50",
+                        TenChuongTrinh = "Khuyến mãi hè 2026",
+                        MoTa = "Giảm ngay 50.000đ cho đơn hàng từ 500.000đ. Số lượng có hạn.",
+                        LoaiGiamGia = LoaiGiamGia.SoTienCoDinh,
+                        GiaTriGiam = 50_000,
+                        GiamToiDa = null,
+                        DonHangToiThieu = 500_000,
+                        NgayBatDau = nowVoucher.AddDays(-15),
+                        NgayKetThuc = nowVoucher.AddDays(60),
+                        SoLuotDungToiDa = 100,
+                        SoLuotDaDung = 0,
+                        MoiKhachMotLan = true,
+                        TrangThai = true
+                    },
+
+                    // 3. VIP200K - Giảm 200k cho đơn lớn
+                    new()
+                    {
+                        Code = "VIP200K",
+                        TenChuongTrinh = "Ưu đãi khách hàng VIP",
+                        MoTa = "Giảm ngay 200.000đ cho đơn hàng từ 3.000.000đ. Dành cho khách VIP.",
+                        LoaiGiamGia = LoaiGiamGia.SoTienCoDinh,
+                        GiaTriGiam = 200_000,
+                        GiamToiDa = null,
+                        DonHangToiThieu = 3_000_000,
+                        NgayBatDau = nowVoucher.AddDays(-7),
+                        NgayKetThuc = nowVoucher.AddMonths(3),
+                        SoLuotDungToiDa = 50,
+                        SoLuotDaDung = 0,
+                        MoiKhachMotLan = true,
+                        TrangThai = true
+                    },
+
+                    // 4. FLASH20 - Giảm 20%, tối đa 1 triệu (flash sale)
+                    new()
+                    {
+                        Code = "FLASH20",
+                        TenChuongTrinh = "Flash Sale cuối tuần",
+                        MoTa = "Giảm 20% tối đa 1.000.000đ, chỉ áp dụng cuối tuần. Số lượng cực ít.",
+                        LoaiGiamGia = LoaiGiamGia.PhanTram,
+                        GiaTriGiam = 20,
+                        GiamToiDa = 1_000_000,
+                        DonHangToiThieu = 2_000_000,
+                        NgayBatDau = nowVoucher.AddDays(-3),
+                        NgayKetThuc = nowVoucher.AddDays(10),
+                        SoLuotDungToiDa = 20,
+                        SoLuotDaDung = 0,
+                        MoiKhachMotLan = true,
+                        TrangThai = true
+                    },
+
+                    // 5. TET2025 - Mã đã hết hạn (để test UI hiển thị "Hết hạn")
+                    new()
+                    {
+                        Code = "TET2025",
+                        TenChuongTrinh = "Khuyến mãi Tết 2025",
+                        MoTa = "Mã đã hết hạn - dùng để test hiển thị trạng thái.",
+                        LoaiGiamGia = LoaiGiamGia.PhanTram,
+                        GiaTriGiam = 15,
+                        GiamToiDa = 300_000,
+                        DonHangToiThieu = 1_000_000,
+                        NgayBatDau = nowVoucher.AddMonths(-6),
+                        NgayKetThuc = nowVoucher.AddMonths(-5),
+                        SoLuotDungToiDa = 100,
+                        SoLuotDaDung = 100,
+                        MoiKhachMotLan = true,
+                        TrangThai = true
+                    }
+                };
+
+                await context.MaGiamGias.AddRangeAsync(sampleVouchers);
+                await context.SaveChangesAsync();
+            }
+
+            // Cộng điểm thưởng mẫu cho 5 khách hàng đầu tiên
+            // (để test màn hình thanh toán có điểm sẵn)
+            var khachHangCoDiem = await context.KhachHangs
+                .OrderBy(k => k.MaKhachHang)
+                .Take(5)
+                .ToListAsync();
+
+            for (int i = 0; i < khachHangCoDiem.Count; i++)
+            {
+                var kh = khachHangCoDiem[i];
+                if (kh.DiemTichLuy == 0)
+                {
+                    // Khách 1: 500 điểm, Khách 2: 300 điểm, Khách 3: 200, Khách 4: 100, Khách 5: 50
+                    kh.DiemTichLuy = i switch
+                    {
+                        0 => 500,
+                        1 => 300,
+                        2 => 200,
+                        3 => 100,
+                        _ => 50
+                    };
+                    kh.TongDiemDaTichLuy = kh.DiemTichLuy;
+                }
+            }
+            await context.SaveChangesAsync();
+            // ==============================================================
+            // Kết thúc Code của SV5
             // ==============================================================
         }
     }
