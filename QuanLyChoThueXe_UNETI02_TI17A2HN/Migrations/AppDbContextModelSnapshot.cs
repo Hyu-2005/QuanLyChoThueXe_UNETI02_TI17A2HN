@@ -34,6 +34,9 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<double?>("KinhDoBanGiao")
+                        .HasColumnType("float");
+
                     b.Property<int>("MaDatXe")
                         .HasColumnType("int");
 
@@ -55,6 +58,9 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<double?>("ViDoBanGiao")
+                        .HasColumnType("float");
 
                     b.HasKey("MaBanGiao");
 
@@ -463,6 +469,33 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Migrations
                         .HasDatabaseName("IX_LichSuBaoDuong_TrangThai");
 
                     b.ToTable("LichSuBaoDuong", (string)null);
+                });
+
+            modelBuilder.Entity("QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.LichSuDiChuyen", b =>
+                {
+                    b.Property<int>("MaDiChuyen")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDiChuyen"));
+
+                    b.Property<double>("KinhDo")
+                        .HasColumnType("float");
+
+                    b.Property<int>("MaDatXe")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ThoiGian")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("ViDo")
+                        .HasColumnType("float");
+
+                    b.HasKey("MaDiChuyen");
+
+                    b.HasIndex("MaDatXe");
+
+                    b.ToTable("LichSuDiChuyen");
                 });
 
             modelBuilder.Entity("QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.LoaiXe", b =>
@@ -963,6 +996,17 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Migrations
                         .IsRequired();
 
                     b.Navigation("Xe");
+                });
+
+            modelBuilder.Entity("QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.LichSuDiChuyen", b =>
+                {
+                    b.HasOne("QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.DatXe", "DatXe")
+                        .WithMany()
+                        .HasForeignKey("MaDatXe")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DatXe");
                 });
 
             modelBuilder.Entity("QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.SuDungMaGiamGia", b =>

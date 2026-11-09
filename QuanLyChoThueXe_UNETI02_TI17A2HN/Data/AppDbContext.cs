@@ -10,7 +10,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data
         {
         }
 
-        // ===== 12 DbSet chính =====
+        // ===== DbSets =====
         public DbSet<TaiKhoan> TaiKhoans { get; set; }
         public DbSet<LoaiXe> LoaiXes { get; set; }
         public DbSet<HangXe> HangXes { get; set; }
@@ -23,35 +23,16 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Data
         public DbSet<ThanhToan> ThanhToans { get; set; }
         public DbSet<GiayToKhachHang> GiayToKhachHangs { get; set; }
         public DbSet<GiaoDichOnline> GiaoDichOnlines { get; set; }
-
-        // ==============================================================
-        // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
-        // file: Data/AppDbContext.cs
-        // nội dung: STT 11 - Bổ sung bảng LichSuBaoDuong theo dõi bảo dưỡng nâng cao
-        // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
-        // ==============================================================
         public DbSet<LichSuBaoDuong> LichSuBaoDuongs { get; set; }
-        // ==============================================================
-        // Kết thúc Code của SV4
-        // ==============================================================
-
-        // ==============================================================
-        // Bắt Đầu Code của SV5: Dương Lâm Huy - 23103100120
-        // file: Data/AppDbContext.cs
-        // nội dung: Thêm 2 DbSet cho Voucher (MaGiamGia) và lịch sử sử dụng (SuDungMaGiamGia)
-        // Module: Module 5 - Tính tiền, Thanh toán
-        // ==============================================================
         public DbSet<MaGiamGia> MaGiamGias { get; set; }
         public DbSet<SuDungMaGiamGia> SuDungMaGiamGias { get; set; }
-        // ==============================================================
-        // Kết thúc Code của SV5
-        // ==============================================================
+
+        // THÊM DÒNG NÀY CHO CHỨC NĂNG GPS
+        public DbSet<LichSuDiChuyen> LichSuDiChuyens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // Ap dung tat ca file cau hinh trong namespace Data.Configurations
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
     }

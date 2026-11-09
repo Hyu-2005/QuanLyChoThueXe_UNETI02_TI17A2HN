@@ -1,9 +1,3 @@
-@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
-@* 
-   File: Views/DatXe/BanGiao.cshtml
-   Noi dung: Giao dien ban giao xe
-   Sinh vien thuc hien: Nguyen Hoang Duc Hieu - 23103100116 - SV4
-*@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.BanGiaoXe
 @{
     ViewData["Title"] = "Ban giao xe";
@@ -32,15 +26,18 @@
                 </div>
             </div>
 
-            <!-- ============================================================== -->
-            <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
-            <!-- file: Views/BanGiaoXe/Index.cshtml -->
-            <!-- nội dung: Đổi action form trỏ về đúng BanGiaoXeController. -->
-            <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
-            <!-- ============================================================== -->
-            <form asp-controller="BanGiaoXe" asp-action="Index" method="post">
+            <form asp-controller="BanGiaoXe" asp-action="Index" method="post" id="formBanGiao">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="MaDatXe" />
+                
+                <!-- 2 THẺ INPUT ẨN CHỨA TỌA ĐỘ GPS LẤY TỪ TRÌNH DUYỆT -->
+                <input type="hidden" asp-for="ViDoBanGiao" id="ViDoBanGiao" />
+                <input type="hidden" asp-for="KinhDoBanGiao" id="KinhDoBanGiao" />
+
+                <!-- KHUNG THÔNG BÁO TRẠNG THÁI GPS -->
+                <div id="gpsStatus" class="alert alert-info border-info mb-4">
+                    <i class="fa-solid fa-spinner fa-spin me-2"></i> Đang kết nối vệ tinh để lấy vị trí GPS hiện tại...
+                </div>
                 
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -93,13 +90,38 @@
                     <button type="submit" class="btn btn-primary" onclick="return confirm('Xác nhận lưu thông tin và bàn giao xe?')">Lưu & Bàn Giao</button>
                 </div>
             </form>
-            <!-- ============================================================== -->
-            <!-- Kết thúc Code của SV4 -->
-            <!-- ============================================================== -->
         </div>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Tự động gọi hàm lấy GPS ngay khi trang vừa tải xong
+        document.addEventListener("DOMContentLoaded", function () {
+            var statusBox = document.getElementById('gpsStatus');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    // Thành công
+                    function (position) {
+                        document.getElementById("ViDoBanGiao").value = position.coords.latitude;
+                        document.getElementById("KinhDoBanGiao").value = position.coords.longitude;
+                        
+                        statusBox.className = 'alert alert-success border-success mb-4';
+                        statusBox.innerHTML = '<i class="fa-solid fa-check-circle me-2"></i> Đã lấy được vị trí GPS hiện tại! Tọa độ sẽ được lưu khi bấm Bàn giao.';
+                    }, 
+                    // Thất bại
+                    function (error) {
+                        statusBox.className = 'alert alert-warning border-warning mb-4';
+                        statusBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-2"></i> Không thể lấy GPS. Vui lòng bật định vị (Location) trên thiết bị để lưu lộ trình xe.';
+                    }
+                );
+            } else {
+                statusBox.className = 'alert alert-danger border-danger mb-4';
+                statusBox.innerHTML = '<i class="fa-solid fa-xmark me-2"></i> Trình duyệt của bạn không hỗ trợ lấy vị trí GPS.';
+            }
+        });
+    </script>
 }

@@ -1,33 +1,33 @@
-@* [VIRELLO] Bảng màu CSS đã chuyển sang giao diện VIRELLO - Vũ Tiến Đạt (SV3) *@
-@* 
-   File: Views/DatXe/Details.cshtml
-   Noi dung: Chi tiet don dat xe
-   Sinh vien thuc hien: Vu Tien Dat - 23103100119 - SV3
-   Module: Module 3 - Khach hang, Tim xe trong va Dat xe
-*@
+@* [VIRELLO] *@
 @model QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.DatXe
+@using QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants
 @{
     ViewData["Title"] = "Chi tiết đơn đặt xe";
 
     var statusClass = Model.TrangThai switch
     {
-        "Chờ duyệt" => "cho-duyet",
-        "Đã duyệt" => "da-duyet",
-        "Đã bàn giao" => "da-ban-giao",
-        "Đang thuê" => "dang-thue",
-        "Chờ thanh toán" => "cho-thanh-toan",
-        "Hoàn thành" => "hoan-thanh",
-        "Từ chối" => "tu-choi",
-        "Đã hủy" => "da-huy",
+        TrangThaiDatXe.ChoDuyet => "cho-duyet",
+        TrangThaiDatXe.DaDuyet => "da-duyet",
+        TrangThaiDatXe.DaBanGiao => "da-ban-giao",
+        TrangThaiDatXe.DangThue => "dang-thue",
+        TrangThaiDatXe.ChoThanhToan => "cho-thanh-toan",
+        TrangThaiDatXe.HoanThanh => "hoan-thanh",
+        TrangThaiDatXe.TuChoi => "tu-choi",
+        TrangThaiDatXe.DaHuy => "da-huy",
         _ => "da-huy"
     };
 
     var vaiTro = Context.Session.GetString("VaiTro");
     var laKhachHang = vaiTro == "KhachHang";
-    var coTheHuy = Model.TrangThai == "Chờ duyệt" || Model.TrangThai == "Đã duyệt";
+    var coTheHuy = Model.TrangThai == TrangThaiDatXe.ChoDuyet || Model.TrangThai == TrangThaiDatXe.DaDuyet;
 
     var soNgay = Math.Max(1, (int)Math.Ceiling((Model.ThoiGianTraDuKien - Model.ThoiGianNhanDuKien).TotalDays));
     var tienThueDuKien = soNgay * Model.DonGiaApDung;
+
+    // Lấy dữ liệu GPS để chuẩn bị hiển thị
+    var lichSuGPS = ViewBag.LichSuDiChuyen as List<QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities.LichSuDiChuyen>;
+    double? viDoBanGiao = Model.BanGiaoXe?.ViDoBanGiao;
+    double? kinhDoBanGiao = Model.BanGiaoXe?.KinhDoBanGiao;
 }
 
 <style>
@@ -39,31 +39,12 @@
         margin-bottom: 28px; padding-bottom: 20px;
         border-bottom: 1px solid rgba(255,255,255,.1);
     }
-    .detail-head .back {
-        font-size: 13px; color: #94a3b8; text-decoration: none;
-        display: inline-block; margin-bottom: 8px;
-    }
+    .detail-head .back { font-size: 13px; color: #94a3b8; text-decoration: none; display: inline-block; margin-bottom: 8px; }
     .detail-head .back:hover { color: #E50914; }
-    .detail-head h1 {
-        font-size: 26px; font-weight: 800; color: #ffffff;
-        letter-spacing: -0.4px; margin: 0 0 8px 0;
-    }
-    .id-chip {
-        display: inline-block;
-        background: rgba(99,102,241,.18); color: #a5b4fc;
-        font-weight: 700; font-size: 13px;
-        padding: 4px 12px; border-radius: 0;
-        margin-right: 8px; vertical-align: middle;
-    }
+    .detail-head h1 { font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: -0.4px; margin: 0 0 8px 0; }
+    .id-chip { display: inline-block; background: rgba(99,102,241,.18); color: #a5b4fc; font-weight: 700; font-size: 13px; padding: 4px 12px; border-radius: 0; margin-right: 8px; vertical-align: middle; }
 
-    .status-pill {
-        display: inline-block;
-        padding: 6px 14px;
-        border-radius: 999px;
-        font-size: 12px; font-weight: 700;
-        letter-spacing: .3px;
-        text-transform: uppercase;
-    }
+    .status-pill { display: inline-block; padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; }
     .status-pill.cho-duyet { background: rgba(245,158,11,.15); color: #fcd34d; }
     .status-pill.da-duyet { background: rgba(59,130,246,.20); color: #93c5fd; }
     .status-pill.da-ban-giao { background: rgba(6,182,212,.15); color: #67e8f9; }
@@ -73,171 +54,77 @@
     .status-pill.tu-choi { background: rgba(239,68,68,.15); color: #fca5a5; }
     .status-pill.da-huy { background: #1c1c1c; color: #94a3b8; }
 
-    .info-card {
-        background: #121212;
-        border: 1px solid rgba(255,255,255,.1);
-        border-radius: 0;
-        padding: 26px 30px;
-        height: 100%;
-    }
-    .info-card .title {
-        font-size: 12px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 1.2px;
-        color: #94a3b8; margin: 0 0 20px 0;
-    }
-    .info-row {
-        display: flex; justify-content: space-between;
-        padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.06);
-        font-size: 14px;
-    }
+    .info-card { background: #121212; border: 1px solid rgba(255,255,255,.1); border-radius: 0; padding: 26px 30px; height: 100%; }
+    .info-card .title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #94a3b8; margin: 0 0 20px 0; }
+    .info-row { display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 14px; }
     .info-row:last-child { border-bottom: none; }
     .info-row .lbl { color: #94a3b8; }
-    .info-row .val {
-        font-weight: 600; color: #ffffff; text-align: right;
-        font-variant-numeric: tabular-nums;
-    }
+    .info-row .val { font-weight: 600; color: #ffffff; text-align: right; font-variant-numeric: tabular-nums; }
 
-    .xe-hero {
-        background: linear-gradient(135deg, #1c1c1c 0%, #0a0a0a 100%);
-        color: #fff;
-        border-radius: 0;
-        padding: 24px 28px;
-        margin-bottom: 20px;
-        display: flex; align-items: center; gap: 20px;
-    }
-    .xe-hero img {
-        width: 120px; height: 90px;
-        object-fit: cover;
-        border-radius: 0;
-        border: 2px solid rgba(255,255,255,.3);
-        flex-shrink: 0;
-    }
+    .xe-hero { background: linear-gradient(135deg, #1c1c1c 0%, #0a0a0a 100%); color: #fff; border-radius: 0; padding: 24px 28px; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; }
+    .xe-hero img { width: 120px; height: 90px; object-fit: cover; border-radius: 0; border: 2px solid rgba(255,255,255,.3); flex-shrink: 0; }
     .xe-hero .info { flex: 1; }
-    .xe-hero h3 {
-        font-size: 22px; font-weight: 800;
-        letter-spacing: -.4px; margin: 0 0 6px 0;
-    }
-    .xe-hero .plate {
-        display: inline-block;
-        background: rgba(255,255,255,.18);
-        border: 1px solid rgba(255,255,255,.25);
-        font-size: 13px; font-weight: 700;
-        padding: 4px 12px; border-radius: 0;
-        font-variant-numeric: tabular-nums;
-    }
+    .xe-hero h3 { font-size: 22px; font-weight: 800; letter-spacing: -.4px; margin: 0 0 6px 0; }
+    .xe-hero .plate { display: inline-block; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.25); font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 0; font-variant-numeric: tabular-nums; }
 
-    .money {
-        font-variant-numeric: tabular-nums;
-        font-weight: 600;
-        color: #ffffff;
-    }
-    .money.primary { color: #E50914; font-size: 16px; font-weight: 800; }
-    .money .unit { font-size: 11px; font-weight: 500; color: #71717a; margin-left: 2px; }
-
-    .price-tile {
-        background: #0a0a0a;
-        border-radius: 0;
-        padding: 20px 22px;
-        text-align: center;
-        border: 1px solid rgba(255,255,255,.1);
-    }
-    .price-tile .lbl {
-        font-size: 11px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 1px;
-        color: #94a3b8; margin-bottom: 10px;
-    }
-    .price-tile .val {
-        font-size: 22px; font-weight: 800;
-        letter-spacing: -.5px;
-        font-variant-numeric: tabular-nums;
-    }
+    .money { font-variant-numeric: tabular-nums; font-weight: 600; color: #ffffff; }
+    .price-tile { background: #0a0a0a; border-radius: 0; padding: 20px 22px; text-align: center; border: 1px solid rgba(255,255,255,.1); }
+    .price-tile .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 10px; }
+    .price-tile .val { font-size: 22px; font-weight: 800; letter-spacing: -.5px; font-variant-numeric: tabular-nums; }
     .price-tile.blue  { background: rgba(59,130,246,.15); border-color: rgba(59,130,246,.35); }
     .price-tile.blue  .val { color: #93c5fd; }
     .price-tile.amber { background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.35); }
     .price-tile.amber .val { color: #fbbf24; }
     .price-tile.green { background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.35); }
     .price-tile.green .val { color: #86efac; }
+    
+    /* Timeline lộ trình GPS */
+    .timeline { position: relative; padding-left: 30px; }
+    .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: rgba(239,68,68,.3); }
+    .timeline-item { position: relative; margin-bottom: 20px; }
+    .timeline-item::before { content: ''; position: absolute; left: -24px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,.2); }
+    .timeline-item.start::before { background: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,.2); }
+    .timeline-time { font-size: 12px; color: #94a3b8; margin-bottom: 2px; }
+    .timeline-text { font-size: 14px; color: #ffffff; font-weight: 600; }
 </style>
 
 <div class="detail-shell">
     <div class="detail-wrap">
-
         <!-- HEADER -->
         <div class="detail-head">
             <div>
                 <a asp-action="DonCuaToi" class="back">← Quay lại danh sách</a>
-                <h1>
-                    Đơn đặt xe
-                    <span class="id-chip">#@Model.MaDatXe</span>
-                </h1>
-                <div>
-                    <span class="status-pill @statusClass">@Model.TrangThai</span>
-                </div>
+                <h1>Đơn đặt xe <span class="id-chip">#@Model.MaDatXe</span></h1>
+                <div><span class="status-pill @statusClass">@Model.TrangThai</span></div>
             </div>
 
-            <div class="d-flex gap-2">
-                @if (coTheHuy)
+            <div class="d-flex gap-2 flex-wrap justify-content-end">
+                @if (coTheHuy) { <form asp-action="Huy" asp-route-id="@Model.MaDatXe" method="post" class="m-0"> @Html.AntiForgeryToken() <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold" style="border-radius:0" onclick="return confirm('Bạn có chắc muốn hủy đơn này?')">Hủy đơn</button> </form> }
+
+                @if (!laKhachHang && Model.TrangThai == TrangThaiDatXe.ChoDuyet)
                 {
-                    <form asp-action="Huy" asp-route-id="@Model.MaDatXe" method="post" class="m-0">
+                    <form asp-action="Duyet" asp-route-id="@Model.MaDatXe" method="post" class="m-0"> @Html.AntiForgeryToken() <button type="submit" class="btn btn-success px-4 py-2 fw-semibold text-white" style="border-radius:0" onclick="return confirm('Xác nhận duyệt đơn này?')">Duyệt đơn</button> </form>
+                    <form asp-action="TuChoi" asp-route-id="@Model.MaDatXe" id="formTuChoi" method="post" class="m-0"> @Html.AntiForgeryToken() <input type="hidden" name="lyDoTuChoi" id="inputLyDo" value="" /> <button type="button" class="btn btn-danger px-4 py-2 fw-semibold text-white" style="border-radius:0" onclick="tuChoiDon()">Từ chối</button> </form>
+                }
+
+                @if (!laKhachHang && Model.TrangThai == TrangThaiDatXe.DaDuyet) { <a asp-controller="BanGiaoXe" asp-action="Index" asp-route-id="@Model.MaDatXe" class="btn btn-primary px-4 py-2 fw-semibold text-white" style="border-radius:0">Bàn giao xe</a> }
+                @if (!laKhachHang && Model.TrangThai == TrangThaiDatXe.DangThue) { <a asp-controller="TraXe" asp-action="Index" asp-route-id="@Model.MaDatXe" class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:0">Nhận trả xe</a> }
+                @if (!laKhachHang && Model.TrangThai == TrangThaiDatXe.ChoThanhToan) { <a asp-controller="ThanhToan" asp-action="ThanhToan" asp-route-id="@Model.MaDatXe" class="btn btn-success px-4 py-2 fw-semibold text-white" style="border-radius:0">Tiến hành Thanh toán</a> }
+
+                @if (Model.BanGiaoXe != null || Model.TrangThai == TrangThaiDatXe.DangThue || Model.TrangThai == TrangThaiDatXe.ChoThanhToan || Model.TrangThai == TrangThaiDatXe.HoanThanh)
+                {
+                    <a asp-controller="BanGiaoXe" asp-action="BienBanDienTu" asp-route-id="@Model.MaDatXe" class="btn btn-outline-info px-3 py-2 fw-semibold" style="border-radius:0">Biên bản & Mã QR Bàn giao</a>
+                }
+
+                @if (!laKhachHang && Model.TrangThai == TrangThaiDatXe.DangThue)
+                {
+                    <button type="button" class="btn btn-info px-4 py-2 fw-semibold text-white" data-bs-toggle="modal" data-bs-target="#trackingModal" style="border-radius:0"><i class="fa-solid fa-map-location-dot"></i> Xem lộ trình GPS</button>
+                    <form asp-controller="GPS" asp-action="GiaLapDiChuyen" method="post" class="d-inline m-0">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold"
-                                style="border-radius:0"
-                                onclick="return confirm('Bạn có chắc muốn hủy đơn này?')">Hủy đơn</button>
+                        <input type="hidden" name="maDatXe" value="@Model.MaDatXe" />
+                        <button type="submit" class="btn btn-warning px-3 py-2 fw-semibold" style="border-radius:0" title="Bấm để giả lập xe chạy thêm 1 điểm"><i class="fa-solid fa-satellite-dish"></i> Giả lập xe chạy</button>
                     </form>
                 }
-
-                <!-- === BAT DAU CODE CUA SV4: NGUYEN HOANG DUC HIEU (23103100116) === -->
-                @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.ChoDuyet)
-                {
-                    <form asp-action="Duyet" asp-route-id="@Model.MaDatXe" method="post" class="m-0">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-success px-4 py-2 fw-semibold text-white"
-                                style="border-radius:0"
-                                onclick="return confirm('Xác nhận duyệt đơn này?')">Duyệt đơn</button>
-                    </form>
-
-                    <form asp-action="TuChoi" asp-route-id="@Model.MaDatXe" id="formTuChoi" method="post" class="m-0">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="lyDoTuChoi" id="inputLyDo" value="" />
-                        <button type="button" class="btn btn-danger px-4 py-2 fw-semibold text-white"
-                                style="border-radius:0"
-                                onclick="tuChoiDon()">Từ chối</button>
-                    </form>
-                }
-
-                <!-- ============================================================== -->
-                <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
-                <!-- file: Views/DatXe/Details.cshtml -->
-                <!-- nội dung: Cập nhật đường dẫn nút bấm trỏ về Controller mới (BanGiaoXe, TraXe), bổ sung nút "Tiến hành Thanh toán" và nút xem "Biên bản & Mã QR Bàn giao". -->
-                <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
-                <!-- ============================================================== -->
-                @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet)
-                {
-                    <a asp-controller="BanGiaoXe" asp-action="Index" asp-route-id="@Model.MaDatXe" class="btn btn-primary px-4 py-2 fw-semibold text-white" style="border-radius:0">Bàn giao xe</a>
-                }
-
-                @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue)
-                {
-                    <a asp-controller="TraXe" asp-action="Index" asp-route-id="@Model.MaDatXe" class="btn btn-warning px-4 py-2 fw-semibold" style="border-radius:0">Nhận trả xe</a>
-                }
-
-                @if (!laKhachHang && Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.ChoThanhToan)
-                {
-                    <a asp-controller="ThanhToan" asp-action="ThanhToan" asp-route-id="@Model.MaDatXe" class="btn btn-success px-4 py-2 fw-semibold text-white" style="border-radius:0">Tiến hành Thanh toán</a>
-                }
-
-                @if (Model.BanGiaoXe != null || Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DangThue 
-                    || Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.ChoThanhToan 
-                    || Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.HoanThanh)
-                {
-                    <a asp-controller="BanGiaoXe" asp-action="BienBanDienTu" asp-route-id="@Model.MaDatXe" class="btn btn-outline-info px-3 py-2 fw-semibold" style="border-radius:0">
-                        Biên bản & Mã QR Bàn giao
-                    </a>
-                }
-                <!-- ============================================================== -->
-                <!-- Kết thúc Code của SV4 -->
-                <!-- ============================================================== -->
-                <!-- === KET THUC CODE CUA SV4 : NGUYEN HOANG DUC HIEU === -->
             </div>
         </div>
 
@@ -245,8 +132,7 @@
         @if (Model.Xe != null)
         {
             <div class="xe-hero">
-                <img src="@(string.IsNullOrEmpty(Model.Xe.AnhXe) ? "/images/xe/default.jpg" : Model.Xe.AnhXe)"
-                     alt="@Model.Xe.TenXe" />
+                <img src="@(string.IsNullOrEmpty(Model.Xe.AnhXe) ? "/images/xe/default.jpg" : Model.Xe.AnhXe)" alt="@Model.Xe.TenXe" />
                 <div class="info">
                     <h3>@Model.Xe.TenXe</h3>
                     <div class="d-flex gap-2 flex-wrap">
@@ -263,160 +149,123 @@
             <div class="col-md-6">
                 <div class="info-card">
                     <h6 class="title">Thông tin khách hàng</h6>
-                    <div class="info-row">
-                        <span class="lbl">Họ tên</span>
-                        <span class="val">@Model.KhachHang?.HoTen</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="lbl">Số điện thoại</span>
-                        <span class="val">@Model.KhachHang?.SoDienThoai</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="lbl">Email</span>
-                        <span class="val">@(string.IsNullOrEmpty(Model.KhachHang?.Email) ? "—" : Model.KhachHang.Email)</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="lbl">Địa chỉ</span>
-                        <span class="val">@(string.IsNullOrEmpty(Model.KhachHang?.DiaChi) ? "—" : Model.KhachHang.DiaChi)</span>
-                    </div>
+                    <div class="info-row"><span class="lbl">Họ tên</span><span class="val">@Model.KhachHang?.HoTen</span></div>
+                    <div class="info-row"><span class="lbl">Số điện thoại</span><span class="val">@Model.KhachHang?.SoDienThoai</span></div>
+                    <div class="info-row"><span class="lbl">Email</span><span class="val">@(string.IsNullOrEmpty(Model.KhachHang?.Email) ? "—" : Model.KhachHang.Email)</span></div>
+                    <div class="info-row"><span class="lbl">Địa chỉ</span><span class="val">@(string.IsNullOrEmpty(Model.KhachHang?.DiaChi) ? "—" : Model.KhachHang.DiaChi)</span></div>
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="info-card">
                     <h6 class="title">Thông tin thuê xe</h6>
-                    <div class="info-row">
-                        <span class="lbl">Ngày đặt</span>
-                        <span class="val">@Model.NgayDat.ToString("dd/MM/yyyy HH:mm")</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="lbl">Thời gian nhận</span>
-                        <span class="val">@Model.ThoiGianNhanDuKien.ToString("dd/MM/yyyy HH:mm")</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="lbl">Thời gian trả</span>
-                        <span class="val">@Model.ThoiGianTraDuKien.ToString("dd/MM/yyyy HH:mm")</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="lbl">Địa điểm nhận</span>
-                        <span class="val">@Model.DiaDiemNhan</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="lbl">Địa điểm trả</span>
-                        <span class="val">@Model.DiaDiemTra</span>
-                    </div>
+                    <div class="info-row"><span class="lbl">Ngày đặt</span><span class="val">@Model.NgayDat.ToString("dd/MM/yyyy HH:mm")</span></div>
+                    <div class="info-row"><span class="lbl">Thời gian nhận</span><span class="val">@Model.ThoiGianNhanDuKien.ToString("dd/MM/yyyy HH:mm")</span></div>
+                    <div class="info-row"><span class="lbl">Thời gian trả</span><span class="val">@Model.ThoiGianTraDuKien.ToString("dd/MM/yyyy HH:mm")</span></div>
+                    <div class="info-row"><span class="lbl">Địa điểm nhận</span><span class="val">@Model.DiaDiemNhan</span></div>
+                    <div class="info-row"><span class="lbl">Địa điểm trả</span><span class="val">@Model.DiaDiemTra</span></div>
                 </div>
             </div>
         </div>
 
         <!-- CHI PHÍ -->
         <div class="row g-4 mb-4">
-            <div class="col-md-3">
-                <div class="price-tile blue">
-                    <div class="lbl">Đơn giá ngày</div>
-                    <div class="val">@Model.DonGiaApDung.ToString("N0")</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="price-tile blue">
-                    <div class="lbl">Số ngày thuê</div>
-                    <div class="val">@soNgay ngày</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="price-tile blue">
-                    <div class="lbl">Tiền thuê dự kiến</div>
-                    <div class="val">@tienThueDuKien.ToString("N0")</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="price-tile amber">
-                    <div class="lbl">Tiền cọc</div>
-                    <div class="val">@Model.TienCoc.ToString("N0")</div>
-                </div>
-            </div>
+            <div class="col-md-3"><div class="price-tile blue"><div class="lbl">Đơn giá ngày</div><div class="val">@Model.DonGiaApDung.ToString("N0")</div></div></div>
+            <div class="col-md-3"><div class="price-tile blue"><div class="lbl">Số ngày thuê</div><div class="val">@soNgay ngày</div></div></div>
+            <div class="col-md-3"><div class="price-tile blue"><div class="lbl">Tiền thuê dự kiến</div><div class="val">@tienThueDuKien.ToString("N0")</div></div></div>
+            <div class="col-md-3"><div class="price-tile amber"><div class="lbl">Tiền cọc</div><div class="val">@Model.TienCoc.ToString("N0")</div></div></div>
         </div>
-
-        <!-- ============================================================== -->
-        <!-- Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu -->
-        <!-- file: Views/DatXe/Details.cshtml -->
-        <!-- nội dung: STT 10 - Bảng điều khiển Gửi Email thông báo tự động & kiểm thử gửi về Gmail cá nhân -->
-        <!-- sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 -->
-        <!-- ============================================================== -->
-        @if (!laKhachHang)
-        {
-            <div class="card border-0 shadow-sm mb-4" style="border-radius:0; background:linear-gradient(to right, #0a0a0a, rgba(59,130,246,.15)); border-left: 5px solid #0284c7 !important;">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="badge bg-primary px-2 py-1">STT 10 - SV4</span>
-                                <h6 class="mb-0 fw-bold text-dark" style="font-size:16px;">
-                                    📧 Chức năng gửi Email thông báo tự động & Nghiệm thu cá nhân
-                                </h6>
-                            </div>
-                            <p class="text-muted small mb-0">
-                                Khi duyệt hoặc từ chối đơn, hệ thống sẽ tự động gửi email thông báo chi tiết.
-                                Đang chuyển tiếp về Gmail cá nhân: <strong class="text-primary">duchieu07122005@gmail.com</strong>
-                            </p>
-                        </div>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <form asp-action="GuiEmailTest" asp-route-id="@Model.MaDatXe" method="post" class="m-0">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-primary fw-semibold" title="Kiểm tra kết nối gửi thư tới duchieu07122005@gmail.com">
-                                    ✉️ Gửi Email test kết nối
-                                </button>
-                            </form>
-                            @if (Model.TrangThai == QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Constants.TrangThaiDatXe.DaDuyet)
-                            {
-                                <form asp-action="GuiLaiEmailXacNhan" asp-route-id="@Model.MaDatXe" method="post" class="m-0">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-primary text-white fw-semibold" title="Gửi lại thông báo duyệt xe của đơn này về Gmail cá nhân">
-                                        📨 Gửi lại Email xác nhận đơn này
-                                    </button>
-                                </form>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-        <!-- ============================================================== -->
-        <!-- Kết thúc Code của SV4 -->
-        <!-- ============================================================== -->
 
         <!-- GHI CHÚ -->
         @if (!string.IsNullOrEmpty(Model.GhiChu) || !string.IsNullOrEmpty(Model.LyDoTuChoi))
         {
             <div class="row g-4">
-                @if (!string.IsNullOrEmpty(Model.GhiChu))
-                {
-                    <div class="col-md-6">
-                        <div class="info-card">
-                            <h6 class="title">Ghi chú</h6>
-                            <div class="p-3 bg-light rounded">@Model.GhiChu</div>
-                        </div>
-                    </div>
-                }
-
-                @if (!string.IsNullOrEmpty(Model.LyDoTuChoi))
-                {
-                    <div class="col-md-6">
-                        <div class="info-card">
-                            <h6 class="title">Lý do từ chối</h6>
-                            <div class="p-3 rounded" style="background:rgba(239,68,68,.15);color:#fca5a5">
-                                @Model.LyDoTuChoi
-                            </div>
-                        </div>
-                    </div>
-                }
+                @if (!string.IsNullOrEmpty(Model.GhiChu)) { <div class="col-md-6"><div class="info-card"><h6 class="title">Ghi chú</h6><div class="p-3 bg-light rounded">@Model.GhiChu</div></div></div> }
+                @if (!string.IsNullOrEmpty(Model.LyDoTuChoi)) { <div class="col-md-6"><div class="info-card"><h6 class="title">Lý do từ chối</h6><div class="p-3 rounded" style="background:rgba(239,68,68,.15);color:#fca5a5">@Model.LyDoTuChoi</div></div></div> }
             </div>
         }
     </div>
 </div>
+
+<!-- MODAL BẢN ĐỒ LỘ TRÌNH GPS (DÙNG IFRAME GOOGLE MAPS) -->
+<div class="modal fade" id="trackingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="background: #121212; border: 1px solid rgba(255,255,255,.1); border-radius: 0;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white"><i class="fa-solid fa-map-location-dot text-info"></i> Lộ trình xe #@Model.MaDatXe</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    <!-- Cột trái: Timeline các điểm di chuyển -->
+                    <div class="col-md-4" style="max-height: 500px; overflow-y: auto;">
+                        <h6 class="text-white fw-bold mb-4">Nhật ký di chuyển</h6>
+                        
+                        <div class="timeline">
+                            <!-- Điểm bàn giao -->
+                            @if (viDoBanGiao.HasValue && kinhDoBanGiao.HasValue)
+                            {
+                                <div class="timeline-item start">
+                                    <div class="timeline-time">@(Model.BanGiaoXe?.ThoiGianBanGiao.ToString("HH:mm - dd/MM/yyyy"))</div>
+                                    <div class="timeline-text text-success">Bàn giao xe</div>
+                                    <div class="mt-2">
+                                        <a href="https://maps.google.com/maps?q=@viDoBanGiao,@kinhDoBanGiao" target="_blank" class="btn btn-sm btn-outline-success">Xem trên Maps</a>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Các điểm di chuyển -->
+                            @if (lichSuGPS != null && lichSuGPS.Any())
+                            {
+                                foreach (var item in lichSuGPS)
+                                {
+                                    <div class="timeline-item">
+                                        <div class="timeline-time">@item.ThoiGian.ToString("HH:mm - dd/MM/yyyy")</div>
+                                        <div class="timeline-text">Xe di chuyển</div>
+                                        <div class="mt-2">
+                                            <a href="https://maps.google.com/maps?q=@item.ViDo,@item.KinhDo" target="_blank" class="btn btn-sm btn-outline-danger">Xem trên Maps</a>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-muted small mt-3">Chưa có dữ liệu di chuyển.</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Cột phải: Bản đồ lớn (Iframe Google Maps) -->
+                    <div class="col-md-8">
+                        @if (viDoBanGiao.HasValue && kinhDoBanGiao.HasValue)
+                        {
+                            <div class="google-map-wrapper h-100" style="min-height: 500px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,.1);">
+                                <iframe 
+                                    src="https://maps.google.com/maps?q=@viDoBanGiao,@kinhDoBanGiao&hl=vi&z=15&output=embed" 
+                                    width="100%" 
+                                    height="100%" 
+                                    style="border:0;" 
+                                    allowfullscreen="" 
+                                    loading="lazy" 
+                                    referrerpolicy="no-referrer-when-downgrade">
+                                </iframe>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                Không có dữ liệu vị trí bàn giao ban đầu.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
-        // === BAT DAU CODE CUA SV4:  NGUYEN HOANG DUC HIEU (23103100116) ===
         function tuChoiDon() {
             var lyDo = prompt('Vui lòng nhập lý do từ chối đơn này:');
             if (lyDo != null && lyDo.trim() !== '') {
@@ -426,6 +275,5 @@
                 alert('Bạn phải nhập lý do từ chối!');
             }
         }
-        // === KET THUC CODE CUA NGUYEN HOANG DUC HIEU ===
     </script>
 }

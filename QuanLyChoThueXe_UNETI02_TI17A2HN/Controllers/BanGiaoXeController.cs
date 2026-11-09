@@ -1,8 +1,6 @@
 // ==============================================================
 // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
 // file: Controllers/BanGiaoXeController.cs
-// nội dung: Tạo mới Controller độc lập để xử lý logic Bàn giao xe 
-// sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
 // ==============================================================
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -36,8 +34,9 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
 
             if (datXe == null || datXe.TrangThai != TrangThaiDatXe.DaDuyet)
                 return NotFound();
-            
-            var model = new BanGiaoXe {
+
+            var model = new BanGiaoXe
+            {
                 MaDatXe = id,
                 SoKmBanGiao = datXe.Xe.SoKmHienTai,
                 ThoiGianBanGiao = DateTime.Now,
@@ -55,7 +54,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         public async Task<IActionResult> Index(int id, BanGiaoXe model)
         {
             if (id != model.MaDatXe) return BadRequest();
-            
+
             var datXe = await _context.DatXes
                 .Include(d => d.Xe)
                 .FirstOrDefaultAsync(d => d.MaDatXe == id);
@@ -68,10 +67,10 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 datXe.TrangThai = TrangThaiDatXe.DangThue;
                 datXe.Xe.SoKmHienTai = model.SoKmBanGiao;
                 datXe.Xe.TinhTrang = TinhTrangXe.DangChoThue;
-                
+
                 _context.BanGiaoXes.Add(model);
                 await _context.SaveChangesAsync();
-                
+
                 TempData["Success"] = "Đã bàn giao xe cho khách hàng thành công. Dưới đây là biên bản bàn giao điện tử và Mã QR xác thực.";
                 return RedirectToAction(nameof(BienBanDienTu), new { id = id });
             }
@@ -79,13 +78,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             ViewBag.DatXe = datXe;
             return View(model);
         }
-       
-        // ==============================================================
-        // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
-        // file: Controllers/BanGiaoXeController.cs
-        // nội dung: STT 9 - Tạo Biên bản bàn giao điện tử kèm Mã QR xác thực nhanh
-        // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
-        // ==============================================================
+
         [SessionAuthorize]
         [HttpGet("/BanGiaoXe/BienBanDienTu/{id}")]
         public async Task<IActionResult> BienBanDienTu(int id)
@@ -103,7 +96,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return RedirectToAction("Index", "DatXe");
             }
 
-            // Kiểm tra quyền: nếu là khách hàng, chỉ được xem biên bản đơn xe của chính mình
             var vaiTro = HttpContext.Session.GetVaiTro();
             if (vaiTro == VaiTro.KhachHang)
             {
@@ -115,7 +107,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 }
             }
 
-            // Tạo chuỗi nội dung xác thực mã QR
             var request = HttpContext.Request;
             var baseUrl = $"{request.Scheme}://{request.Host}";
             var urlXacThuc = $"{baseUrl}/BanGiaoXe/BienBanDienTu/{id}";
@@ -164,8 +155,5 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             var qrBytes = _qrCodeService.GenerateQRCode(noiDungQR, 15);
             return File(qrBytes, "image/png", $"QRCode_BanGiao_{id}.png");
         }
-        // ==============================================================
-        // Kết thúc Code của SV4
-        // ==============================================================
     }
 }

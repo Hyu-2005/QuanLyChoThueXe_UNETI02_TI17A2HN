@@ -1,8 +1,5 @@
 // ============================================================
 // File: Controllers/DatXeController.cs
-// Noi dung: Tim xe trong, dat xe, kiem tra trung lich, huy don
-// Sinh vien thuc hien: Vu Tien Dat - 23103100119 - SV3
-// Module: Module 3 - Khach hang, Tim xe trong va Dat xe
 // ============================================================
 
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +37,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         // =====================================================
         // TIM XE TRONG
         // =====================================================
-
         [HttpGet]
         public async Task<IActionResult> TimXeTrong()
         {
@@ -58,14 +54,12 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         {
             if (vm.ThoiGianTra <= vm.ThoiGianNhan)
             {
-                ModelState.AddModelError(nameof(vm.ThoiGianTra),
-                    "Thoi gian tra phai sau thoi gian nhan");
+                ModelState.AddModelError(nameof(vm.ThoiGianTra), "Thoi gian tra phai sau thoi gian nhan");
             }
 
             if (vm.ThoiGianNhan < DateTime.Now.AddHours(-1))
             {
-                ModelState.AddModelError(nameof(vm.ThoiGianNhan),
-                    "Thoi gian nhan khong duoc nam trong qua khu");
+                ModelState.AddModelError(nameof(vm.ThoiGianNhan), "Thoi gian nhan khong duoc nam trong qua khu");
             }
 
             if (!ModelState.IsValid)
@@ -87,10 +81,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return View(vm);
         }
 
-        // =====================================================
-        // KIEM TRA GIAY TO: phai co CCCD + GPLX da duoc nhan vien xac minh moi duoc dat xe
-        // Tra ve null neu hop le, nguoc lai tra ve thong bao loi
-        // =====================================================
         private async Task<string?> KiemTraGiayToAsync(int maKhachHang)
         {
             var giayTos = await _context.GiayToKhachHangs
@@ -115,25 +105,16 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                     loi.Add($"{ten} đã hết hạn");
             }
 
-            return loi.Count == 0
-                ? null
-                : "Bạn cần có đủ CCCD và GPLX đã được xác minh mới được đặt xe: " + string.Join("; ", loi) + ".";
+            return loi.Count == 0 ? null : "Bạn cần có đủ CCCD và GPLX đã được xác minh mới được đặt xe: " + string.Join("; ", loi) + ".";
         }
 
         [HttpGet]
         public async Task<IActionResult> DatXe(int maXe, DateTime? thoiGianNhan = null, DateTime? thoiGianTra = null)
         {
-            // ==============================================================
-            // Bắt Đầu Code của SV3: Vũ Tiến Đạt
-            // file: Controllers/DatXeController.cs
-            // nội dung: Chặn mở trang đặt xe khi khách chưa có CCCD/GPLX được xác minh (kèm lý do cụ thể).
-            // sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
-            // ==============================================================
             var maKhachHangHienTai = HttpContext.Session.GetMaKhachHang();
             if (maKhachHangHienTai.HasValue)
             {
-                var loiGiayTo = await GiayToHelper.KiemTraDieuKienThueXeAsync(
-                    _context, maKhachHangHienTai.Value, thoiGianNhan);
+                var loiGiayTo = await GiayToHelper.KiemTraDieuKienThueXeAsync(_context, maKhachHangHienTai.Value, thoiGianNhan);
                 if (loiGiayTo != null)
                 {
                     TempData["Error"] = loiGiayTo;
@@ -141,10 +122,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 }
             }
 
-            // ==============================================================
-            // Kết thúc Code của SV3
-            // ==============================================================
-            // 1. Kiem tra xe ton tai
             var xe = await _context.Xes
                 .Include(x => x.LoaiXe)
                 .Include(x => x.HangXe)
@@ -156,14 +133,12 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return RedirectToAction(nameof(TimXeTrong));
             }
 
-            // 2. Kiem tra tinh trang xe co the cho thue
             if (!TinhTrangXe.CoTheChoThue.Contains(xe.TinhTrang))
             {
                 TempData["Error"] = $"Xe dang o trang thai '{xe.TinhTrang}', khong the dat";
                 return RedirectToAction(nameof(TimXeTrong));
             }
 
-            // 3. Thoi gian: neu chua truyen thi mac dinh ngay mai -> 3 ngay sau
             var nhan = thoiGianNhan ?? DateTime.Now.Date.AddDays(1).AddHours(9);
             var tra = thoiGianTra ?? DateTime.Now.Date.AddDays(3).AddHours(9);
 
@@ -174,15 +149,12 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 tra = DateTime.Now.Date.AddDays(3).AddHours(9);
             }
 
-            // 4. Kiem tra trung lich (chi khi co thoi gian cu the)
             var biTrung = await _trungLichService.KiemTraTrungLich(maXe, nhan, tra);
             if (biTrung)
             {
                 TempData["Error"] = "Xe da co lich dat trong khoang thoi gian nay. Vui long chon khoang khac.";
-                // Van hien form de user chon lai thoi gian
             }
 
-            // 5. Lay bang gia hieu luc
             var bangGia = await _context.BangGiaThues
                 .Where(b => b.TrangThai)
                 .Where(b => b.TuNgay <= nhan && b.DenNgay >= tra)
@@ -190,7 +162,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 .OrderByDescending(b => b.MaXe.HasValue)
                 .FirstOrDefaultAsync();
 
-            // 6. Tinh toan so ngay + tien thue du kien
             var soNgay = Math.Max(1, (int)Math.Ceiling((tra - nhan).TotalDays));
             var donGiaNgay = bangGia?.DonGiaNgay ?? 0;
             var donGiaGio = bangGia?.DonGiaGio ?? 0;
@@ -222,12 +193,10 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
         public async Task<IActionResult> DatXe(DatXeCreateVM vm)
         {
             if (vm.ThoiGianTraDuKien <= vm.ThoiGianNhanDuKien)
-                ModelState.AddModelError(nameof(vm.ThoiGianTraDuKien),
-                    "Thoi gian tra phai sau thoi gian nhan");
+                ModelState.AddModelError(nameof(vm.ThoiGianTraDuKien), "Thoi gian tra phai sau thoi gian nhan");
 
             if (vm.ThoiGianNhanDuKien < DateTime.Now.AddHours(-1))
-                ModelState.AddModelError(nameof(vm.ThoiGianNhanDuKien),
-                    "Thoi gian nhan khong duoc nam trong qua khu");
+                ModelState.AddModelError(nameof(vm.ThoiGianNhanDuKien), "Thoi gian nhan khong duoc nam trong qua khu");
 
             if (!ModelState.IsValid)
             {
@@ -249,24 +218,13 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return RedirectToAction(nameof(TimXeTrong));
             }
 
-            // ==============================================================
-            // Bắt Đầu Code của SV3: Vũ Tiến Đạt
-            // file: Controllers/DatXeController.cs
-            // nội dung: Vá lỗ hổng: máy chủ từ chối tạo đơn nếu khách chưa có CCCD và GPLX được xác minh (còn hạn đến ngày nhận xe), kể cả khi gửi form trực tiếp.
-            // sinh viên thực hiện: Vũ Tiến Đạt - 23103100119 - SV3
-            // ==============================================================
-            var loiGiayToKhachHang = await GiayToHelper.KiemTraDieuKienThueXeAsync(
-                _context, maKhachHang.Value, vm.ThoiGianNhanDuKien);
+            var loiGiayToKhachHang = await GiayToHelper.KiemTraDieuKienThueXeAsync(_context, maKhachHang.Value, vm.ThoiGianNhanDuKien);
             if (loiGiayToKhachHang != null)
             {
                 TempData["Error"] = loiGiayToKhachHang;
                 return RedirectToAction("CuaToi", "GiayTo");
             }
-            // ==============================================================
-            // Kết thúc Code của SV3
-            // ==============================================================
 
-            // Bat buoc co du CCCD + GPLX da duoc xac minh
             var loiGiayToPost = await KiemTraGiayToAsync(maKhachHang.Value);
             if (loiGiayToPost != null)
             {
@@ -290,12 +248,10 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return RedirectToAction(nameof(TimXeTrong));
             }
 
-            var biTrung = await _trungLichService.KiemTraTrungLich(
-                vm.MaXe, vm.ThoiGianNhanDuKien, vm.ThoiGianTraDuKien);
+            var biTrung = await _trungLichService.KiemTraTrungLich(vm.MaXe, vm.ThoiGianNhanDuKien, vm.ThoiGianTraDuKien);
             if (biTrung)
             {
-                ModelState.AddModelError(string.Empty,
-                    "Xe vua co nguoi khac dat trong khoang thoi gian nay. Vui long chon xe khac.");
+                ModelState.AddModelError(string.Empty, "Xe vua co nguoi khac dat trong khoang thoi gian nay. Vui long chon xe khac.");
                 await LoadThongTinXeAsync(vm);
                 return View(vm);
             }
@@ -314,6 +270,12 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 return View(vm);
             }
 
+            string ghiChuHienTai = vm.GhiChu?.Trim() ?? "";
+            if (!string.IsNullOrEmpty(vm.MaGiamGiaCode))
+            {
+                ghiChuHienTai += $" [Mã dự kiến: {vm.MaGiamGiaCode.ToUpper()}]";
+            }
+
             var datXe = new Models.Entities.DatXe
             {
                 MaKhachHang = maKhachHang.Value,
@@ -326,7 +288,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 DonGiaApDung = bangGia.DonGiaNgay,
                 TienCoc = bangGia.TienCocMacDinh,
                 TrangThai = TrangThaiDatXe.ChoDuyet,
-                GhiChu = vm.GhiChu?.Trim()
+                GhiChu = ghiChuHienTai
             };
 
             _context.DatXes.Add(datXe);
@@ -336,21 +298,10 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return RedirectToAction(nameof(DonCuaToi));
         }
 
-        // =====================================================
-        // DANH SACH DON CUA TOI (khach hang xem)
-        // =====================================================
-
         [HttpGet]
         public async Task<IActionResult> DonCuaToi(
-            string? tuKhoa,
-            string? trangThai,
-            DateTime? tuNgay,
-            DateTime? denNgay,
-            int? maLoaiXe,
-            string? sapXepTheo,
-            string? thuTuSapXep,
-            int trang = 1,
-            int kichThuocTrang = 10)
+            string? tuKhoa, string? trangThai, DateTime? tuNgay, DateTime? denNgay,
+            int? maLoaiXe, string? sapXepTheo, string? thuTuSapXep, int trang = 1, int kichThuocTrang = 10)
         {
             var maKhachHang = HttpContext.Session.GetMaKhachHang();
             if (!maKhachHang.HasValue)
@@ -399,22 +350,11 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return View(vm);
         }
 
-        // =====================================================
-        // DANH SACH TAT CA DON (admin/nhan vien xem)
-        // =====================================================
-
         [HttpGet]
         [SessionAuthorize(Roles = new[] { VaiTro.Admin, VaiTro.NhanVien })]
         public async Task<IActionResult> Index(
-            string? tuKhoa,
-            string? trangThai,
-            DateTime? tuNgay,
-            DateTime? denNgay,
-            int? maLoaiXe,
-            string? sapXepTheo,
-            string? thuTuSapXep,
-            int trang = 1,
-            int kichThuocTrang = 10)
+            string? tuKhoa, string? trangThai, DateTime? tuNgay, DateTime? denNgay,
+            int? maLoaiXe, string? sapXepTheo, string? thuTuSapXep, int trang = 1, int kichThuocTrang = 10)
         {
             var query = _context.DatXes
                 .Include(d => d.KhachHang)
@@ -455,10 +395,6 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             return View(vm);
         }
 
-        // =====================================================
-        // CHI TIET DON
-        // =====================================================
-
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -468,6 +404,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 .Include(d => d.Xe).ThenInclude(x => x.HangXe)
                 .Include(d => d.BanGiaoXe)
                 .Include(d => d.TraXe)
+                .Include(d => d.ThanhToans)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.MaDatXe == id);
 
@@ -488,23 +425,30 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 }
             }
 
+            // LẤY LỊCH SỬ DI CHUYỂN GPS CHO ADMIN XEM
+            if (vaiTro == VaiTro.Admin || vaiTro == VaiTro.NhanVien)
+            {
+                ViewBag.LichSuDiChuyen = await _context.LichSuDiChuyens
+                    .Where(l => l.MaDatXe == id)
+                    .OrderBy(l => l.ThoiGian)
+                    .AsNoTracking()
+                    .ToListAsync();
+            }
+            else
+            {
+                // Khách hàng thì không có dữ liệu bản đồ
+                ViewBag.LichSuDiChuyen = null;
+            }
+
             return View(datXe);
         }
-
-        // =====================================================
-        // HUY DON
-        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Huy(int id)
         {
             var datXe = await _context.DatXes.FindAsync(id);
-            if (datXe == null)
-            {
-                TempData["Error"] = "Khong tim thay don dat xe";
-                return RedirectToAction(nameof(DonCuaToi));
-            }
+            if (datXe == null) return NotFound();
 
             var vaiTro = HttpContext.Session.GetVaiTro();
             var laKhachHang = vaiTro == VaiTro.KhachHang;
@@ -512,11 +456,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             if (laKhachHang)
             {
                 var maKhachHang = HttpContext.Session.GetMaKhachHang();
-                if (datXe.MaKhachHang != maKhachHang)
-                {
-                    TempData["Error"] = "Ban khong co quyen huy don nay";
-                    return RedirectToAction(nameof(DonCuaToi));
-                }
+                if (datXe.MaKhachHang != maKhachHang) return Forbid();
             }
 
             if (!TrangThaiDatXe.CoTheHuy.Contains(datXe.TrangThai))
@@ -526,11 +466,9 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             }
 
             var soGioConLai = (datXe.ThoiGianNhanDuKien - DateTime.Now).TotalHours;
-            if (soGioConLai < QuyDinhThue.SoGioToiThieuTruocKhiHuy)
+            if (soGioConLai < QuyDinhThue.SoGioToiThieuTruocKhiHuy && laKhachHang)
             {
-                TempData["Error"] =
-                    $"Chi duoc huy truoc gio nhan it nhat {QuyDinhThue.SoGioToiThieuTruocKhiHuy} gio. " +
-                    $"Don nay chi con {soGioConLai:N1} gio.";
+                TempData["Error"] = $"Chi duoc huy truoc gio nhan it nhat {QuyDinhThue.SoGioToiThieuTruocKhiHuy} gio.";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
@@ -538,24 +476,105 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Success"] = $"Da huy don #{datXe.MaDatXe} thanh cong";
-
-            if (laKhachHang)
-                return RedirectToAction(nameof(DonCuaToi));
-            else
-                return RedirectToAction(nameof(Index));
+            return laKhachHang ? RedirectToAction(nameof(DonCuaToi)) : RedirectToAction(nameof(Index));
         }
 
-        // =====================================================
-        // HELPER
-        // =====================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Duyet(int id)
+        {
+            var datXe = await _context.DatXes.Include(d => d.Xe).Include(d => d.KhachHang).FirstOrDefaultAsync(d => d.MaDatXe == id);
+            if (datXe == null) return NotFound();
+
+            if (datXe.TrangThai != TrangThaiDatXe.ChoDuyet)
+            {
+                TempData["Error"] = $"Don dang o trang thai '{datXe.TrangThai}', khong the duyet";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            bool isTrungLich = await _trungLichService.KiemTraTrungLich(datXe.MaXe, datXe.ThoiGianNhanDuKien, datXe.ThoiGianTraDuKien, datXe.MaDatXe);
+            if (isTrungLich)
+            {
+                TempData["Error"] = "Khong the duyet vi xe nay da co don khac chiem lich.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            datXe.TrangThai = TrangThaiDatXe.DaDuyet;
+            await _context.SaveChangesAsync();
+
+            _ = Task.Run(async () => {
+                try { await _emailService.GuiEmailXacNhanDatXeAsync(datXe); } catch { }
+            });
+
+            TempData["Success"] = $"Đã duyệt đơn #{datXe.MaDatXe} thành công.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TuChoi(int id, string lyDoTuChoi)
+        {
+            var datXe = await _context.DatXes.Include(d => d.KhachHang).Include(d => d.Xe).FirstOrDefaultAsync(d => d.MaDatXe == id);
+            if (datXe == null) return NotFound();
+
+            if (datXe.TrangThai != TrangThaiDatXe.ChoDuyet || string.IsNullOrWhiteSpace(lyDoTuChoi))
+            {
+                TempData["Error"] = "Không thể từ chối (sai trạng thái hoặc thiếu lý do)";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            datXe.TrangThai = TrangThaiDatXe.TuChoi;
+            datXe.LyDoTuChoi = lyDoTuChoi;
+            await _context.SaveChangesAsync();
+
+            _ = Task.Run(async () => {
+                try { await _emailService.GuiEmailTuChoiDatXeAsync(datXe, lyDoTuChoi); } catch { }
+            });
+
+            TempData["Success"] = $"Đã từ chối đơn #{datXe.MaDatXe}.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GuiLaiEmailXacNhan(int id)
+        {
+            var datXe = await _context.DatXes.Include(d => d.Xe).Include(d => d.KhachHang).FirstOrDefaultAsync(d => d.MaDatXe == id);
+            if (datXe == null) return NotFound();
+
+            try
+            {
+                await _emailService.GuiEmailXacNhanDatXeAsync(datXe);
+                TempData["Success"] = $"Đã gửi lại email xác nhận cho đơn #{id}!";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi khi gửi email: " + ex.Message;
+            }
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GuiEmailTest(int id)
+        {
+            try
+            {
+                bool thanhCong = await _emailService.GuiEmailTestAsync();
+                TempData[thanhCong ? "Success" : "Warning"] = thanhCong
+                    ? "🎉 Đã gửi email test thành công!"
+                    : "Hệ thống xử lý mô phỏng. Điền mật khẩu Gmail vào appsettings để gửi thật.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi: " + ex.Message;
+            }
+            return RedirectToAction(nameof(Details), new { id });
+        }
 
         private async Task LoadThongTinXeAsync(DatXeCreateVM vm)
         {
-            var xe = await _context.Xes
-                .Include(x => x.LoaiXe)
-                .Include(x => x.HangXe)
-                .FirstOrDefaultAsync(x => x.MaXe == vm.MaXe);
-
+            var xe = await _context.Xes.Include(x => x.LoaiXe).Include(x => x.HangXe).FirstOrDefaultAsync(x => x.MaXe == vm.MaXe);
             if (xe == null) return;
 
             vm.BienSo = xe.BienSo;
@@ -577,19 +596,13 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
                 vm.DonGiaNgay = bangGia.DonGiaNgay;
                 vm.DonGiaGio = bangGia.DonGiaGio;
                 vm.TienCoc = bangGia.TienCocMacDinh;
-                vm.SoNgayThue = Math.Max(1,
-                    (int)Math.Ceiling((vm.ThoiGianTraDuKien - vm.ThoiGianNhanDuKien).TotalDays));
+                vm.SoNgayThue = Math.Max(1, (int)Math.Ceiling((vm.ThoiGianTraDuKien - vm.ThoiGianNhanDuKien).TotalDays));
                 vm.TienThueDuKien = vm.SoNgayThue * bangGia.DonGiaNgay;
             }
         }
 
         private async Task<IQueryable<Models.Entities.DatXe>> ApplyFilterAsync(
-            IQueryable<Models.Entities.DatXe> query,
-            string? tuKhoa,
-            string? trangThai,
-            DateTime? tuNgay,
-            DateTime? denNgay,
-            int? maLoaiXe)
+            IQueryable<Models.Entities.DatXe> query, string? tuKhoa, string? trangThai, DateTime? tuNgay, DateTime? denNgay, int? maLoaiXe)
         {
             if (!string.IsNullOrWhiteSpace(tuKhoa))
             {
@@ -604,255 +617,39 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Controllers
             if (!string.IsNullOrWhiteSpace(trangThai))
                 query = query.Where(d => d.TrangThai == trangThai);
 
-            if (tuNgay.HasValue)
-                query = query.Where(d => d.ThoiGianNhanDuKien >= tuNgay.Value);
-            if (denNgay.HasValue)
-                query = query.Where(d => d.ThoiGianNhanDuKien <= denNgay.Value);
-
-            if (maLoaiXe.HasValue)
-                query = query.Where(d => d.Xe != null && d.Xe.MaLoaiXe == maLoaiXe.Value);
+            if (tuNgay.HasValue) query = query.Where(d => d.ThoiGianNhanDuKien >= tuNgay.Value);
+            if (denNgay.HasValue) query = query.Where(d => d.ThoiGianNhanDuKien <= denNgay.Value);
+            if (maLoaiXe.HasValue) query = query.Where(d => d.Xe != null && d.Xe.MaLoaiXe == maLoaiXe.Value);
 
             return await Task.FromResult(query);
         }
 
-        private static IQueryable<Models.Entities.DatXe> ApplySort(
-            IQueryable<Models.Entities.DatXe> query,
-            string? sapXepTheo,
-            string? thuTuSapXep)
+        private static IQueryable<Models.Entities.DatXe> ApplySort(IQueryable<Models.Entities.DatXe> query, string? sapXepTheo, string? thuTuSapXep)
         {
             return (sapXepTheo?.ToLower(), thuTuSapXep?.ToLower()) switch
             {
                 ("thoigiannhan", "asc") => query.OrderBy(d => d.ThoiGianNhanDuKien),
                 ("thoigiannhan", _) => query.OrderByDescending(d => d.ThoiGianNhanDuKien),
                 ("ngaydat", "asc") => query.OrderBy(d => d.NgayDat),
-                ("ngaydat", _) => query.OrderByDescending(d => d.NgayDat),
-                (_, "asc") => query.OrderBy(d => d.NgayDat),
                 _ => query.OrderByDescending(d => d.NgayDat)
             };
         }
 
-        // ============================================================
-        // BAT DAU PHAN CODE CUA SINH VIEN 4
-        // Ho va ten: Nguyen Hoang Duc Hieu
-        // Ma sinh vien: 23103100116
-        // Noi dung thuc hien: Xu ly Duyet don, Tu choi, 
-        // ============================================================
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Duyet(int id)
-        {
-            var datXe = await _context.DatXes
-                .Include(d => d.Xe)
-                .Include(d => d.KhachHang)
-                .FirstOrDefaultAsync(d => d.MaDatXe == id);
-            if (datXe == null)
-            {
-                TempData["Error"] = "Khong tim thay don dat xe";
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (datXe.TrangThai != TrangThaiDatXe.ChoDuyet)
-            {
-                TempData["Error"] = $"Don dang o trang thai '{datXe.TrangThai}', khong the duyet";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            if (datXe.Xe?.TinhTrang == TinhTrangXe.BaoDuong || datXe.Xe?.TinhTrang == TinhTrangXe.NgungHoatDong)
-            {
-                TempData["Error"] = $"Không thể duyệt vì xe đang ở tình trạng: {datXe.Xe?.TinhTrang}";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            // Gọi service kiểm tra trùng lịch (Do SV3 viết)
-            bool isTrungLich = await _trungLichService.KiemTraTrungLich(
-                datXe.MaXe,
-                datXe.ThoiGianNhanDuKien,
-                datXe.ThoiGianTraDuKien,
-                datXe.MaDatXe);
-
-            if (isTrungLich)
-            {
-                TempData["Error"] = "Khong the duyet vi xe nay da co don khac chiem lich trong khoang thoi gian tren.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            datXe.TrangThai = TrangThaiDatXe.DaDuyet;
-            await _context.SaveChangesAsync();
-
-            // ==============================================================
-            // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
-            // file: Controllers/DatXeController.cs
-            // nội dung: STT 10 - Tự động gửi Email xác nhận duyệt đơn đặt xe tới khách hàng
-            // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
-            // ==============================================================
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await _emailService.GuiEmailXacNhanDatXeAsync(datXe);
-                }
-                catch
-                {
-                    // Fail-safe: khong de loi email anh huong den tien trinh duyet don
-                }
-            });
-            // ==============================================================
-            // Kết thúc Code của SV4
-            // ==============================================================
-
-            TempData["Success"] = $"Đã duyệt đơn #{datXe.MaDatXe} thành công và gửi email thông báo cho khách hàng.";
-            return RedirectToAction(nameof(Details), new { id });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TuChoi(int id, string lyDoTuChoi)
-        {
-            var datXe = await _context.DatXes
-                .Include(d => d.KhachHang)
-                .Include(d => d.Xe)
-                .FirstOrDefaultAsync(d => d.MaDatXe == id);
-            if (datXe == null)
-            {
-                TempData["Error"] = "Khong tim thay don dat xe";
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (datXe.TrangThai != TrangThaiDatXe.ChoDuyet)
-            {
-                TempData["Error"] = $"Don dang o trang thai '{datXe.TrangThai}', khong the tu choi";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            if (string.IsNullOrWhiteSpace(lyDoTuChoi))
-            {
-                TempData["Error"] = "Vui long nhap ly do tu choi.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            datXe.TrangThai = TrangThaiDatXe.TuChoi;
-            datXe.LyDoTuChoi = lyDoTuChoi;
-            await _context.SaveChangesAsync();
-
-            // ==============================================================
-            // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
-            // file: Controllers/DatXeController.cs
-            // nội dung: STT 10 - Tự động gửi Email thông báo từ chối đơn đặt xe kèm lý do tới khách hàng
-            // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
-            // ==============================================================
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await _emailService.GuiEmailTuChoiDatXeAsync(datXe, lyDoTuChoi);
-                }
-                catch
-                {
-                    // Fail-safe: khong de loi email anh huong den tien trinh
-                }
-            });
-            // ==============================================================
-            // Kết thúc Code của SV4
-            // ==============================================================
-
-            TempData["Success"] = $"Đã từ chối đơn #{datXe.MaDatXe} và gửi email thông báo lý do tới khách hàng.";
-            return RedirectToAction(nameof(Details), new { id });
-        }
-
-        // ==============================================================
-        // Bắt Đầu Code của SV4: Nguyễn Hoàng Đức Hiếu
-        // file: Controllers/DatXeController.cs
-        // nội dung: STT 10 - Bổ sung chức năng gửi lại email xác nhận và gửi email kiểm thử kết nối Gmail cá nhân
-        // sinh viên thực hiện : Nguyễn Hoàng Đức Hiếu -  23103100116 - SV4 
-        // ==============================================================
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GuiLaiEmailXacNhan(int id)
-        {
-            var datXe = await _context.DatXes
-                .Include(d => d.Xe)
-                .Include(d => d.KhachHang)
-                .FirstOrDefaultAsync(d => d.MaDatXe == id);
-
-            if (datXe == null)
-            {
-                TempData["Error"] = "Không tìm thấy đơn đặt xe";
-                return RedirectToAction(nameof(Index));
-            }
-
-            try
-            {
-                await _emailService.GuiEmailXacNhanDatXeAsync(datXe);
-                TempData["Success"] = $"Đã kích hoạt gửi email xác nhận cho đơn #{id} tới hòm thư cá nhân/khách hàng!";
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Lỗi khi gửi email: " + ex.Message;
-            }
-
-            return RedirectToAction(nameof(Details), new { id });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GuiEmailTest(int id)
-        {
-            try
-            {
-                bool thanhCong = await _emailService.GuiEmailTestAsync();
-                if (thanhCong)
-                {
-                    TempData["Success"] = "🎉 Đã gửi email kiểm thử kết nối thành công tới Gmail cá nhân! Hãy kiểm tra Hộp thư đến (hoặc Thư rác/Spam).";
-                }
-                else
-                {
-                    TempData["Warning"] = "Hệ thống đã xử lý qua luồng mô phỏng an toàn (Log console). Để nhận email thật về Gmail cá nhân, bạn hãy dán Mật khẩu ứng dụng Gmail (16 chữ) vào mục 'Password' trong appsettings.json.";
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Lỗi kiểm tra gửi mail: " + ex.Message;
-            }
-
-            return RedirectToAction(nameof(Details), new { id });
-        }
-        // ==============================================================
-        // Kết thúc Code của SV4
-        // ==============================================================
-
-
-
         private List<SelectListItem> LayDanhSachTrangThai()
         {
-            return TrangThaiDatXe.TatCa
-                .Select(t => new SelectListItem { Value = t, Text = t })
-                .ToList();
+            return TrangThaiDatXe.TatCa.Select(t => new SelectListItem { Value = t, Text = t }).ToList();
         }
 
         private async Task<List<SelectListItem>> LayDanhSachLoaiXe()
         {
-            return await _context.LoaiXes
-                .Where(l => l.TrangThai)
-                .OrderBy(l => l.TenLoaiXe)
-                .Select(l => new SelectListItem
-                {
-                    Value = l.MaLoaiXe.ToString(),
-                    Text = l.TenLoaiXe
-                })
-                .ToListAsync();
+            return await _context.LoaiXes.Where(l => l.TrangThai).OrderBy(l => l.TenLoaiXe)
+                .Select(l => new SelectListItem { Value = l.MaLoaiXe.ToString(), Text = l.TenLoaiXe }).ToListAsync();
         }
 
         private async Task<List<SelectListItem>> LayDanhSachHangXe()
         {
-            return await _context.HangXes
-                .Where(h => h.TrangThai)
-                .OrderBy(h => h.TenHangXe)
-                .Select(h => new SelectListItem
-                {
-                    Value = h.MaHangXe.ToString(),
-                    Text = h.TenHangXe
-                })
-                .ToListAsync();
+            return await _context.HangXes.Where(h => h.TrangThai).OrderBy(h => h.TenHangXe)
+                .Select(h => new SelectListItem { Value = h.MaHangXe.ToString(), Text = h.TenHangXe }).ToListAsync();
         }
     }
 }

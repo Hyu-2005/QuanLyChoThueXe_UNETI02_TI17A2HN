@@ -45,8 +45,15 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.Models.Entities
         [Display(Name = "Ghi chú")]
         public string? GhiChu { get; set; }
 
-        // ===== Navigation =====
+        // ===== Navigation & GPS =====
         [ForeignKey(nameof(MaDatXe))]
         public DatXe? DatXe { get; set; }
+
+        // 2 CỘT MỚI THÊM VÀO ĐỂ LƯU GPS
+        [Display(Name = "Vĩ độ bàn giao")]
+        public double? ViDoBanGiao { get; set; }
+
+        [Display(Name = "Kinh độ bàn giao")]
+        public double? KinhDoBanGiao { get; set; }
     }
 }

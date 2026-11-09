@@ -1,8 +1,5 @@
 ﻿// ============================================================
 // File: ViewModels/DatXe/DatXeCreateVM.cs
-// Noi dung: ViewModel cho form tao don dat xe moi
-// Sinh vien thuc hien: Vu Tien Dat - 23103100119 - SV3
-// Module: Module 3 - Khach hang, Tim xe trong va Dat xe
 // ============================================================
 
 using System.ComponentModel.DataAnnotations;
@@ -38,6 +35,11 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.DatXe
         [Display(Name = "Ghi chu")]
         public string? GhiChu { get; set; }
 
+        // ĐÂY LÀ THUỘC TÍNH BỊ THIẾU GÂY RA LỖI
+        [StringLength(30, ErrorMessage = "Mã giảm giá tối đa 30 ký tự")]
+        [Display(Name = "Mã giảm giá (nếu có)")]
+        public string? MaGiamGiaCode { get; set; }
+
         // ===== Du lieu hien thi (khong bind tu form) =====
         public string? BienSo { get; set; }
         public string? TenXe { get; set; }
@@ -52,5 +54,7 @@ namespace QuanLyChoThueXe_UNETI02_TI17A2HN.ViewModels.DatXe
 
         public int SoNgayThue { get; set; }
         public decimal TienThueDuKien { get; set; }
+
+        public decimal TienGiamDuKien { get; set; } = 0;
     }
 }
